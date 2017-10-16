@@ -22,5 +22,20 @@
 ::(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ::SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-rmdir build /s /q
-mkdir build
+cd build
+
+cmake -G "Visual Studio 15" ../
+
+mkdir Debug
+copy ..\lib\SDL2\bin\x86\* Debug
+copy ..\lib\SDL2_image\bin\x86\* Debug
+
+mkdir Debug\assets
+copy ..\assets\* Debug\assets
+
+mkdir Release
+copy ..\lib\SDL2\bin\x86\* Release
+copy ..\lib\SDL2_image\bin\x86\* Release
+
+mkdir Release\assets
+copy ..\assets\* Release\assets
