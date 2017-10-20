@@ -43,8 +43,9 @@ else()
 	# )
 endif()
 
-# Setup the Game Project
-project("Game")
+# Setup the Project
+SET(name "PROJ")
+project(${name})
 
 # don't leave CMAKE_BUILD_TYPE empty
 # differentiation between debug and release builds.
@@ -63,35 +64,38 @@ add_definitions( -O2 )
 endif ( CMAKE_BUILD_TYPE STREQUAL "Release" )
 
 # Lets LOAD our headers
-file(GLOB_RECURSE HDRS ${Game_SOURCE_DIR}/src/*.h)
+file(GLOB_RECURSE HDRS 
+	${PROJ_SOURCE_DIR}/src/*.h
+)
 
 # Lets LOAD our sources
 file(GLOB_RECURSE SRCS
-	${Game_SOURCE_DIR}/src/*.cpp
-	${Game_SOURCE_DIR}/src/*.c
+	${PROJ_SOURCE_DIR}/src/*.cpp
+	${PROJ_SOURCE_DIR}/src/*.c
 )
 
-#add_executable(Game ${Game_SOURCE_DIR}/src/Main.cpp)
-add_executable(Game ${SRCS} ${HDRS})
-target_compile_features(Game PRIVATE cxx_lambda_init_captures)
-target_link_libraries(Game --coverage)
+#add_executable(PROJ ${PROJ_SOURCE_DIR}/src/Main.cpp)
+add_executable(PROJ ${SRCS} ${HDRS})
+#add_executable(${name} WIN32 ${SRCS})
+target_compile_features(${name} PRIVATE cxx_lambda_init_captures)
+target_link_libraries(${name} --coverage)
 
 # We need a CMAKE_DIR with some code to find external dependencies
-SET(Game_CMAKE_DIR "${Game_SOURCE_DIR}/cmake")
+SET(PROJ_CMAKE_DIR "${PROJ_SOURCE_DIR}/cmake")
 
 # SDL2
-INCLUDE(${Game_CMAKE_DIR}/FindSDL2.cmake)
+INCLUDE(${PROJ_CMAKE_DIR}/FindSDL2.cmake)
 
 # Define the include DIRs
 include_directories(
-	${Game_SOURCE_DIR}/headers
-	${Game_SOURCE_DIR}/sources
+	${PROJ_SOURCE_DIR}/headers
+	${PROJ_SOURCE_DIR}/sources
 	${SDL2_INCLUDE_DIRS}
 	${SDL2I_INCLUDE_DIRS}
 )
 
 # Define the link libraries
-target_link_libraries( Game
+target_link_libraries( ${name}
 	${SDL2_LIBRARIES}
 	${SDL2I_LIBRARIES}
 )
