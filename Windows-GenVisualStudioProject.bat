@@ -22,9 +22,13 @@
 ::(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ::SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+mkdir build
 cd build
 
 cmake -G "Visual Studio 15" ../
+
+mkdir assets
+copy ..\assets\* assets
 
 mkdir Debug
 copy ..\lib\SDL2\bin\x86\* Debug

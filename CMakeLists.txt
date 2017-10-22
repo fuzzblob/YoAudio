@@ -23,7 +23,9 @@
 #(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-cmake_minimum_required(VERSION 3.2)
+# 3.6 supports set_property(DIRECTORY ${PROJ_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT PROJ)
+cmake_minimum_required(VERSION 3.6)
+#cmake_minimum_required(VERSION 3.2)
 
 if (CMAKE_COMPILER_IS_GNUCC)
 	option(ENABLE_COVERAGE "Enable coverage reporting for gcc/clang" FALSE)
@@ -76,6 +78,7 @@ file(GLOB_RECURSE SRCS
 
 #add_executable(PROJ ${PROJ_SOURCE_DIR}/src/Main.cpp)
 add_executable(PROJ ${SRCS} ${HDRS})
+set_property(DIRECTORY ${PROJ_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT PROJ)
 #add_executable(${name} WIN32 ${SRCS})
 target_compile_features(${name} PRIVATE cxx_lambda_init_captures)
 target_link_libraries(${name} --coverage)
