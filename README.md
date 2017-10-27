@@ -11,7 +11,7 @@ A C++ audio environment. It is meant as a playground for experimentation with ga
 
 ## Overview <a name="overview"></a>
 
-###Build Instructions <a name="build"></a>
+### Build Instructions <a name="build"></a>
 
 The following requirements need to be met to be able to build this project:
 
