@@ -37,4 +37,32 @@ to be determined
 
 ## Playing a sound <a name="sound"></a>
 
-Not implemented :P
+To see how sounds are being played back check out **main.cpp**.
+
+Here is the basic idea:
+
+	// initialize SDL audio
+	if (SDL_Init(SDL_INIT_AUDIO) < 0)
+	{
+		return 1;
+	}
+
+	// initialize YO audio
+	YOA_Init();
+	
+	// Play Oneshot
+	PlaySound("door_open_01.wav", false, SDL_MIX_MAXVOLUME / 2);
+	
+	// Play Loop and store Voice ID
+	uint16_t ambLoop = PlaySound("ambience.wav", true, SDL_MIX_MAXVOLUME);
+
+	// Stop sound using Voice ID
+	StopVoice(ambLoop);
+
+	// quit YO audio
+	YOA_Quit();
+
+	// quit SDL
+	SDL_Quit();
+	
+	return 0;
