@@ -2,9 +2,9 @@
 
 int main(void)
 {
-	for (int i = 0; i < 200000; i++)
+	for (int i = 0; i < 2000; i++)
 	{
-		printf("Hello world! \t\i\t", i);
+		printf("Hello world! \t%i\n", i);
 	}
 
     return 0;
