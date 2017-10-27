@@ -47,13 +47,13 @@ Sound * AssetManager::LoadSound(const char * cFilename)
 
 	if (newSound == nullptr)
 	{
-		fprintf(stderr, "[%s: %d]Error: Memory allocation error\n", __FILE__, __LINE__);
+		fprintf(stderr, "[%s:\t%d]\nError: Memory allocation error\n\n", __FILE__, __LINE__);
 		return nullptr;
 	}
 
 	if (SDL_LoadWAV(cFilename, &(newSound->Spec), &(newSound->Buffer), &(newSound->SampleLength)) == nullptr)
 	{
-		fprintf(stderr, "[%s:\t%d]\nWarning: failed to open wave file: %s error: %s\n", __FILE__, __LINE__, cFilename, SDL_GetError());
+		fprintf(stderr, "[%s:\t%d]\nWarning: failed to open wave file: %s error: %s\n\n", __FILE__, __LINE__, cFilename, SDL_GetError());
 		free(newSound);
 		return nullptr;
 	}

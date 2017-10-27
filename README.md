@@ -4,6 +4,7 @@
 - [Overview](#overview)
 - [Build Instructions](#build)
 - [Playing a sound](#sound)
+- [TODO](#todo)
 
 ### About <a name="about"></a>
 
@@ -66,3 +67,18 @@ Here is the basic idea:
 	SDL_Quit();
 	
 	return 0;
+
+## TODO <a name="todo"></a>
+
+These are things I'd like to explore with this library / tool in the future:
+
+- mix in floating point space
+	- fill with zeros
+	- do math per sample as opposed to copying the buffer with SDL function
+	- resample from WAV spec to device spec
+	- convert from wav spec format to float
+	- convert from float to Device spec format
+- use a Vector to keep track of currently playing voices
+	- recycle stopped Voices
+	- free up Voice memory when quitting
+- add a small fade-out when stopping & pausing

@@ -40,7 +40,7 @@ void YOA_Init(void)
 
 	if (Device == nullptr)
 	{
-		fprintf(stderr, "[%s: %d]Fatal Error: Memory c-allocation error\n", __FILE__, __LINE__);
+		fprintf(stderr, "[%s:\t%d]\nFatal Error: Memory c-allocation error\n\n", __FILE__, __LINE__);
 		return;
 	}
 
@@ -48,7 +48,7 @@ void YOA_Init(void)
 
 	if (!(SDL_WasInit(SDL_INIT_AUDIO) & SDL_INIT_AUDIO))
 	{
-		fprintf(stderr, "[%s:\t%d]\nError: SDL_INIT_AUDIO not initialized\n", __FILE__, __LINE__);
+		fprintf(stderr, "[%s:\t%d]\nError: SDL_INIT_AUDIO not initialized\n\n", __FILE__, __LINE__);
 		return;
 	}
 
@@ -65,14 +65,14 @@ void YOA_Init(void)
 	rootVoice = (Voice*)(Device->SpecWanted).userdata;
 	if (rootVoice == nullptr)
 	{
-		fprintf(stderr, "[%s: %d]Error: Memory allocation error\n", __FILE__, __LINE__);
+		fprintf(stderr, "[%s:\t%d]Error: Memory allocation error\n\n", __FILE__, __LINE__);
 		return;
 	}
 
 	// want.userdata = newSound;
 	if ((Device->DeviceID = SDL_OpenAudioDevice(nullptr, 0, &(Device->SpecWanted), &(Device->SpecObtained), ALLOWED_CHANGES)) == 0)
 	{
-		fprintf(stderr, "[%s: %d]Warning: failed to open audio device: %s\n", __FILE__, __LINE__, SDL_GetError());
+		fprintf(stderr, "[%s:\t%d]Warning: failed to open audio device: %s\n\n", __FILE__, __LINE__, SDL_GetError());
 	}
 	else
 	{
@@ -91,7 +91,7 @@ void YOA_Quit(void)
 	printf("Yo Audio Quit\n");
 	if(Device == nullptr)
 	{
-		fprintf(stderr, "[%s:\t%d]\nError: no audio device initialized!\n", __FILE__, __LINE__);
+		fprintf(stderr, "[%s:\t%d]\nError: no audio device initialized!\n\n", __FILE__, __LINE__);
 		return;
 	}
 
@@ -117,7 +117,7 @@ uint16_t PlaySound(const char * filename, bool loop, int volume)
 
 	if (Device == nullptr)
 	{
-		fprintf(stderr, "[%s:\t%d]\nError: no audio device initialized!\n", __FILE__, __LINE__);
+		fprintf(stderr, "[%s:\t%d]\nError: no audio device initialized!\n\n", __FILE__, __LINE__);
 		return 0;
 	}
 
@@ -161,7 +161,6 @@ void StopVoice(uint16_t id)
 		current = current->Next;
 	}
 
-	//previous->next = current->next;
 	current->IsStopping = true;
 
 	return;
@@ -195,7 +194,7 @@ Voice * GetVoice(const char * filename, bool loop, int volume)
 
 	if (newVoice == nullptr)
 	{
-		fprintf(stderr, "[%s: %d]Error: Memory allocation error\n", __FILE__, __LINE__);
+		fprintf(stderr, "[%s:\t%d]\nError: Memory allocation error\n\n", __FILE__, __LINE__);
 		return nullptr;
 	}
 
@@ -203,7 +202,6 @@ Voice * GetVoice(const char * filename, bool loop, int volume)
 
 	if (newVoice->Sound == nullptr)
 	{
-		//fprintf(stderr, "[%s: %d]Warning: failed to open wave file: %s error: %s\n", __FILE__, __LINE__, filename, SDL_GetError());
 		free(newVoice);
 		return nullptr;
 	}
@@ -246,12 +244,6 @@ static inline void AudioCallback(void * userdata, uint8_t * stream, int len)
 	Voice * voice = (Voice *) userdata;
 	Voice * previous = voice;
     int tempLength;
-
-	// TODO: get a float buffer to mix in
-	// - fill with zeros
-	// - resample to Device->SpecObtained.freq
-	// - convert from voice->Sound->Spec.format to float
-	// - convert float buffer to Device->SpecObtained.format
 
     // fill buffer with silence
     SDL_memset(stream, 0, len);
