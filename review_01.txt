@@ -1,0 +1,194 @@
+ooh  - let me review that for you :smile:
+
+
+[11:08] 
+is it a C or C++ library?
+
+
+[11:09] 
+your implementation files are called ".cpp" but your headers have extern "C" everywhere
+
+
+[11:10] 
+pragma region strongly ties your code to MSVC. It's very nonstandard and uncommon
+
+
+[11:11] 
+... it's very strongly C. This is absolutely not C++, at all.
+
+
+[11:12] 
+"typedef struct" is a C-ism, you mark your headers as extern "C", and then you `Device = (AudioDevice*)malloc(sizeof(AudioDevice)); if (Device == nullptr)`.
+
+
+[11:13] 
+your init function can fail, but it cannot tell you that it failed so your program cannot know it failed
+
+
+[11:14] 
+you start audio directly after YOA_Init, which is not typically when you want to start it because there's nothing to do yet and there may be other changes requested at that point
+
+
+[11:14] 
+`Que` is spanish for 'What?". You're looking for `Queue`
+
+
+[11:16] 
+you reimplement a linked list. I would use std::list first, and then switch that out to vector.
+
+
+[11:17] 
+`voice = previous->Next = voice->Next;` -> what?
+
+[11:17] 
+just look at that line and tell me what it does.
+
+
+[11:17] 
+(also, indentation there is very wrong. Do you use a formatter?)
+
+
+[11:18] 
+`tempLength = ((uint32_t) len > voice->LengthRemaining) ? voice->LengthRemaining : (uint32_t) len;` -> Good sign. This looks like you've turned on warnings. Sadly, in this case you can't modify the signature of the function instead, as SDL should never ask for a negative length and now your code has gained a smell because of it.
+
+
+[11:19] 
+`else if(voice->IsLooping == true && voice->IsStopping == false)`
+What about writing this like 
+`else if(voice->IsLooping and not voice->IsStopping)` ?
+
+
+[11:20] 
+YoAudio.cpp, line 285. `else`. There's this "else if" just above it. When do you end up in the else case?
+
+
+[11:21] 
+Defs.h, you have YOA_MAC, YOA_WINDOWS and YOA_UNIX, and then you use the first two and force unix to use SDL. If you're using SDL anyway, why have these options? YOA_UNIX is never used at all
+
+
+[11:22] 
+this is a configuration toggle and 25 lines of code that, after you read what it actually says, is "We're using SDL. Deal with it."
+
+
+[11:22] 
+top tip #1: If your code does nothing, remove it.
+
+
+[11:22] 
+AssetManager.cpp, that singleton is not thread safe.
+
+
+[11:22] 
+Who should call the Release on the singleton?
+
+
+[11:23] 
+AssetManager, GetPath, I would use std::filesystem or boost::filesystem there instead of an SDL implementation function and a string append.
+
+
+[11:24] 
+your todo on line 45 is done.
+
+
+[11:25] 
+you have a major memory leak in your AssetManager, it never frees the Sound objects
+
+
+[11:25] 
+you check for NULL in the release function. The code you run after that check will also work if it is NULL, so you might as well always run it.
+
+
+[11:26] 
+your main.cpp has an escape in an include statement: `#include "YOA\YOAudio.h"`. MSVC is okay-ish with this, but every other OS and compiler will barf on it. Please use forward slashes, always.
+
+
+[11:27] 
+your library uses SDL under the hood and defs.h implies that it's a switchable backend, but your example main.cpp is littered with SDL-specifics
+
+
+[11:27] 
+so it's very non-opaque in what it uses underneath
+
+
+[11:28] 
+I would hide the SDL_Init behind YOA_Init to indicate that it takes care of the audio initing
+
+
+[11:31] 
+I mean, your lib should be the one used for audio, or not. If it is, then take care of the full audio stuff. If it's not, your function does not apply.
+
+
+[11:32] 
+what happens if I queue up a million songs at the same time?
+
+
+[11:34] 
+GetVoice can return a nullptr. PlaySound takes that nullptr and then dereferences ti in line 137.
+
+
+[11:34] 
+PlaySound actually doesn't play a sound, it plays a Voice.
+
+
+[11:36] 
+YOAudio.cpp, line 264. What are the odds of `if(voice->LengthRemaining == 0)` being true, after you checked `if(voice->LengthRemaining > 0)` 8 lines up?
+
+
+[11:40] 
+Your way to handle looping is a bit flawed.First, you play a half buffer in one AudioCallback, so if you up the size of your callbacks your audio stream changes. Then, you use two iterations of the loop to do the repetition, the first to set it back to the start and then you play it again.
+
+
+[11:40] 
+if your sample starts and/or ends with a non-zero waveform this will result in noticeable pops
+
+
+[11:41] 
+your special-casing for looped sounds means that when you stop them you get a free memory leak
+
+
+[11:43] 
+YoAudio.cpp allocates space for the size of a Sound, and then casts it to a Voice pointer. What is it, a voice or a sound?
+
+
+[11:44] 
+Then in the "destructor" you call an asset manager function to free it again. IT wasn't his to allocate, why should it delete it? (edited)
+
+
+[11:45] 
+You have in your public API "PlaySound" and "StopVoice". Please clear up the confusion between those two terms :smile:
+
+
+[11:47] 
+What about just passing back the Voice* to the user as an opaque pointer instead of the ID stuff?
+
+
+[11:47] 
+What happens if I put an invalid ID into StopVoice? What happens if I try to stop a sound that already stopped of its own accord?
+
+
+[11:49] 
+you have a Device->IsEnabled as a sort of "Did my constructor work" function. Don't have these, instead make your init / constructor just fail.
+
+
+[11:49] 
+if it were an actual constructor, throw an exception. Then it's not possible to call a function on such an object as it would not exist to start with.
+
+
+[11:50] 
+<end of review>
+
+
+[11:50] 
+@chris tag, review :slightly_smiling_face:
+
+
+[11:51] 
+(please interpret all of these comments as positive feedback. I want you to learn & want to tell you where to improve and what things to keep in mind, even if there are a few statements that sound abrasive they are not meant in a negative way)
+
+
+[11:51] 
+also, let me know if there's some comments you would formulate differently. I'm also here to learn
+
+
+[11:53] 
+(oh, and anybody else new to C++, please read @chris’s project too with these review comments to see if you can follow them too)
