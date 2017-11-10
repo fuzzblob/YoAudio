@@ -142,7 +142,7 @@ uint16_t PlaySound(const char * filename, bool loop, int volume)
         return 0;
     }
 
-	Voice * newVoice = ResourceManager::GetInstance()->GetVoice(filename, loop, volume);
+	Voice * newVoice = ResourceManager::GetInstance()->GetVoice(std::string(filename), loop, volume);
 
 	if (newVoice != nullptr)
 	{

@@ -58,14 +58,14 @@ private:
 public:
 	static ResourceManager* GetInstance();
 	static void Release();
-	static std::string GetPath(std::string sFilename);
+	static std::string GetPath(const std::string & filename);
 
-	Sound* GetSound(const char * cFilename);
-	Sound * LoadSound(const char * cFilename);
+	Sound* GetSound(const std::string & filename);
+	Sound * LoadSound(const std::string & filename);
 	bool FreeSound(Sound* sound);
 
 	uint16_t GetVoiceCount();
-	Voice * GetVoice(const char * filename, bool loop, int volume);
+	Voice * GetVoice(const std::string & filename, bool loop, int volume);
 private:
 	ResourceManager();
 	~ResourceManager();

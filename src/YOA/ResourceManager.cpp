@@ -21,26 +21,26 @@ void ResourceManager::Release()
 	sInstance = nullptr;
 }
 
-std::string ResourceManager::GetPath(std::string sFilename)
+std::string ResourceManager::GetPath(const std::string & filename)
 {
 	std::string fullPath = std::string(SDL_GetBasePath());
-	fullPath.append("assets\/" + sFilename);
+	fullPath.append("assets\/" + filename);
 	return fullPath;
 }
 
-Sound * ResourceManager::GetSound(const char * cFilename)
+Sound * ResourceManager::GetSound(const std::string & filename)
 {
-	std::string fullPath = GetPath(cFilename);
+	std::string fullPath = GetPath(filename);
 
 	if (mSounds[fullPath] == nullptr)
 	{
-		mSounds[fullPath] = LoadSound(fullPath.c_str());
+		mSounds[fullPath] = LoadSound(fullPath);
 	}
 
 	return mSounds[fullPath];
 }
 
-Sound * ResourceManager::LoadSound(const char * cFilename)
+Sound * ResourceManager::LoadSound(const std::string & filename)
 {
 	Sound * newSound = (Sound*)malloc(sizeof(Sound));
 
@@ -50,9 +50,9 @@ Sound * ResourceManager::LoadSound(const char * cFilename)
 		return nullptr;
 	}
 
-	if (SDL_LoadWAV(cFilename, &(newSound->Spec), &(newSound->Buffer), &(newSound->SampleLength)) == nullptr)
+	if (SDL_LoadWAV(filename.c_str(), &(newSound->Spec), &(newSound->Buffer), &(newSound->SampleLength)) == nullptr)
 	{
-		fprintf(stderr, "[%s:\t%d]\nWarning: failed to open wave file: %s error: %s\n\n", __FILE__, __LINE__, cFilename, SDL_GetError());
+		fprintf(stderr, "[%s:\t%d]\nWarning: failed to open wave file: %s error: %s\n\n", __FILE__, __LINE__, filename, SDL_GetError());
 		free(newSound);
 		return nullptr;
 	}
@@ -77,7 +77,7 @@ uint16_t ResourceManager::GetVoiceCount()
 	return lastVoice;
 }
 
-Voice * ResourceManager::GetVoice(const char * filename, bool loop, int volume)
+Voice * ResourceManager::GetVoice(const std::string & filename, bool loop, int volume)
 {
 	Voice * newVoice = nullptr;
 
@@ -101,6 +101,10 @@ Voice * ResourceManager::GetVoice(const char * filename, bool loop, int volume)
 			fprintf(stderr, "[%s:\t%d]\nError: Memory allocation error\n\n", __FILE__, __LINE__);
 			return nullptr;
 		}
+
+		// set Voice ID
+		lastVoice++;
+		newVoice->ID = lastVoice;
 	}
 	
 	newVoice->Sound = sInstance->GetSound(filename);
@@ -111,9 +115,6 @@ Voice * ResourceManager::GetVoice(const char * filename, bool loop, int volume)
 		return nullptr;
 	}
 
-	lastVoice++;
-
-	newVoice->ID = lastVoice;
 	newVoice->State = ToPlay;
 	newVoice->PlayHead = newVoice->Sound->Buffer;
 	newVoice->LengthRemaining = newVoice->Sound->Length;
@@ -157,5 +158,4 @@ ResourceManager::~ResourceManager()
 		}
 	}
 	mSounds.clear();
-	
 }
