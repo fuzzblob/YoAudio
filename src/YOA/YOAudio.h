@@ -5,7 +5,7 @@
 extern "C"
 {
 #endif
-	void YOA_Init(void);
+	int YOA_Init(void);
 
 	void YOA_Quit(void);
 

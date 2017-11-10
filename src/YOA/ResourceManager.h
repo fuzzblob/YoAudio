@@ -1,11 +1,10 @@
-#ifndef _ASSETMANAGER_H
-#define _ASSETMANAGER_H
+#ifndef _RESOURCEMANAGER_H
+#define _RESOURCEMANAGER_H
 
 #include <map>
 
 #include "Defs.h"
 
-#pragma region STRUCTS
 typedef struct Sound
 {
 	uint32_t Length;
@@ -15,9 +14,19 @@ typedef struct Sound
 	SDL_AudioSpec Spec;
 } Sound;
 
+enum VoiceState
+{
+	ToPlay = 1,
+	Playing = 2,
+	Paused = 3,
+	Stopping = 4,
+	Stopped  = 5
+};
+
 typedef struct Voice
 {
 	uint16_t ID;
+	VoiceState State;
 	Sound * Sound;
 	uint32_t LengthRemaining;
 	uint8_t * PlayHead;
@@ -35,26 +44,31 @@ typedef struct AudioDevice
 	SDL_AudioSpec SpecObtained;
 	bool IsEnabled;
 } AudioDevice;
-#pragma endregion SOUND | VOICE | DEVICE
 
-class AssetManager
+class ResourceManager
 {
 private:
-	static AssetManager* sInstance;
+	static ResourceManager* sInstance;
 
 	std::map<std::string, Sound*> mSounds;
+	std::map<uint16_t, Voice*> mVoices;
+
+	uint16_t lastVoice = 0;
 
 public:
-	static AssetManager* GetInstance();
+	static ResourceManager* GetInstance();
 	static void Release();
 	static std::string GetPath(std::string sFilename);
 
 	Sound* GetSound(const char * cFilename);
 	Sound * LoadSound(const char * cFilename);
 	bool FreeSound(Sound* sound);
+
+	uint16_t GetVoiceCount();
+	Voice * GetVoice(const char * filename, bool loop, int volume);
 private:
-	AssetManager();
-	~AssetManager();
+	ResourceManager();
+	~ResourceManager();
 };
 
-#endif // !_ASSETMANAGER_H
+#endif // !_RESOURCEMANAGER_H

@@ -1,7 +1,8 @@
 #ifndef _YOA_DEFS_H
 #define _YOA_DEFS_H
 
-
+// This is a blob for switching audio rendering backends
+/*
 #define YOA_SDL			0
 #define YOA_WINDOWS		1
 #define YOA_MAC			2
@@ -15,6 +16,7 @@
 // unix OSes should use SDL - https://www.libsdl.org/
 #define YOA_PLATFORM YOA_SDL
 #endif
+*/
 
 // define this to force SDL backend
 #define YOA_FORCE_SDL
@@ -24,11 +26,12 @@
 #define YOA_PLATFORM YOA_SDL
 #endif
 
-// TODO: handle other platforms when not forcing SDL
+// TODO: handle other platform specific backends
 #if YOA_PLATFORM == YOA_SDL
 #include <SDL.h>
 #endif
 
+// Here are some builtin types and their value ranges
 /*
 #define SInt8 signed char;				// '\x80' to '\x7f' (-128 to 127) 
 #define SInt16 signed short int;		// -32768 to 32767

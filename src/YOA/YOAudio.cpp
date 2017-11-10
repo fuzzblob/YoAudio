@@ -4,7 +4,7 @@
 
 #include "Defs.h"
 #include "YOAudio.h"
-#include "AssetManager.h"
+#include "ResourceManager.h"
 
 // 0                                    No changes
 // SDL_AUDIO_ALLOW_FREQUENCY_CHANGE     frequency changes (e.g. AUDIO_FREQUENCY = 48000, but allow files to play at 44.100)
@@ -18,10 +18,8 @@
 #define AUDIO_CHANNELS 2
 #define AUDIO_SAMPLES 4096
 
-#pragma region PROTOTYPES | STATICS
 // Voices
-static Voice * QueVoice(Voice * next);
-static Voice * GetVoice(const char * filename, bool loop, int volume);
+static Voice * QueueVoice(Voice * next);
 
 // SDL audio callback
 static inline void AudioCallback(void * userdata, uint8_t * stream, int len);
@@ -29,11 +27,27 @@ static inline void AudioCallback(void * userdata, uint8_t * stream, int len);
 // static variables
 static AudioDevice * Device = nullptr;
 static Voice* rootVoice;
-static uint16_t lastVoice = 0;
-#pragma endregion
 
-void YOA_Init(void)
+int YOA_Init(void)
 {
+	if (SDL_WasInit(SDL_INIT_AUDIO) != 0)
+	{
+		printf("Audio is already initialized.\n");
+	}
+	else
+	{
+		// initialize SDL audio
+		if (SDL_Init(SDL_INIT_AUDIO) < 0)
+		{
+			fprintf(stderr, "[%s:\t%d]Warning: failed to initilize SDL!\n\n", __FILE__, __LINE__);
+			return 1;
+		}
+
+		// TODO: check if SDL is only used by YoAudio
+		// then quit on Realease() like so:
+		// SDL_QuitSubSystem(SDL_INIT_AUDIO);
+	}
+
 	printf("Yo Audio Init\n");
 
 	Device = (AudioDevice*)malloc(sizeof(AudioDevice));
@@ -41,7 +55,7 @@ void YOA_Init(void)
 	if (Device == nullptr)
 	{
 		fprintf(stderr, "[%s:\t%d]\nFatal Error: Memory c-allocation error\n\n", __FILE__, __LINE__);
-		return;
+		return 1;
 	}
 
 	Device->IsEnabled = false;
@@ -49,7 +63,7 @@ void YOA_Init(void)
 	if (!(SDL_WasInit(SDL_INIT_AUDIO) & SDL_INIT_AUDIO))
 	{
 		fprintf(stderr, "[%s:\t%d]\nError: SDL_INIT_AUDIO not initialized\n\n", __FILE__, __LINE__);
-		return;
+		return 1;
 	}
 
 	SDL_memset(&(Device->SpecWanted), 0, sizeof(Device->SpecWanted));
@@ -66,13 +80,14 @@ void YOA_Init(void)
 	if (rootVoice == nullptr)
 	{
 		fprintf(stderr, "[%s:\t%d]Error: Memory allocation error\n\n", __FILE__, __LINE__);
-		return;
+		return 1;
 	}
 
 	// want.userdata = newSound;
 	if ((Device->DeviceID = SDL_OpenAudioDevice(nullptr, 0, &(Device->SpecWanted), &(Device->SpecObtained), ALLOWED_CHANGES)) == 0)
 	{
 		fprintf(stderr, "[%s:\t%d]Warning: failed to open audio device: %s\n\n", __FILE__, __LINE__, SDL_GetError());
+		return 1;
 	}
 	else
 	{
@@ -83,6 +98,7 @@ void YOA_Init(void)
 
 		// unpause SDL audio callback
 		YOA_Resume();
+		return 0;
 	}
 }
 
@@ -99,7 +115,7 @@ void YOA_Quit(void)
 	{
 		YOA_Pause();
 
-		AssetManager::GetInstance()->FreeSound((Sound *)(Device->SpecWanted).userdata);
+		ResourceManager::GetInstance()->FreeSound((Sound *)(Device->SpecWanted).userdata);
 
 		// close SDL audio
 		SDL_CloseAudioDevice(Device->DeviceID);
@@ -108,7 +124,7 @@ void YOA_Quit(void)
 	free(Device);
 	Device = nullptr;
 
-	AssetManager::Release();
+	ResourceManager::Release();
 }
 
 uint16_t PlaySound(const char * filename, bool loop, int volume)
@@ -121,32 +137,43 @@ uint16_t PlaySound(const char * filename, bool loop, int volume)
 		return 0;
 	}
 
-    Voice * newVoice;
-
     if(!Device->IsEnabled)
     {
         return 0;
     }
 
-    newVoice = GetVoice(filename, loop, volume);
+	Voice * newVoice = ResourceManager::GetInstance()->GetVoice(filename, loop, volume);
 
-    SDL_LockAudioDevice(Device->DeviceID);
-    QueVoice(newVoice);
-    SDL_UnlockAudioDevice(Device->DeviceID);
+	if (newVoice != nullptr)
+	{
+		SDL_LockAudioDevice(Device->DeviceID);
+		QueueVoice(newVoice);
+		SDL_UnlockAudioDevice(Device->DeviceID);
 
-	printf("%s got ID: %i\n", filename, newVoice->ID);
-
-	return newVoice->ID;
+		printf("%s got ID: %i\n", filename, newVoice->ID);
+		return newVoice->ID;
+	}
+	else
+	{
+		fprintf(stderr, "[%s:\t%d]\nError: Can't queue NULL voice!\n\n", __FILE__, __LINE__);
+		return 0;
+	}
 }
 
 void StopVoice(uint16_t id)
 {
-	printf("Stopping Voice: %i\n", id);
-
 	if (rootVoice == nullptr)
 	{
 		return;
 	}
+
+	if (id == 0 || id > ResourceManager::GetInstance()->GetVoiceCount())
+	{
+		printf("Invadid ID: %i\nCan't stop specified Voice as it does not exist!\n\n", id);
+		return;
+	}
+
+	printf("Stopping Voice: %i\n", id);
 
 	// get Voice matching the ID
 	Voice * current = rootVoice;
@@ -161,7 +188,7 @@ void StopVoice(uint16_t id)
 		current = current->Next;
 	}
 
-	current->IsStopping = true;
+	current->State = Stopping;
 
 	return;
 }
@@ -188,38 +215,7 @@ void YOA_Resume(void)
     }
 }
 
-Voice * GetVoice(const char * filename, bool loop, int volume)
-{
-	Voice * newVoice = (Voice*)malloc(sizeof(Voice));
-
-	if (newVoice == nullptr)
-	{
-		fprintf(stderr, "[%s:\t%d]\nError: Memory allocation error\n\n", __FILE__, __LINE__);
-		return nullptr;
-	}
-
-	newVoice->Sound = AssetManager::GetInstance()->GetSound(filename);
-
-	if (newVoice->Sound == nullptr)
-	{
-		free(newVoice);
-		return nullptr;
-	}
-
-	lastVoice++;
-
-	newVoice->ID = lastVoice;
-	newVoice->PlayHead = newVoice->Sound->Buffer;
-	newVoice->LengthRemaining = newVoice->Sound->Length;
-	newVoice->Next = nullptr;
-	newVoice->Volume = volume;
-	newVoice->IsLooping = loop;
-	newVoice->IsStopping = false;
-
-	return newVoice;
-}
-
-Voice * QueVoice(Voice * newVoice)
+Voice * QueueVoice(Voice * newVoice)
 {
 	// TODO: use Vector insread of linked list
 	if (rootVoice == nullptr)
@@ -243,7 +239,7 @@ static inline void AudioCallback(void * userdata, uint8_t * stream, int len)
 {
 	Voice * voice = (Voice *) userdata;
 	Voice * previous = voice;
-    int tempLength;
+	uint32_t tempLength;
 
     // fill buffer with silence
     SDL_memset(stream, 0, len);
@@ -253,42 +249,48 @@ static inline void AudioCallback(void * userdata, uint8_t * stream, int len)
 
     while(voice != nullptr)
     {
-        if(voice->LengthRemaining > 0)
-        {
-            if(voice->IsStopping == true)
-            {
-				voice = previous->Next = voice->Next;
-				continue;
-            }
+		if (voice->State == Stopping)
+		{
+			voice->State = Stopped;
 
-            if(voice->LengthRemaining == 0)
-            {
-                tempLength = 0;
-            }
-            else
-            {
-                tempLength = ((uint32_t) len > voice->LengthRemaining) ? voice->LengthRemaining : (uint32_t) len;
-				SDL_MixAudioFormat(stream, voice->PlayHead, AUDIO_FORMAT, tempLength, voice->Volume);
-            }
+			// remove stopping voice from linked list
+			previous->Next = voice->Next;
+			voice = previous->Next;
+		}
+		else
+		{
+			// TODO: seamless looping by iterating over samples -> sample remaining
 
-            voice->PlayHead += tempLength;
-            voice->LengthRemaining -= tempLength;
+			tempLength = ((uint32_t)len > voice->LengthRemaining) ? voice->LengthRemaining : (uint32_t)len;
+			SDL_MixAudioFormat(stream, voice->PlayHead, AUDIO_FORMAT, tempLength, voice->Volume);
 
-            previous = voice;
-            voice = voice->Next;
-        }
-        else if(voice->IsLooping == true && voice->IsStopping == false)
-        {
-            voice->PlayHead = voice->Sound->Buffer;
-            voice->LengthRemaining = voice->Sound->Length;
-        }
-        else
-        {
-            previous->Next = voice->Next;
-            SDL_FreeWAV(voice->PlayHead);
-            free(voice);
+			voice->PlayHead += tempLength;
+			voice->LengthRemaining -= tempLength;
 
-            voice = previous->Next;
-        }
+			if (voice->LengthRemaining <= 0)
+			{
+				if (voice->IsLooping == true)
+				{
+					voice->PlayHead = voice->Sound->Buffer;
+					voice->LengthRemaining = voice->Sound->Length;
+				}
+				else
+				{
+					// Non looping sound has no more mixable samples
+					voice->State = Stopped;
+
+					// remove stopping voice from linked list
+					if (voice->Next != nullptr)
+					{
+						previous->Next = voice->Next;
+						// prepare for progressing through the linked list
+						voice = previous;
+					}
+				}
+			}
+
+			previous = voice;
+			voice = previous->Next;
+		}
     }
 }
