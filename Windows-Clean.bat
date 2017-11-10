@@ -23,4 +23,6 @@
 ::SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 rmdir build /s /q
+rmdir Win32 /s /q
+rmdir Game.dir /s /q
 mkdir build
