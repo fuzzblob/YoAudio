@@ -31,19 +31,10 @@ typedef struct Voice
 	uint32_t LengthRemaining;
 	uint8_t * PlayHead;
 	bool IsLooping;
-	bool IsStopping;
 	uint8_t Volume;
 
 	struct Voice * Next;
 } Voice;
-
-typedef struct AudioDevice
-{
-	SDL_AudioDeviceID DeviceID;
-	SDL_AudioSpec SpecWanted;
-	SDL_AudioSpec SpecObtained;
-	bool IsEnabled;
-} AudioDevice;
 
 class ResourceManager
 {

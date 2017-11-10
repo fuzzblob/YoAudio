@@ -18,6 +18,13 @@
 #define AUDIO_CHANNELS 2
 #define AUDIO_SAMPLES 4096
 
+typedef struct AudioDevice
+{
+	SDL_AudioDeviceID DeviceID;
+	SDL_AudioSpec SpecWanted;
+	SDL_AudioSpec SpecObtained;
+} AudioDevice;
+
 // Voices
 static Voice * QueueVoice(Voice * next);
 
@@ -58,8 +65,6 @@ int YOA_Init(void)
 		return 1;
 	}
 
-	Device->IsEnabled = false;
-
 	if (!(SDL_WasInit(SDL_INIT_AUDIO) & SDL_INIT_AUDIO))
 	{
 		fprintf(stderr, "[%s:\t%d]\nError: SDL_INIT_AUDIO not initialized\n\n", __FILE__, __LINE__);
@@ -93,9 +98,6 @@ int YOA_Init(void)
 	{
 		// TODO: check SpecWanted against SpecObtained
 
-		// enabled device
-		Device->IsEnabled = true;
-
 		// unpause SDL audio callback
 		YOA_Resume();
 		return 0;
@@ -111,15 +113,12 @@ void YOA_Quit(void)
 		return;
 	}
 
-	if (Device->IsEnabled)
-	{
-		YOA_Pause();
+	YOA_Pause();
 
-		ResourceManager::GetInstance()->FreeSound((Sound *)(Device->SpecWanted).userdata);
+	ResourceManager::GetInstance()->FreeSound((Sound *)(Device->SpecWanted).userdata);
 
-		// close SDL audio
-		SDL_CloseAudioDevice(Device->DeviceID);
-	}
+	// close SDL audio
+	SDL_CloseAudioDevice(Device->DeviceID);
 
 	free(Device);
 	Device = nullptr;
@@ -136,11 +135,6 @@ uint16_t PlaySound(const char * filename, bool loop, int volume)
 		fprintf(stderr, "[%s:\t%d]\nError: no audio device initialized!\n\n", __FILE__, __LINE__);
 		return 0;
 	}
-
-    if(!Device->IsEnabled)
-    {
-        return 0;
-    }
 
 	Voice * newVoice = ResourceManager::GetInstance()->GetVoice(std::string(filename), loop, volume);
 
@@ -188,7 +182,8 @@ void StopVoice(uint16_t id)
 		current = current->Next;
 	}
 
-	current->State = Stopping;
+	if(current->State != Stopped)
+		current->State = Stopping;
 
 	return;
 }
@@ -197,8 +192,7 @@ void YOA_Pause(void)
 {
 	printf("Yo Audio Pause\n");
 
-    if(Device != nullptr 
-		&& Device->IsEnabled == true)
+    if(Device != nullptr)
     {
         SDL_PauseAudioDevice(Device->DeviceID, 1);
     }
@@ -208,8 +202,7 @@ void YOA_Resume(void)
 {
 	printf("Yo Audio Resume\n");
 
-    if(Device != nullptr 
-		&& Device->IsEnabled)
+    if(Device != nullptr)
     {
         SDL_PauseAudioDevice(Device->DeviceID, 0);
     }

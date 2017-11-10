@@ -83,14 +83,6 @@ if your sample starts and/or ends with a non-zero waveform this will result in n
 your special-casing for looped sounds means that when you stop them you get a free memory leak
 
 
-[11:43] 
-YoAudio.cpp allocates space for the size of a Sound, and then casts it to a Voice pointer. What is it, a voice or a sound?
-
-
-[11:44] 
-Then in the "destructor" you call an asset manager function to free it again. IT wasn't his to allocate, why should it delete it? (edited)
-
-
 [11:45] 
 You have in your public API "PlaySound" and "StopVoice". Please clear up the confusion between those two terms :smile:
 
@@ -98,13 +90,6 @@ You have in your public API "PlaySound" and "StopVoice". Please clear up the con
 [11:47] 
 What about just passing back the Voice* to the user as an opaque pointer instead of the ID stuff?
 
-
-[11:47] 
-What happens if I put an invalid ID into StopVoice? What happens if I try to stop a sound that already stopped of its own accord?
-
-
-[11:49] 
-you have a Device->IsEnabled as a sort of "Did my constructor work" function. Don't have these, instead make your init / constructor just fail.
 
 
 [11:49] 
