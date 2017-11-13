@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <vector>
 
 #include "Defs.h"
 #include "YOAudio.h"
@@ -26,14 +27,15 @@ typedef struct AudioDevice
 } AudioDevice;
 
 // Voices
-static Voice * QueueVoice(Voice * next);
+static void QueueVoice(Voice * next);
+std::vector<float> m_stream;
+std::vector<Voice*> m_playingAudio;
 
 // SDL audio callback
 static inline void AudioCallback(void * userdata, uint8_t * stream, int len);
 
 // static variables
 static AudioDevice * Device = nullptr;
-static Voice* rootVoice;
 
 int YOA_Init(void)
 {
@@ -78,15 +80,7 @@ int YOA_Init(void)
 	(Device->SpecWanted).channels = AUDIO_CHANNELS;
 	(Device->SpecWanted).samples = AUDIO_SAMPLES;
 	(Device->SpecWanted).callback = AudioCallback;
-	(Device->SpecWanted).userdata = calloc(1, sizeof(Sound));
-
-	// TODO: Chris, let's think about this one a bit
-	rootVoice = (Voice*)(Device->SpecWanted).userdata;
-	if (rootVoice == nullptr)
-	{
-		fprintf(stderr, "[%s:\t%d]Error: Memory allocation error\n\n", __FILE__, __LINE__);
-		return 1;
-	}
+	(Device->SpecWanted).userdata = nullptr;
 
 	// want.userdata = newSound;
 	if ((Device->DeviceID = SDL_OpenAudioDevice(nullptr, 0, &(Device->SpecWanted), &(Device->SpecObtained), ALLOWED_CHANGES)) == 0)
@@ -126,7 +120,7 @@ void YOA_Quit(void)
 	ResourceManager::Release();
 }
 
-uint16_t PlaySound(const char * filename, bool loop, int volume)
+uint16_t PlayWavFile(const char * filename, bool loop, int volume)
 {
 	printf("Playing: %s\n", filename);
 
@@ -154,38 +148,33 @@ uint16_t PlaySound(const char * filename, bool loop, int volume)
 	}
 }
 
-void StopVoice(uint16_t id)
+int StopVoice(uint16_t id)
 {
-	if (rootVoice == nullptr)
-	{
-		return;
-	}
-
 	if (id == 0 || id > ResourceManager::GetInstance()->GetVoiceCount())
 	{
 		printf("Invadid ID: %i\nCan't stop specified Voice as it does not exist!\n\n", id);
-		return;
+		return 1;
 	}
 
 	printf("Stopping Voice: %i\n", id);
 
-	// get Voice matching the ID
-	Voice * current = rootVoice;
-	
-	while (current->Next != nullptr)
-	{
-		if (current->ID == id)
-		{
-			break;
-		}
+	std::vector<Voice*>::iterator it = m_playingAudio.begin();
+	std::vector<Voice*>::iterator end = m_playingAudio.end();
 
-		current = current->Next;
+	for (; it != end; ++it)
+	{
+		if ((*it._Ptr)->ID == id)
+		{
+			SDL_LockAudioDevice(Device->DeviceID);
+
+			m_playingAudio.erase(it);
+
+			SDL_UnlockAudioDevice(Device->DeviceID);
+			return 0;
+		}
 	}
 
-	if(current->State != Stopped)
-		current->State = Stopping;
-
-	return;
+	return 1;
 }
 
 void YOA_Pause(void)
@@ -208,57 +197,81 @@ void YOA_Resume(void)
     }
 }
 
-Voice * QueueVoice(Voice * newVoice)
+void QueueVoice(Voice * newVoice)
 {
-	// TODO: use Vector insread of linked list
-	if (rootVoice == nullptr)
+	// avoid duplicate Voices
+	if (StopVoice(newVoice->ID) == 0)
 	{
-		return nullptr;
+		fprintf(stderr, "[%s:\t%d]\nError: had to stop ID %i before it could be played!\n\n", __FILE__, __LINE__, newVoice->ID);
 	}
 
-	// get the last voice in the linked list
-	Voice * last = rootVoice;
-	while (last->Next != nullptr)
-	{
-		last = last->Next;
-	}
+	SDL_LockAudioDevice(Device->DeviceID);
+	
+	m_playingAudio.push_back(newVoice);
 
-	last->Next = newVoice;
-
-	return nullptr;
+	SDL_UnlockAudioDevice(Device->DeviceID);
 }
 
 static inline void AudioCallback(void * userdata, uint8_t * stream, int len)
 {
-	Voice * voice = (Voice *) userdata;
-	Voice * previous = voice;
-	uint32_t tempLength;
+	int streamLen = len / 2;
+	m_stream.reserve(streamLen);
+	float* floatStream = m_stream.begin()._Ptr;
 
-    // fill buffer with silence
-    SDL_memset(stream, 0, len);
+	for (int i = 0; i < streamLen; i++)
+	{
+		floatStream[i] = 0.0f;
+	}
 
-    // first one is place holder
-    voice = voice->Next;
+	std::vector<Voice*>::iterator it = m_playingAudio.begin();
+	std::vector<Voice*>::iterator end = m_playingAudio.end();
 
-    while(voice != nullptr)
-    {
-		if (voice->State == Stopping)
+	for (; it != end; ++it)
+	{
+		Voice * voice = *it._Ptr;
+
+		if (voice->State == ToPlay)
 		{
-			voice->State = Stopped;
-
-			// remove stopping voice from linked list
-			previous->Next = voice->Next;
-			voice = previous->Next;
+			voice->State = Playing;
 		}
-		else
+
+		if (voice->State == Playing)
 		{
-			// TODO: seamless looping by iterating over samples -> sample remaining
+			// s16 to normalized float
+			float sampleFactor = 1 / 32768.0f;
+			float volumeFactor = voice->Volume;
+			float pitch = voice->Pitch;
 
-			tempLength = ((uint32_t)len > voice->LengthRemaining) ? voice->LengthRemaining : (uint32_t)len;
-			SDL_MixAudioFormat(stream, voice->PlayHead, AUDIO_FORMAT, tempLength, voice->Volume);
+			/*
+			int processedSamples = 0;
 
-			voice->PlayHead += tempLength;
-			voice->LengthRemaining -= tempLength;
+			while (processedSamples < streamLen)
+			{
+				// TODO: implement seamless looping
+			}
+			*/
+
+			uint32_t length = (uint32_t)((streamLen > voice->LengthRemaining / 2) ? voice->LengthRemaining / 2 : streamLen);
+
+			Sint16* samples = (Sint16*)voice->PlayHead;
+			float sampleIndex = 0;
+
+			// TODO: pitch sounds according to tehir samplerate vs device rate
+			for (uint32_t i = 0; i < length; i++)
+			{
+				if (i == length - 1)
+				{
+					voice = voice;
+				}
+
+				floatStream[i] = (samples[(int)sampleIndex] * 1.0f) * sampleFactor * volumeFactor;
+
+				// non-interpolating pitching
+				sampleIndex += pitch;
+			}
+
+			voice->PlayHead += length * 2;
+			voice->LengthRemaining -= length * 2;
 
 			if (voice->LengthRemaining <= 0)
 			{
@@ -266,24 +279,34 @@ static inline void AudioCallback(void * userdata, uint8_t * stream, int len)
 				{
 					voice->PlayHead = voice->Sound->Buffer;
 					voice->LengthRemaining = voice->Sound->Length;
+
+					length = streamLen - length;
 				}
 				else
 				{
 					// Non looping sound has no more mixable samples
 					voice->State = Stopped;
-
-					// remove stopping voice from linked list
-					if (voice->Next != nullptr)
-					{
-						previous->Next = voice->Next;
-						// prepare for progressing through the linked list
-						voice = previous;
-					}
 				}
 			}
-
-			previous = voice;
-			voice = previous->Next;
 		}
-    }
+	}
+
+	Sint16* current = (Sint16*) stream;
+	for (int i = 0; i < streamLen; i++)
+	{
+		float val = floatStream[i];
+
+		// clipping
+		if (val > 1.0f)
+		{
+			val = 1.0f;
+		}
+		else if (val < -1.0f)
+		{
+			val = -1.0f;
+		}
+
+		// convert float back to s16
+		current[i] = (Sint16)(val * 32767);
+	}
 }

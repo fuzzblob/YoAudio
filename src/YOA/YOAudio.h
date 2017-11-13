@@ -9,9 +9,9 @@ extern "C"
 
 	void YOA_Quit(void);
 
-	uint16_t PlaySound(const char * filename, bool loop, int volume);
+	uint16_t PlayWavFile(const char * filename, bool loop, int volume);
 
-	void StopVoice(uint16_t id);
+	int StopVoice(uint16_t id);
 
 	void YOA_Pause(void);
 

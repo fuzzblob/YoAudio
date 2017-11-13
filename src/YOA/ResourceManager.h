@@ -8,7 +8,6 @@
 typedef struct Sound
 {
 	uint32_t Length;
-	uint32_t SampleLength;
 	uint8_t * Buffer;
 
 	SDL_AudioSpec Spec;
@@ -31,7 +30,8 @@ typedef struct Voice
 	uint32_t LengthRemaining;
 	uint8_t * PlayHead;
 	bool IsLooping;
-	uint8_t Volume;
+	float Volume;
+	float Pitch;
 
 	struct Voice * Next;
 } Voice;

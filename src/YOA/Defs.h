@@ -1,9 +1,9 @@
 #ifndef _YOA_DEFS_H
 #define _YOA_DEFS_H
 
+#define YOA_SDL			0
 // This is a blob for switching audio rendering backends
 /*
-#define YOA_SDL			0
 #define YOA_WINDOWS		1
 #define YOA_MAC			2
 #define YOA_UNIX		3

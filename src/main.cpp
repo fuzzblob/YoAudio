@@ -19,9 +19,11 @@ int main(void)
 	// oneshots, loops, stopping, 
 	// pausing & resuming the audio engine
 
-	PlaySound("door_open_01.wav", false, 64);
+	PlayWavFile("door_open_01.wav", false, 64);
 	SDL_Delay(250);
-	uint16_t ambLoop = PlaySound("ambience.wav", true, 128);
+
+	// storing a looping sound - voice ID to stop it at a later point
+	uint16_t ambLoop = PlayWavFile("ambience.wav", true, 128);
 
 	// don't use delays in actual code like this
 	SDL_Delay(3500);
@@ -32,9 +34,14 @@ int main(void)
 	YOA_Resume();
 
 	SDL_Delay(500);
-	PlaySound("door_close_01.wav", false, 64);
+	PlayWavFile("door_close_01.wav", false, 64);
 	SDL_Delay(200);
-	StopVoice(ambLoop);
+
+	if (StopVoice(ambLoop) == 1)
+	{
+		fprintf(stderr, "[%s:\t%d]\nError: could not stop amb-loop!\n\n", __FILE__, __LINE__);
+	}
+	
 	SDL_Delay(750);
 
 	// quit YO audio

@@ -24,7 +24,7 @@ void ResourceManager::Release()
 std::string ResourceManager::GetPath(const std::string & filename)
 {
 	std::string fullPath = std::string(SDL_GetBasePath());
-	fullPath.append("assets\/" + filename);
+	fullPath.append("assets/" + filename);
 	return fullPath;
 }
 
@@ -50,15 +50,13 @@ Sound * ResourceManager::LoadSound(const std::string & filename)
 		return nullptr;
 	}
 
-	if (SDL_LoadWAV(filename.c_str(), &(newSound->Spec), &(newSound->Buffer), &(newSound->SampleLength)) == nullptr)
+	if (SDL_LoadWAV(filename.c_str(), &(newSound->Spec), &(newSound->Buffer), &(newSound->Length)) == nullptr)
 	{
 		fprintf(stderr, "[%s:\t%d]\nWarning: failed to open wave file: %s error: %s\n\n", __FILE__, __LINE__, filename, SDL_GetError());
 		free(newSound);
 		return nullptr;
 	}
 
-	newSound->Buffer = newSound->Buffer;
-	newSound->Length = newSound->SampleLength;
 	(newSound->Spec).callback = nullptr;
 	(newSound->Spec).userdata = nullptr;
 
@@ -67,7 +65,10 @@ Sound * ResourceManager::LoadSound(const std::string & filename)
 
 bool ResourceManager::FreeSound(Sound* sound)
 {
-	SDL_FreeWAV(sound->Buffer);
+	if(sound->Buffer != nullptr)
+		SDL_FreeWAV(sound->Buffer);
+	
+	sound->Buffer = nullptr;
 
 	return false;
 }
@@ -119,16 +120,17 @@ Voice * ResourceManager::GetVoice(const std::string & filename, bool loop, int v
 	newVoice->PlayHead = newVoice->Sound->Buffer;
 	newVoice->LengthRemaining = newVoice->Sound->Length;
 	newVoice->Next = nullptr;
-	newVoice->Volume = volume;
+	newVoice->Volume = (float) volume / 128.0f;
+	newVoice->Pitch = 1.0f;
 	newVoice->IsLooping = loop;
 
-	if (mVoices[lastVoice] != nullptr)
+	if (mVoices[newVoice->ID] != nullptr && mVoices[newVoice->ID] != newVoice)
 	{
 		fprintf(stderr, "[%s:\t%d]\nError: New Voice could not be stored in voice map!\n\n", __FILE__, __LINE__);
 	}
 	else
 	{
-		mVoices[lastVoice] = newVoice;
+		mVoices[newVoice->ID] = newVoice;
 	}
 
 	return newVoice;
