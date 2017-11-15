@@ -32,8 +32,6 @@ typedef struct Voice
 	bool IsLooping;
 	float Volume;
 	float Pitch;
-
-	struct Voice * Next;
 } Voice;
 
 class ResourceManager
@@ -56,7 +54,7 @@ public:
 	bool FreeSound(Sound* sound);
 
 	uint16_t GetVoiceCount();
-	Voice * GetVoice(const std::string & filename, bool loop, int volume);
+	Voice * GetVoice();
 private:
 	ResourceManager();
 	~ResourceManager();

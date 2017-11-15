@@ -65,6 +65,12 @@ Sound * ResourceManager::LoadSound(const std::string & filename)
 
 bool ResourceManager::FreeSound(Sound* sound)
 {
+	if (sound == nullptr)
+	{
+		printf("Can't stop NULL sound!");
+		return false;
+	}
+
 	if(sound->Buffer != nullptr)
 		SDL_FreeWAV(sound->Buffer);
 	
@@ -78,7 +84,7 @@ uint16_t ResourceManager::GetVoiceCount()
 	return lastVoice;
 }
 
-Voice * ResourceManager::GetVoice(const std::string & filename, bool loop, int volume)
+Voice * ResourceManager::GetVoice()
 {
 	Voice * newVoice = nullptr;
 
@@ -108,21 +114,7 @@ Voice * ResourceManager::GetVoice(const std::string & filename, bool loop, int v
 		newVoice->ID = lastVoice;
 	}
 	
-	newVoice->Sound = sInstance->GetSound(filename);
-
-	if (newVoice->Sound == nullptr)
-	{
-		free(newVoice);
-		return nullptr;
-	}
-
-	newVoice->State = ToPlay;
-	newVoice->PlayHead = newVoice->Sound->Buffer;
-	newVoice->LengthRemaining = newVoice->Sound->Length;
-	newVoice->Next = nullptr;
-	newVoice->Volume = (float) volume / 128.0f;
-	newVoice->Pitch = 1.0f;
-	newVoice->IsLooping = loop;
+	newVoice->Sound = nullptr;
 
 	if (mVoices[newVoice->ID] != nullptr && mVoices[newVoice->ID] != newVoice)
 	{
