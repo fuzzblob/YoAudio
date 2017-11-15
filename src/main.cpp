@@ -1,7 +1,5 @@
 #include <stdio.h>
 
-#include <SDL.h>
-
 #include "YOA\YoManager.h"
 
 // have to override SDL defined main for some reson...

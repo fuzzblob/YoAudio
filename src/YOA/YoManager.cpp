@@ -23,7 +23,13 @@ void YoManager::Release(bool quitSDL)
 
 	if (quitSDL == true)
 	{
+		// quit SDL
 		SDL_Quit();
+	}
+	else
+	{
+		// only quit SDL Audio system
+		SDL_QuitSubSystem(SDL_INIT_AUDIO);
 	}
 }
 
@@ -220,10 +226,6 @@ bool YoManager::Init()
 			fprintf(stderr, "[%s:\t%d]Warning: failed to initilize SDL!\n\n", __FILE__, __LINE__);
 			return false;
 		}
-
-		// TODO: check if SDL is only used by YoAudio
-		// then quit on Realease() like so:
-		// SDL_QuitSubSystem(SDL_INIT_AUDIO);
 	}
 
 	printf("Yo Audio Init\n");
@@ -253,7 +255,6 @@ bool YoManager::Init()
 	(Device->SpecWanted).callback = AudioCallback;
 	(Device->SpecWanted).userdata = nullptr;
 
-	// want.userdata = newSound;
 	if ((Device->DeviceID = SDL_OpenAudioDevice(nullptr, 0, &(Device->SpecWanted), &(Device->SpecObtained), ALLOWED_CHANGES)) == 0)
 	{
 		fprintf(stderr, "[%s:\t%d]Warning: failed to open audio device: %s\n\n", __FILE__, __LINE__, SDL_GetError());
@@ -264,6 +265,7 @@ bool YoManager::Init()
 		mQuit = false;
 		mThreadRunning = true;
 		mThread = std::thread([this]() { this->Run(); });
+		// alterate: std::thread t{&Class::Run, this}
 
 		// TODO: check SpecWanted against SpecObtained
 
@@ -315,19 +317,11 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 
 		if (voice->State == Playing)
 		{
+			// TODO: make dependent on sound.spec.format
 			// s16 to normalized float
 			float sampleFactor = 1 / 32768.0f;
 			float volumeFactor = voice->Volume;
 			float pitch = voice->Pitch;
-
-			/*
-			int processedSamples = 0;
-
-			while (processedSamples < streamLen)
-			{
-			// TODO: implement seamless looping
-			}
-			*/
 
 			uint32_t length = (uint32_t)((streamLen > voice->LengthRemaining / 2) ? voice->LengthRemaining / 2 : streamLen);
 
@@ -344,6 +338,7 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 
 				floatStream[i] = (samples[(int)sampleIndex] * 1.0f) * sampleFactor * volumeFactor;
 
+				// TODO: implement interpolating pitching & resampling
 				// non-interpolating pitching
 				sampleIndex += pitch;
 			}
@@ -374,6 +369,7 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 	{
 		float val = floatStream[i];
 
+		// TODO: implement a lookahead brickwall limiter
 		// clipping
 		if (val > 1.0f)
 		{
@@ -384,6 +380,7 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 			val = -1.0f;
 		}
 
+		// TODO: make dependent on device.spec.format
 		// convert float back to s16
 		current[i] = (Sint16)(val * 32767);
 	}
