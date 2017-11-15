@@ -51,7 +51,6 @@ uint16_t YoManager::PlayWavFile(const std::string & filename, bool loop, float v
 		return 0;
 	}
 
-	newVoice->State = ToPlay;
 	newVoice->PlayHead = newVoice->Sound->Buffer;
 	newVoice->LengthRemaining = newVoice->Sound->Length;
 	newVoice->Volume = volume;
@@ -80,8 +79,6 @@ bool YoManager::StopVoice(uint16_t id)
 		return false;
 	}
 
-	printf("Stopping Voice: %i\n", id);
-
 	std::vector<Voice*>::iterator it = m_playingAudio.begin();
 	std::vector<Voice*>::iterator end = m_playingAudio.end();
 
@@ -93,8 +90,12 @@ bool YoManager::StopVoice(uint16_t id)
 			m_playingAudio.erase(it);
 			SDL_UnlockAudioDevice(Device->DeviceID);
 
-			if((*it._Ptr)->State != Stopped)
+			if ((*it._Ptr)->State != Stopped)
+			{
+				printf("Stopped Voice: %i\n", id);
+				(*it._Ptr)->State = Stopped;
 				return true;
+			}
 		}
 	}
 
@@ -160,7 +161,7 @@ void YoManager::Run()
 		mTimer->Update();
 		if (mTimer->DeltaTime() >= 1.0f / UPDATE_RATE)
 		{
-			printf("DeltaTime: %f\n", mTimer->DeltaTime());
+			//printf("DeltaTime: %f\n", mTimer->DeltaTime());
 			this->Update();
 			mTimer->Reset();
 		}
@@ -276,15 +277,13 @@ bool YoManager::Init()
 void YoManager::QueueVoice(Voice * newVoice)
 {
 	// avoid duplicate Voices
-	if (sInstance->StopVoice(newVoice->ID) == true)
-	{
-		fprintf(stderr, "[%s:\t%d]\nError: had to stop ID %i before it could be played!\n\n", __FILE__, __LINE__, newVoice->ID);
-	}
+	sInstance->StopVoice(newVoice->ID); // returns true because we probably set the state to ToPlay
+	// set voice state
+	newVoice->State = ToPlay;
 
 	SDL_LockAudioDevice(Device->DeviceID);
-
+	// add voice to playing voices vector
 	sInstance->m_playingAudio.push_back(newVoice);
-
 	SDL_UnlockAudioDevice(Device->DeviceID);
 }
 

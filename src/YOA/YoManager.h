@@ -46,14 +46,13 @@ public:
 	bool StopVoice(uint16_t id);
 	void Pause(bool pause);
 	bool IsPaused();
-
-	void Run();
-	void Update();
 private:
 	YoManager();
 	~YoManager();
 
 	bool Init();
+	void Run();
+	void Update();
 	
 	void QueueVoice(Voice * newVoice);
 	static inline void AudioCallback(void * userdata, uint8_t * stream, int len);

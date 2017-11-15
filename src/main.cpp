@@ -26,7 +26,7 @@ int main(void)
 
 	SDL_Delay(1200);
 	mAudio->PlayWavFile("door_close_01.wav", false, 0.5f, 1.0f);
-	SDL_Delay(200);
+	SDL_Delay(400);
 
 	// stop the looping sound
 	if (mAudio->StopVoice(ambLoop) == false)
@@ -34,14 +34,11 @@ int main(void)
 		fprintf(stderr, "[%s:\t%d]\nError: could not stop amb-loop!\n\n", __FILE__, __LINE__);
 	}
 	
-	SDL_Delay(750);
+	SDL_Delay(1500);
 
 	// quite Yo audio system
 	YoManager::Release(true); // also quit SDL
 	mAudio = nullptr;
-
-	for (int i = 0; i < 60000; i++)
-		i = (int) sqrt(i*i);
 
     return 0;
 }
