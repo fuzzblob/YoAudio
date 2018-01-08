@@ -6,7 +6,7 @@
 # SDL2_LIBRARIES                            #
 #############################################
 
-SET( SDL2_SEARCH_PATHS
+SET( LIB_SEARCH_PATHS
 	${SDL2_ROOT_DIR}					# SDL2!
 	./lib/SDL2
 	./lib/SDL2_image
@@ -18,33 +18,36 @@ SET( SDL2_SEARCH_PATHS
 	/usr								# LINUX/MAC/UNIX
 )
 
+# SDL2 include
 FIND_PATH( SDL2_INCLUDE_DIRS
 	NAMES
 		SDL.h
 	PATHS
-		${SDL2_SEARCH_PATHS}
+		${LIB_SEARCH_PATHS}
 	PATH_SUFFIXES
 		include
 	DOC
 		"The directory where SDL.h resides"
 )
 
+# SDL2_image include
 FIND_PATH( SDL2I_INCLUDE_DIRS
 	NAMES
 		SDL_image.h
 	PATHS
-		${SDL2_SEARCH_PATHS}
+		${LIB_SEARCH_PATHS}
 	PATH_SUFFIXES
 		include
 	DOC
 		"The directory where SDL_image.h resides"
 )
 
+# SDL2 lib
 FIND_LIBRARY( SDL2_LIBRARIES
 	NAMES
 		SDL2 SDL2main
 	PATHS
-		${SDL2_SEARCH_PATHS}
+		${LIB_SEARCH_PATHS}
 	PATH_SUFFIXES
 		lib
 		lib64
@@ -54,11 +57,12 @@ FIND_LIBRARY( SDL2_LIBRARIES
 		"The SDL2 library"
 )
 
+# SDL2_image lib
 FIND_LIBRARY( SDL2I_LIBRARIES
 	NAMES
 		SDL2_image
 	PATHS
-		${SDL2_SEARCH_PATHS}
+		${LIB_SEARCH_PATHS}
 	PATH_SUFFIXES
 		lib
 		lib64

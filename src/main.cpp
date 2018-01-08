@@ -1,11 +1,19 @@
 #include <stdio.h>
 
+#include "Editor\Editor.h"
+
 #include "YOA\YoManager.h"
 
 // have to override SDL defined main for some reson...
 #undef main
 int main(void)
 {
+	Editor* editor = new Editor();
+	delete editor;
+	editor = nullptr;
+
+	return 0;
+
 	YoManager* mAudio = YoManager::GetInstance();
 
 	// play one-shot sound effect

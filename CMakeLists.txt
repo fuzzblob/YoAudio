@@ -86,8 +86,8 @@ target_link_libraries(${name} --coverage)
 # We need a CMAKE_DIR with some code to find external dependencies
 SET(PROJ_CMAKE_DIR "${PROJ_SOURCE_DIR}/cmake")
 
-# SDL2
-INCLUDE(${PROJ_CMAKE_DIR}/FindSDL2.cmake)
+# Add libs (SDL2, dear IMGUI, GL bindings)
+INCLUDE(${PROJ_CMAKE_DIR}/FindLibs.cmake)
 
 # Define the include DIRs
 include_directories(
@@ -95,12 +95,14 @@ include_directories(
 	${PROJ_SOURCE_DIR}/sources
 	${SDL2_INCLUDE_DIRS}
 	${SDL2I_INCLUDE_DIRS}
+	${GLFW_INCLUDE_DIRS}
 )
 
 # Define the link libraries
 target_link_libraries( ${name}
 	${SDL2_LIBRARIES}
 	${SDL2I_LIBRARIES}
+	${GLFW_LIBRARIES}
 )
 
 #project("tests")
