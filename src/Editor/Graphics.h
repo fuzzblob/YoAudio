@@ -2,35 +2,27 @@
 #define _GRAPHICS_H
 
 #include <SDL.h>
-#include <SDL_image.h>
 #include <stdio.h>
 #include <string>
 
 class Graphics
 {
 public:
-	static const int ScreenWidth = 800;
-	static const int ScreenHeight = 600;
+	static const int ScreenWidth = 1280;
+	static const int ScreenHeight = 720;
 private:
 	static Graphics* sInstance;
 	static bool sInitialized;
 
 	SDL_Window* mWindow;
-	SDL_Surface* mBackBuffer;
-
-	SDL_Renderer* mRenderer;
+	SDL_GLContext mGlContext;
 
 public:
 	static Graphics* GetInstance();
 	static bool IsInitialized();
 	static void Release();
 
-	SDL_Texture* LoadTexture(std::string path);
-
-	void ClearBackBuffer();
-	void DrawTexture(SDL_Texture* tex, SDL_Rect* rend = nullptr);
-	void Render();
-	static int GuiRun();
+	SDL_Window* GetWindow();
 private:
 	Graphics();
 	~Graphics();

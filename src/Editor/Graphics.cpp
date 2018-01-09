@@ -29,115 +29,34 @@ void Graphics::Release()
 	sInstance = nullptr;
 }
 
-SDL_Texture * Graphics::LoadTexture(std::string path)
-{
-	SDL_Texture* tex = nullptr;
-
-	SDL_Surface* surface = IMG_Load(path.c_str());
-
-	if (surface == nullptr)
-	{
-		printf("Image Load Error: %s\n Path: %s\n", SDL_GetError(), path.c_str());
-		return nullptr;
-	}
-
-	tex = SDL_CreateTextureFromSurface(mRenderer, surface);
-
-	if (tex == nullptr)
-	{
-		printf("Create Texture Error:");
-		return nullptr;
-	}
-
-	SDL_FreeSurface(surface);
-
-	return tex;
-}
-
-void Graphics::ClearBackBuffer()
-{
-	if (mRenderer == nullptr)
-		return;
-
-	SDL_RenderClear(mRenderer);
-}
-
-void Graphics::DrawTexture(SDL_Texture * tex, SDL_Rect* rend)
-{
-	SDL_RenderCopy(mRenderer, tex, nullptr, rend);
-}
-
 Graphics::Graphics()
 {
-	mBackBuffer = nullptr;
+	//mBackBuffer = nullptr;
 	sInitialized = Init();
 }
 
 Graphics::~Graphics()
 {
+	// Cleanup
+	ImGui_ImplSdlGL3_Shutdown();
+	SDL_GL_DeleteContext(mGlContext);
+	SDL_DestroyWindow(mWindow);
+
 	SDL_DestroyWindow(mWindow);
 	mWindow = nullptr;
 
-	SDL_DestroyRenderer(mRenderer);
-	mRenderer = nullptr;
-
-	IMG_Quit();
+	SDL_Quit();
 }
 
 bool Graphics::Init()
 {
-	return true;
-
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		printf("SDL Video Initialization Error: %s\n", SDL_GetError());
 		return false;
 	}
 
-	mWindow = SDL_CreateWindow("Yo Audio Editor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, ScreenWidth, ScreenHeight, SDL_WINDOW_SHOWN);
-
-	if (mWindow == nullptr)
-	{
-		printf("Window creation Error: %s\n", SDL_GetError());
-		return false;
-	}
-
-	mRenderer = SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_ACCELERATED);
-	if (mRenderer == nullptr)
-	{
-		printf("Renderer Creation Error: %s\n", SDL_GetError());
-		return false;
-	}
-
-	SDL_SetRenderDrawColor(mRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-
-	int flags = IMG_INIT_PNG;
-	if (!(IMG_Init(flags) & flags))
-	{
-		printf("Image Initialization Error: %s\n", SDL_GetError());
-		return false;
-	}
-
-	mBackBuffer = SDL_GetWindowSurface(mWindow);
-
-	return true;
-}
-
-void Graphics::Render()
-{
-	ImGui::ShowDemoWindow();
-
-	SDL_RenderPresent(mRenderer);
-}
-
-int Graphics::GuiRun()
-{
-	// Setup SDL
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
-	{
-		printf("Error: %s\n", SDL_GetError());
-		return -1;
-	}
+	// IMGUI setup
 
 	// Setup window
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
@@ -149,12 +68,12 @@ int Graphics::GuiRun()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 	SDL_DisplayMode current;
 	SDL_GetCurrentDisplayMode(0, &current);
-	SDL_Window *window = SDL_CreateWindow("ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
+	mWindow = SDL_CreateWindow("Yo Audio Editor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+	mGlContext = SDL_GL_CreateContext(mWindow);
 	gl3wInit();
 
 	// Setup ImGui binding
-	ImGui_ImplSdlGL3_Init(window);
+	ImGui_ImplSdlGL3_Init(mWindow);
 
 	// Setup style
 	ImGui::StyleColorsClassic();
@@ -176,69 +95,10 @@ int Graphics::GuiRun()
 	//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
 	//IM_ASSERT(font != NULL);
 
-	bool show_demo_window = true;
-	bool show_another_window = false;
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+	return true;
+}
 
-	// Main loop
-	bool done = false;
-	while (!done)
-	{
-		// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
-		// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
-		// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-		SDL_Event event;
-		while (SDL_PollEvent(&event))
-		{
-			ImGui_ImplSdlGL3_ProcessEvent(&event);
-			if (event.type == SDL_QUIT)
-				done = true;
-		}
-		ImGui_ImplSdlGL3_NewFrame(window);
-
-		// 1. Show a simple window.
-		// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
-		{
-			static float f = 0.0f;
-			ImGui::Text("Hello, world!");                           // Some text (you can use a format string too)
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float as a slider from 0.0f to 1.0f
-			ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats as a color
-			if (ImGui::Button("Demo Window"))                       // Use buttons to toggle our bools. We could use Checkbox() as well.
-				show_demo_window ^= 1;
-			if (ImGui::Button("Another Window"))
-				show_another_window ^= 1;
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		}
-
-		// 2. Show another simple window. In most cases you will use an explicit Begin/End pair to name the window.
-		if (show_another_window)
-		{
-			ImGui::Begin("Another Window", &show_another_window);
-			ImGui::Text("Hello from another window!");
-			ImGui::End();
-		}
-
-		// 3. Show the ImGui demo window. Most of the sample code is in ImGui::ShowDemoWindow().
-		if (show_demo_window)
-		{
-			ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
-			ImGui::ShowDemoWindow(&show_demo_window);
-		}
-
-		// Rendering
-		glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
-		glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-		glClear(GL_COLOR_BUFFER_BIT);
-		ImGui::Render();
-		SDL_GL_SwapWindow(window);
-	}
-
-	// Cleanup
-	ImGui_ImplSdlGL3_Shutdown();
-	SDL_GL_DeleteContext(glcontext);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
-
-	return 0;
+SDL_Window * Graphics::GetWindow()
+{
+	return mWindow;
 }
