@@ -49,7 +49,7 @@ To see how sounds are being played back check out **main.cpp**.
 
 Here is the basic idea:
 
-	#include "YOAudio.h"
+	#include "YoAudio.h"
 
 	int main()
 	{
