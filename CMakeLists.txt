@@ -71,6 +71,8 @@ include_directories(
 
 add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDRS})
 
+target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
+
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
