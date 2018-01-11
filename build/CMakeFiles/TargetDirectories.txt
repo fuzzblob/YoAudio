@@ -1,3 +1,0 @@
-Y:/j/src/chris/YoAudioEditor/build/CMakeFiles/YoAudioEditor.dir
-Y:/j/src/chris/YoAudioEditor/build/CMakeFiles/ALL_BUILD.dir
-Y:/j/src/chris/YoAudioEditor/build/CMakeFiles/ZERO_CHECK.dir
