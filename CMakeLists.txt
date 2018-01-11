@@ -69,6 +69,8 @@ include_directories(
 	${SDL2_INCLUDE_DIRS}
 )
 
+add_definitions(-DBUILD_DLL)
+
 #set_target_properties( ${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY bin )
 
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin )

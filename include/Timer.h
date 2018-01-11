@@ -1,9 +1,9 @@
 #ifndef _TIMER_H
 #define _TIMER_H
 
-#include <SDL.h>
+#include "Defs.h"
 
-class Timer
+class IMPORT_EXPORT Timer
 {
 private:
 	unsigned int mSTartTicks;

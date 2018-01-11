@@ -7,34 +7,34 @@
 extern "C"
 {
 #endif
-	int YOA_Init(void) 
+	int IMPORT_EXPORT YOA_Init(void)
 	{
 		return (YoManager::GetInstance() != nullptr); 
 	}
 
-	void YOA_Quit(void) 
+	void IMPORT_EXPORT YOA_Quit(void)
 	{ 
-		YoManager::Release(); 
+		YoManager::Release(true); 
 	}
 
-	uint16_t PlayWavFile(const char * filename, bool loop, float volume, float pitch)
+	uint16_t IMPORT_EXPORT PlayWavFile(const char * filename, bool loop, float volume, float pitch)
 	{
 		return YoManager::GetInstance()->PlayWavFile(std::string(filename), loop, volume, pitch);
 	}
 
-	int StopVoice(uint16_t id)
+	int IMPORT_EXPORT StopVoice(uint16_t id)
 	{
 		bool sucess = YoManager::GetInstance()->StopVoice(id);
 		if (sucess) return 0;
 		else return 1;
 	}
 
-	void YOA_Pause(void)
+	void IMPORT_EXPORT YOA_Pause(void)
 	{
 		YoManager::GetInstance()->Pause(true);
 	}
 
-	void YOA_Resume(void)
+	void IMPORT_EXPORT YOA_Resume(void)
 	{
 		YoManager::GetInstance()->Pause(false);
 	}

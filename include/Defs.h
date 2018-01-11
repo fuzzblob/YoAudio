@@ -1,6 +1,13 @@
 #ifndef _YOA_DEFS_H
 #define _YOA_DEFS_H
 
+
+#if defined( BUILD_DLL )
+#define IMPORT_EXPORT __declspec(dllexport)
+#else
+#define IMPORT_EXPORT __declspec(dllimport)
+#endif
+
 #define YOA_SDL			0
 // This is a blob for switching audio rendering backends
 /*
