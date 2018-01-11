@@ -41,7 +41,7 @@ At the moment the build process has only ever been tested on Windows with Micros
 
 ### Linux & Mac OS
 
-to be determined (maybe let me know or submitt a pull request)
+to be determined (maybe let me know or submit a pull request)
 
 ## Playing a sound <a name="sound"></a>
 
