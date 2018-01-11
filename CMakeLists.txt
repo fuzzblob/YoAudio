@@ -18,13 +18,14 @@ endif ( CMAKE_BUILD_TYPE STREQUAL "" )
 #
 # Set up SDL2 dependency stuff
 #
-
+set(SDL2_SEARCH_PATHS ../YoAudio/dependencies/SDL2)
+ 
 # SDL2 include
 FIND_PATH( SDL2_INCLUDE_DIRS
 	NAMES
 		SDL.h
 	PATHS
-		dependencies/SDL2
+		${SDL2_SEARCH_PATHS}
 	PATH_SUFFIXES
 		include
 	DOC
@@ -36,7 +37,7 @@ FIND_LIBRARY( SDL2_LIBRARIES
 	NAMES
 		SDL2 SDL2main
 	PATHS
-		dependencies/SDL2
+		${SDL2_SEARCH_PATHS}
 	PATH_SUFFIXES
 		lib
 		lib64

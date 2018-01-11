@@ -1,0 +1,13 @@
+﻿  main.cpp
+  gl3w.c
+Editor.obj : error LNK2019: unresolved external symbol "public: __thiscall Timer::Timer(void)" (??0Timer@@QAE@XZ) referenced in function "private: __thiscall Editor::Editor(void)" (??0Editor@@AAE@XZ)
+Editor.obj : error LNK2019: unresolved external symbol "public: __thiscall Timer::~Timer(void)" (??1Timer@@QAE@XZ) referenced in function "public: void * __thiscall Timer::`scalar deleting destructor'(unsigned int)" (??_GTimer@@QAEPAXI@Z)
+Editor.obj : error LNK2019: unresolved external symbol "public: void __thiscall Timer::Reset(void)" (?Reset@Timer@@QAEXXZ) referenced in function "public: void __thiscall Editor::Run(void)" (?Run@Editor@@QAEXXZ)
+Editor.obj : error LNK2019: unresolved external symbol "public: float __thiscall Timer::DeltaTime(void)" (?DeltaTime@Timer@@QAEMXZ) referenced in function "public: void __thiscall Editor::Run(void)" (?Run@Editor@@QAEXXZ)
+Editor.obj : error LNK2019: unresolved external symbol "public: void __thiscall Timer::Update(void)" (?Update@Timer@@QAEXXZ) referenced in function "public: void __thiscall Editor::Run(void)" (?Run@Editor@@QAEXXZ)
+Editor.obj : error LNK2019: unresolved external symbol "public: static class YoManager * __cdecl YoManager::GetInstance(void)" (?GetInstance@YoManager@@SAPAV1@XZ) referenced in function "public: void __thiscall Editor::Run(void)" (?Run@Editor@@QAEXXZ)
+Editor.obj : error LNK2019: unresolved external symbol "public: static void __cdecl YoManager::Release(bool)" (?Release@YoManager@@SAX_N@Z) referenced in function "public: void __thiscall Editor::Run(void)" (?Run@Editor@@QAEXXZ)
+Editor.obj : error LNK2019: unresolved external symbol "public: unsigned short __thiscall YoManager::PlayWavFile(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &,bool,float,float)" (?PlayWavFile@YoManager@@QAEGABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@_NMM@Z) referenced in function "private: void __thiscall Editor::App(void)" (?App@Editor@@AAEXXZ)
+Editor.obj : error LNK2019: unresolved external symbol "public: bool __thiscall YoManager::StopVoice(unsigned short)" (?StopVoice@YoManager@@QAE_NG@Z) referenced in function "private: void __thiscall Editor::App(void)" (?App@Editor@@AAEXXZ)
+Editor.obj : error LNK2019: unresolved external symbol "public: void __thiscall YoManager::Pause(bool)" (?Pause@YoManager@@QAEX_N@Z) referenced in function "private: void __thiscall Editor::App(void)" (?App@Editor@@AAEXXZ)
+Y:\j\src\chris\YoAudioEditor\bin\Debug\YoAudioEditor.exe : fatal error LNK1120: 10 unresolved externals

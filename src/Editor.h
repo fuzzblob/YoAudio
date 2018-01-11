@@ -1,10 +1,10 @@
 #ifndef _EDITOR_H
 #define _EDITOR_H
 
-#include "../YOA/Timer.h"
+#include "../../YoAudio/include/Timer.h"
 #include "InputManager.h"
 #include "GUI.h"
-#include "..\YOA\YoManager.h"
+#include "../../YoAudio/include/YoManager.h"
 
 class Editor
 {

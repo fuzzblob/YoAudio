@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "Editor\Editor.h"
+#include "Editor.h"
 
 // have to override SDL defined main for some reson...
 #undef main
