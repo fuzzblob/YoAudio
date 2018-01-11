@@ -20,3 +20,7 @@ Win32/
 # Visual Studio
 
 .vs/*
+
+# SDL2 dependency
+
+dependencies/*
