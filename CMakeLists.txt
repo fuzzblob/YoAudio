@@ -40,11 +40,24 @@ FIND_LIBRARY( SDL2_LIBRARIES
 		${SDL2_SEARCH_PATHS}
 	PATH_SUFFIXES
 		lib
-		lib64
 		lib/x86
 		lib/x64
 	DOC
 		"The SDL2 library"
+)
+
+# SDL2 bin
+FIND_PATH( SDL2_BINARIES
+	NAMES
+		SDL2.dll
+	PATHS
+		${SDL2_SEARCH_PATHS}
+	PATH_SUFFIXES
+		bin
+		bin/x86
+		bin/x64
+	DOC
+		"The SDL2 binary"
 )
 
 # Check if we found it!
@@ -85,6 +98,18 @@ FIND_LIBRARY( YOA_LIBRARIES
 		"The YoAudio library"
 )
 
+# YOA bin
+FIND_PATH( YOA_BINARIES
+	NAMES
+		YoAudio.dll
+	PATHS
+		${YOA_SEARCH_PATHS}
+	PATH_SUFFIXES
+		bin/Debug
+	DOC
+		"The YoAudio binary"
+)
+
 # Check if we found it!
 IF ( YOA_INCLUDE_DIRS AND YOA_LIBRARIES )
 	SET( YOA_FOUND TRUE )
@@ -94,7 +119,9 @@ ELSE ( YOA_INCLUDE_DIRS AND YOA_LIBRARIES  )
 	MESSAGE(STATUS "Looking for YoAudio - not found")
 ENDIF ( YOA_INCLUDE_DIRS AND YOA_LIBRARIES )
 
-
+#
+# input files for this project
+#
 file(GLOB_RECURSE HDRS
 	src/*.h
 )
@@ -116,3 +143,16 @@ add_executable(${PROJECT_NAME} ${SRCS} ${HDRS})
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES} ${YOA_LIBRARIES})
 
 set_property(DIRECTORY ${PROJ_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+
+add_custom_command(
+    TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		"${SDL2_BINARIES}/SDL2.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+
+add_custom_command(
+    TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		"${YOA_BINARIES}/YoAudio.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+
