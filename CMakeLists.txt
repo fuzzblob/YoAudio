@@ -1,56 +1,10 @@
-#Copyright (C) 2015 Barry Deeney
-#Copyright (c) 2015, Benny Bobaganoosh
-#Copyright (c) 2017, Chris Tammik
-#All rights reserved.
-#
-#Redistribution and use in source and binary forms, with or without
-#modification, are permitted provided that the following conditions are met:
-#
-#1. Redistributions of source code must retain the above copyright notice, this
-#   list of conditions and the following disclaimer. 
-#2. Redistributions in binary form must reproduce the above copyright notice,
-#  this list of conditions and the following disclaimer in the documentation
-#   and/or other materials provided with the distribution.
-#
-#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-#DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-#ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-#(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-#LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-#ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-#(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-# 3.6 supports set_property(DIRECTORY ${PROJ_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT PROJ)
 cmake_minimum_required(VERSION 3.6)
-#cmake_minimum_required(VERSION 3.2)
+project(YoAudio)
 
-if (CMAKE_COMPILER_IS_GNUCC)
-	option(ENABLE_COVERAGE "Enable coverage reporting for gcc/clang" FALSE)
+message(STATUS "Hello, we are now building ${PROJECT_NAME}")
 
-	if (ENABLE_COVERAGE)
-		add_compile_options(--coverage -O0)
-	endif()
-endif()
-
-if (MSVC)
-	add_compile_options(/W4)
-else()
-	add_compile_options(-Wall) #-Wextra -Wpedantic
-	# add_definitions(
-		# -c
-		# -Wall
-	# )
-endif()
-
-# Setup the Project
-SET(name "PROJ")
-project(${name})
-
-# don't leave CMAKE_BUILD_TYPE empty
-# differentiation between debug and release builds.
+# set CMAKE_BUILD_TYPE if empty
+# for differentiation between debug and release builds.
 if ( CMAKE_BUILD_TYPE STREQUAL "" )
 	set(
 		CMAKE_BUILD_TYPE
@@ -61,53 +15,25 @@ if ( CMAKE_BUILD_TYPE STREQUAL "" )
 	)
 endif ( CMAKE_BUILD_TYPE STREQUAL "" )
 
-if ( CMAKE_BUILD_TYPE STREQUAL "Release" )
-add_definitions( -O2 )
-endif ( CMAKE_BUILD_TYPE STREQUAL "Release" )
-
-# Lets LOAD our headers
-file(GLOB_RECURSE HDRS 
-	${PROJ_SOURCE_DIR}/src/*.h
+file(GLOB_RECURSE HDRS
+	include/*.h
 )
 
-# Lets LOAD our sources
 file(GLOB_RECURSE SRCS
-	${PROJ_SOURCE_DIR}/src/*.cpp
-	${PROJ_SOURCE_DIR}/src/*.c
+	src/*.cpp
+	src/*.c
 )
 
-#add_executable(PROJ ${PROJ_SOURCE_DIR}/src/Main.cpp)
-add_executable(PROJ ${SRCS} ${HDRS})
-set_property(DIRECTORY ${PROJ_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT PROJ)
-#add_executable(${name} WIN32 ${SRCS})
-target_compile_features(${name} PRIVATE cxx_lambda_init_captures)
-target_link_libraries(${name} --coverage)
+message(STATUS "${HDRS}")
+message(STATUS "${SRCS}")
 
-# We need a CMAKE_DIR with some code to find external dependencies
-SET(PROJ_CMAKE_DIR "${PROJ_SOURCE_DIR}/cmake")
-
-# Add libs (SDL2, dear IMGUI, GL bindings)
-INCLUDE(${PROJ_CMAKE_DIR}/FindLibs.cmake)
-
-# Define the include DIRs
 include_directories(
-	${PROJ_SOURCE_DIR}/headers
-	${PROJ_SOURCE_DIR}/sources
-	${SDL2_INCLUDE_DIRS}
-	${SDL2I_INCLUDE_DIRS}
-	${GLFW_INCLUDE_DIRS}
+	include
 )
 
-# Define the link libraries
-target_link_libraries( ${name}
-	${SDL2_LIBRARIES}
-	${SDL2I_LIBRARIES}
-	${GLFW_LIBRARIES}
-)
+add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDRS})
 
-#project("tests")
-#enable_testing()
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-#add_executable(tester tester.cpp)
-#target_link_libraries(tester --coverage)
-#add_test(Tester tester)
+set_property(DIRECTORY ${PROJ_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
