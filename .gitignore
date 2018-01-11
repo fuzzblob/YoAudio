@@ -15,3 +15,7 @@ CTestTestfile.cmake
 /lib/*
 /build/*
 Win32/
+
+# Visual Studio
+
+.vs/*
