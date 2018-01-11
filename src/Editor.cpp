@@ -141,12 +141,12 @@ void Editor::App()
 		static uint16_t ambLoop = 0u;
 		if (ImGui::Button("Play Ambience"))
 		{
-			ambLoop = PlayWavFile("ambience.wav", true, 1.0f, 1.0f);
+			ambLoop = YOA_PlayWavFile("ambience.wav", true, 1.0f, 1.0f);
 		}
 		if (ambLoop != 0u && ImGui::Button("Stop Ambience"))
 		{
 			// stop the looping sound
-			if (StopVoice(ambLoop) == false)
+			if (YOA_StopVoice(ambLoop) == false)
 			{
 				fprintf(stderr, "[%s:\t%d]\nError: could not stop amb-loop!\n\n", __FILE__, __LINE__);
 			}
@@ -155,12 +155,12 @@ void Editor::App()
 
 		if (ImGui::Button("Play Door Open"))
 		{
-			PlayWavFile("door_open_01.wav", false, 0.5f, 1.0f);
+      YOA_PlayWavFile("door_open_01.wav", false, 0.5f, 1.0f);
 		}
 
 		if (ImGui::Button("Play Door Close"))
 		{
-			PlayWavFile("door_close_01.wav", false, 0.5f, 1.0f);
+      YOA_PlayWavFile("door_close_01.wav", false, 0.5f, 1.0f);
 		}
 
 		ImGui::Spacing();
