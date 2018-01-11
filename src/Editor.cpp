@@ -1,6 +1,7 @@
 #include "Editor.h"
 #include "GUI.h"
 #include "imgui\imgui.h"
+#include "../../YoAudio/include/YOAudio.h"
 
 Editor* Editor::sInstance = nullptr;
 
@@ -140,12 +141,12 @@ void Editor::App()
 		static uint16_t ambLoop = 0u;
 		if (ImGui::Button("Play Ambience"))
 		{
-			ambLoop = mAudio->PlayWavFile("ambience.wav", true, 1.0f, 1.0f);
+			ambLoop = PlayWavFile("ambience.wav", true, 1.0f, 1.0f);
 		}
 		if (ambLoop != 0u && ImGui::Button("Stop Ambience"))
 		{
 			// stop the looping sound
-			if (mAudio->StopVoice(ambLoop) == false)
+			if (StopVoice(ambLoop) == false)
 			{
 				fprintf(stderr, "[%s:\t%d]\nError: could not stop amb-loop!\n\n", __FILE__, __LINE__);
 			}
@@ -154,29 +155,29 @@ void Editor::App()
 
 		if (ImGui::Button("Play Door Open"))
 		{
-			mAudio->PlayWavFile("door_open_01.wav", false, 0.5f, 1.0f);
+			PlayWavFile("door_open_01.wav", false, 0.5f, 1.0f);
 		}
 
 		if (ImGui::Button("Play Door Close"))
 		{
-			mAudio->PlayWavFile("door_close_01.wav", false, 0.5f, 1.0f);
+			PlayWavFile("door_close_01.wav", false, 0.5f, 1.0f);
 		}
 
 		ImGui::Spacing();
 
 		// pause & unpause the audio engine
 		if (ImGui::Button("Pause Playback"))
-			mAudio->Pause(true);
+			YOA_Pause();
 		
 		if (ImGui::Button("Resume Playback"))
-			mAudio->Pause(false);
+			YOA_Pause();
 	}
 }
 
 void Editor::Run()
 {
-	mAudio = YoManager::GetInstance();
-
+  YOA_Init();
+	
 	while (mQuit == false)
 	{
 		mTimer->Update();
@@ -203,7 +204,6 @@ void Editor::Run()
 		}
 	}
 
-	// quite Yo audio system
-	YoManager::Release(true); // also quit SDL
-	mAudio = nullptr;
+	// quit Yo audio system
+  YOA_Quit();
 }

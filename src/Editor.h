@@ -4,7 +4,6 @@
 #include "../../YoAudio/include/Timer.h"
 #include "InputManager.h"
 #include "GUI.h"
-#include "../../YoAudio/include/YoManager.h"
 
 class Editor
 {
@@ -17,7 +16,6 @@ private:
 	Timer* mTimer;
 	InputManager* mInputManager;
 	Gui* mUi;
-	YoManager* mAudio;
 
 	SDL_Event mEvents;
 public:
