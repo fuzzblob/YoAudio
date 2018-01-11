@@ -12,6 +12,7 @@ CTestTestfile.cmake
 
 # YoAudio
 
+/bin/*
 /lib/*
 /build/*
 Win32/
