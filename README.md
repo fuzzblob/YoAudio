@@ -17,21 +17,21 @@ A C++ audio environment. It is meant as a playground for experimentation with ga
 
 ## Overview <a name="overview"></a>
 
+### Dependencies <a name="dependencies"></a>
+
+- Simple DirectMedia Layer [SDL version 2.0.7 (stable)](http://libsdl.org/download-2.0.php)
+
 ### Build Instructions <a name="build"></a>
 
 The following requirements need to be met to be able to build this project:
 
 - SDL 2.0+ Development Libraries
-- SDL_image 2.0+ Development Libraries
-	- these are not being used by the audio engine itself
 
 ### Windows
 
 At the moment the build process has only ever been tested on Windows with Microsoft Visual Studio 2017. Follow these steps to generate a Visual Studio project:
 
 - extract **SDL2** to `lib/SDL2`
-	- make sure to copy include, lib and bin directories
-- extract **SDL_image** to `lib/SDL_image`
 	- make sure to copy include, lib and bin directories
 - run **cmake**
 	- on Windows simply execute `Windows-GenVisualStudioProject.bat`
