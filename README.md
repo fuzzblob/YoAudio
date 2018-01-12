@@ -60,13 +60,13 @@ Here is the basic idea:
 		float pitch = 1.0f;
 		
 		// Play Oneshot
-		PlaySound("door_open_01.wav", false, volume, pitch);
+		YOA_PlaySound("door_open_01.wav", false, volume, pitch);
 		
 		// Play loop and store VoiceID
 		uint16_t ambLoop = PlaySound("ambience.wav", true, volume, pitch);
 
 		// Stop loop using VoiceID
-		StopVoice(ambLoop);
+		YOA_StopVoice(ambLoop);
 
 		// quit YO audio
 		YOA_Quit();
