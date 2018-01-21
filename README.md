@@ -13,7 +13,7 @@ A C++ audio environment. It is meant as a playground for experimentation with ga
 **Goals**
 
 - develop a usable audio framework for games (and other applications)
-- learn C++ development, especially digital signal processing (DSP) for audio
+- learn C++ development: low level, high performance, flexible and robust audio plaback for games as well as digital signal processing (DSP)
 
 ## Overview <a name="overview"></a>
 
@@ -29,19 +29,21 @@ The following requirements need to be met to be able to build this project:
 
 ### Windows
 
-At the moment the build process has only ever been tested on Windows with Microsoft Visual Studio 2017. Follow these steps to generate a Visual Studio project:
+At the moment the build process has only ever been tested on Windows with Microsoft Visual Studio 2017 Community Edition. Follow these steps to generate a Visual Studio project:
 
-- extract **SDL2** to `lib/SDL2`
-	- make sure to copy include, lib and bin directories
+- extract **SDL2** to `dependencies/SDL2`
+	- make sure to copy *include*, *lib* and *bin* directories
 - run **cmake**
-	- on Windows simply execute `Windows-GenVisualStudioProject.bat`
+	- on Windows simply execute `m.bat`
 - Open the solution at `build/YoAudio.snl`
 - build by hitting `ctrl + shift + b`
-- to remove the Solution or re-generate it you should first run `Windows-Clean.bat`
+- the output will be built to `bin/Debug` or `bin/Release`
+	- YoAudio.dll for runtime
+	- YoAudio.pdb for debug symbols 
 
 ### Linux & Mac OS
 
-to be determined (maybe let me know or submit a pull request)
+If you build this project on these platforms, let me know how it went or submit a pull request ;)
 
 ## Playing a sound <a name="sound"></a>
 
@@ -81,7 +83,7 @@ These are things I'd like to explore with this library / tool in the future (in 
 - multithreading
 	- create MessageQueue
 	- create AudioRenderer (filling AudioFrame queue for the callback to copy out of)
-- create SampleGenerator interface
+- create SampleGenerator interface to generalize audio sources (sample playback, synthesis, streaming)
 	- GenerateSamples()
 	- SamplesRemaining()
 - create Mixer graph	
@@ -96,10 +98,10 @@ These are things I'd like to explore with this library / tool in the future (in 
 			- HighPass
 			- LowPass
 		- RingModulator
-- mix in floating point space
-	- Voice statemachine
-		- add a small fade-out when stopping, pausing, virtualizing
-		- fade-in on un-pausing / de-virtualizing
-	- resample from WAV spec to device spec
+- Voice statemachine
+	- add a small fade-out when stopping, pausing, virtualizing
+	- fade-in on un-pausing / de-virtualizing
+- resample from WAV spec to device spec
+- instead of hard coded 16bit int
 	- convert from WAV spec format to float
 	- convert from float to Device spec format
