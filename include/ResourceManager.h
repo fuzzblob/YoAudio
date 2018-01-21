@@ -4,35 +4,8 @@
 #include <map>
 
 #include "Defs.h"
-
-typedef struct Sound
-{
-	uint32_t Length;
-	uint8_t * Buffer;
-
-	SDL_AudioSpec Spec;
-} Sound;
-
-enum VoiceState
-{
-	ToPlay = 1,
-	Playing = 2,
-	Paused = 3,
-	Stopping = 4,
-	Stopped  = 5
-};
-
-typedef struct Voice
-{
-	uint16_t ID;
-	VoiceState State;
-	Sound * Sound;
-	uint32_t LengthRemaining;
-	uint8_t * PlayHead;
-	bool IsLooping;
-	float Volume;
-	float Pitch;
-} Voice;
+#include "Voice.h"
+#include "Sound.h"
 
 class ResourceManager
 {
