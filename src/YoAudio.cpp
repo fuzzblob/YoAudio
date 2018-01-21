@@ -1,7 +1,7 @@
 #include "YoManager.h"
 #include "YoAudio.h"
 
-int YOA_Init(void)
+bool YOA_Init(void)
 {
 	return (YoManager::GetInstance() != nullptr); 
 }

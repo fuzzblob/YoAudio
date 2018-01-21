@@ -2,6 +2,7 @@
 #define _TIMER_H
 
 #include "Defs.h"
+#include "DllImportExport.h"
 
 class IMPORT_EXPORT Timer
 {
