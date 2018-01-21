@@ -9,10 +9,15 @@ extern "C"
 #endif
 
 bool IMPORT_EXPORT YOA_Init(void);
-void IMPORT_EXPORT YOA_Quit(void);
+
+void IMPORT_EXPORT YOA_Quit(bool quitSDL);
+
 uint16_t IMPORT_EXPORT YOA_PlayWavFile(const char * filename, bool loop, float volume, float pitch);
+
 int IMPORT_EXPORT YOA_StopVoice(uint16_t id);
+
 void IMPORT_EXPORT YOA_Pause(void);
+
 void IMPORT_EXPORT YOA_Resume(void);
 
 #ifdef __cplusplus
