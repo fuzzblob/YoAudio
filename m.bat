@@ -8,6 +8,6 @@ if exist build rmdir /S /Q build
 mkdir build
 cd build
 
-%CM% -G "Visual Studio 14 2015" -Wdev ../
+%CM% -G "Visual Studio 15" -Wdev ../
 
 cd ..
