@@ -25,6 +25,7 @@ FIND_PATH( SDL2_INCLUDE_DIRS
 		SDL.h
 	PATHS
 		dependencies/SDL2
+        /usr/local/opt/sdl2/include/SDL2
 	PATH_SUFFIXES
 		include
 	DOC
@@ -37,6 +38,7 @@ FIND_LIBRARY( SDL2_LIBRARIES
 		SDL2 SDL2main
 	PATHS
 		dependencies/SDL2
+        /usr/local/opt/sdl2/lib
 	PATH_SUFFIXES
 		lib
 		lib64
