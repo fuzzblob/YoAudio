@@ -31,9 +31,7 @@ int YOA_StopVoice(uint16_t id)
 	if (inst == nullptr)
 		return false;
 
-	bool sucess = YoManager::GetInstance()->StopVoice(id);
-	if (sucess) return 0;
-	else return 1;
+	return YoManager::GetInstance()->StopVoice(id) ? 0 : 1;
 }
 
 void YOA_Pause(void)
