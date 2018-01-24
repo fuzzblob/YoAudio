@@ -93,7 +93,7 @@ These are things I'd like to explore with this library / tool in the future (in 
 			- SamplePlayer
 			- Synth
 	- AudioEffect
-		- Clipper
+		- limiter for final output
 		- Filter
 			- HighPass
 			- LowPass
@@ -101,7 +101,8 @@ These are things I'd like to explore with this library / tool in the future (in 
 - Voice statemachine
 	- add a small fade-out when stopping, pausing, virtualizing
 	- fade-in on un-pausing / de-virtualizing
-- resample from WAV spec to device spec
+- re-sample from WAV spec to device spec
+- proper pitch algorithm
 - instead of hard coded 16bit int
 	- convert from WAV spec format to float
 	- convert from float to Device spec format

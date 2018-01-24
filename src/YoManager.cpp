@@ -317,7 +317,6 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 
 		if (voice->State == Playing)
 		{
-			// TODO: make dependent on sound.spec.format
 			// s16 to normalized float
 			float sampleFactor = 1 / 32768.0f;
 			float volumeFactor = voice->Volume;
@@ -328,7 +327,6 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 			Sint16* samples = (Sint16*)voice->PlayHead;
 			float sampleIndex = 0;
 
-			// TODO: pitch sounds according to tehir samplerate vs device rate
 			for (uint32_t i = 0; i < length; i++)
 			{
 				if (i == length - 1)
@@ -369,18 +367,12 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 	{
 		float val = floatStream[i];
 
-		// TODO: implement a lookahead brickwall limiter
 		// clipping
 		if (val > 1.0f)
-		{
 			val = 1.0f;
-		}
 		else if (val < -1.0f)
-		{
 			val = -1.0f;
-		}
 
-		// TODO: make dependent on device.spec.format
 		// convert float back to s16
 		current[i] = (Sint16)(val * 32767);
 	}
