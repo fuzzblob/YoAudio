@@ -298,17 +298,14 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 	fstream->reserve(streamLen);
 	float* floatStream = fstream->begin()._Ptr;
 
-	for (int i = 0; i < streamLen; i++)
+	for (float f : *fstream)
 	{
-		floatStream[i] = 0.0f;
+		f = 0.0f;
 	}
 
-	std::vector<Voice*>::iterator it = sInstance->m_playingAudio.begin();
-	std::vector<Voice*>::iterator end = sInstance->m_playingAudio.end();
-
-	for (; it != end; ++it)
+	for (auto voice : sInstance->m_playingAudio)
 	{
-		Voice * voice = *it._Ptr;
+		//Voice * voice = *it._Ptr;
 
 		if (voice->State == ToPlay)
 		{
