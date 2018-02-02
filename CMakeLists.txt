@@ -59,6 +59,7 @@ ENDIF ( SDL2_INCLUDE_DIRS AND SDL2_LIBRARIES )
 
 file(GLOB_RECURSE HDRS
 	include/*.h
+	src/*.h
 )
 
 file(GLOB_RECURSE SRCS
