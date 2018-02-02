@@ -3,48 +3,6 @@
 #include "imgui\imgui.h"
 #include "../../YoAudio/include/YOAudio.h"
 
-Editor* Editor::sInstance = nullptr;
-
-Editor * Editor::GetInstance()
-{
-	if (sInstance == nullptr)
-	{
-		sInstance = new Editor();
-	}
-
-	return sInstance;
-}
-
-void Editor::Release()
-{
-	delete sInstance;
-	sInstance = nullptr;
-}
-
-Editor::Editor()
-{
-	mQuit = false;
-
-	mUi = new Gui();
-	mTimer = new Timer();
-	
-	mInputManager = InputManager::GetInstance();
-}
-
-Editor::~Editor()
-{
-	InputManager::Release();
-	mInputManager = nullptr;
-
-	delete mUi;
-	mUi = nullptr;
-
-	delete mTimer;
-	mTimer = nullptr;
-
-	SDL_Quit();
-}
-
 void MenuBar()
 {
 	if (ImGui::BeginMainMenuBar())
@@ -129,6 +87,54 @@ void MenuBar()
 	}
 }
 
+void Editor::Run()
+{
+	bool quit = false;
+
+	// UI implicitly starts SDL for OpenGL rendering
+	std::unique_ptr<Gui> ui = std::make_unique<Gui>();
+	std::unique_ptr<Timer> timer = std::make_unique<Timer>();
+	std::unique_ptr<InputManager> inputManager = std::make_unique<InputManager>();
+	SDL_Event mEvents;
+	float deltaTime = 0.0f;
+
+	// init Yo AudioEngine
+	if (YOA_Init() == false)
+	{
+		printf("Yo Audio initialization error! Shutting town");
+		quit = true;
+	}
+
+	while (quit == false)
+	{
+		timer->Update();
+		deltaTime = timer->DeltaTime();
+
+		while (SDL_PollEvent(&mEvents) != 0)
+		{
+			ui->ProcessEvent(&mEvents);
+			if (mEvents.type == SDL_QUIT)
+				quit = true;
+		}
+
+		if (deltaTime >= 1.0f / FRAME_RATE)
+		{
+			inputManager->Update();
+			ui->StartFrame();
+			// TODO: display GUI label "DeltaTime: %f\n" + deltaTime);
+
+			// main GUI
+			App();
+
+			ui->EndFrame();
+			timer->Reset();
+		}
+	}
+
+	// quit Yo audio system
+	YOA_Quit(false);
+}
+
 void Editor::App()
 {
 	MenuBar();
@@ -155,12 +161,12 @@ void Editor::App()
 
 		if (ImGui::Button("Play Door Open"))
 		{
-      YOA_PlayWavFile("door_open_01.wav", false, 0.5f, 1.0f);
+			YOA_PlayWavFile("door_open_01.wav", false, 0.5f, 1.0f);
 		}
 
 		if (ImGui::Button("Play Door Close"))
 		{
-      YOA_PlayWavFile("door_close_01.wav", false, 0.5f, 1.0f);
+			YOA_PlayWavFile("door_close_01.wav", false, 0.5f, 1.0f);
 		}
 
 		ImGui::Spacing();
@@ -170,40 +176,6 @@ void Editor::App()
 			YOA_Pause();
 		
 		if (ImGui::Button("Resume Playback"))
-			YOA_Pause();
+			YOA_Resume();
 	}
-}
-
-void Editor::Run()
-{
-  YOA_Init();
-	
-	while (mQuit == false)
-	{
-		mTimer->Update();
-		
-		while (SDL_PollEvent(&mEvents) != 0)
-		{
-			mUi->ProcessEvent(&mEvents);
-			if (mEvents.type == SDL_QUIT)
-			{
-				mQuit = true;
-			}
-		}
-
-		if (mTimer->DeltaTime() >= 1.0f / FRAME_RATE)
-		{
-			//printf("DeltaTime: %f\n", mTimer->DeltaTime());
-			mInputManager->Update();
-			mUi->StartFrame();
-
-			App();
-
-			mUi->EndFrame();
-			mTimer->Reset();
-		}
-	}
-
-	// quit Yo audio system
-  YOA_Quit();
 }
