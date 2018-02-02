@@ -10,27 +10,22 @@
 class ResourceManager
 {
 private:
-	static ResourceManager* sInstance;
-
-	std::map<std::string, Sound*> mSounds;
-	std::map<uint16_t, Voice*> mVoices;
+	std::map<std::string, std::shared_ptr<Sound>> mSounds;
+	std::map<uint16_t, std::shared_ptr<Voice>> mVoices;
 
 	uint16_t lastVoice = 0;
 
 public:
-	static ResourceManager* GetInstance();
-	static void Release();
 	static std::string GetPath(const std::string & filename);
 
-	Sound* GetSound(const std::string & filename);
-	Sound * LoadSound(const std::string & filename);
-	bool FreeSound(Sound* sound);
+	std::shared_ptr<Sound> GetSound(const std::string & filename);
+	std::shared_ptr<Sound> LoadSound(const std::string & filename);
+	bool FreeSound(Sound* sound) noexcept;
 
-	uint16_t GetVoiceCount();
-	Voice * GetVoice();
-private:
-	ResourceManager();
-	~ResourceManager();
+	uint16_t GetVoiceCount() noexcept;
+	std::shared_ptr<Voice> GetVoice();
+	ResourceManager() noexcept;
+	~ResourceManager() noexcept;
 };
 
 #endif // !_RESOURCEMANAGER_H

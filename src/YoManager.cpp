@@ -1,24 +1,25 @@
 #include "YoManager.h"
-
 #include "Defs.h"
+#include <algorithm>
 
-YoManager * YoManager::sInstance = nullptr;
+std::unique_ptr<YoManager> YoManager::sInstance = nullptr;
 bool YoManager::sInitialized = false;
-AudioDevice * YoManager::Device = nullptr;
 
 YoManager * YoManager::GetInstance()
 {
 	if (sInstance == nullptr)
 	{
-		sInstance = new YoManager();
+		sInstance = std::make_unique<YoManager>();
 	}
 
-	return sInstance;
+	return sInstance.get();
 }
 
 void YoManager::Release(bool quitSDL)
 {
-	delete sInstance;
+	if(sInstance == nullptr)
+		return;
+	
 	sInstance = nullptr;
 
 	if (quitSDL == true)
@@ -42,20 +43,24 @@ uint16_t YoManager::PlayWavFile(const std::string & filename, bool loop, float v
 {
 	printf("Playing: %s\n", filename.c_str());
 
-	if (Device == nullptr)
+	if (m_device == nullptr)
 	{
-		fprintf(stderr, "[%s:\t%d]\nError: no audio device initialized!\n\n", __FILE__, __LINE__);
+		printf("NULL Error: no Device present!");
 		return 0;
 	}
 
-	Voice * newVoice = ResourceManager::GetInstance()->GetVoice();
-	newVoice->Sound = ResourceManager::GetInstance()->GetSound(filename);
-
+	std::shared_ptr<Voice> newVoice = m_resources->GetVoice();
+	newVoice->Sound = m_resources->GetSound(filename);
+	
 	if (newVoice->Sound == nullptr)
 	{
 		newVoice->State = Stopped;
+		
+		printf("Could not load sound at path: %s", filename);
 		return 0;
 	}
+
+	newVoice->Sound->Spec.userdata = this;
 
 	newVoice->PlayHead = newVoice->Sound->Buffer;
 	newVoice->LengthRemaining = newVoice->Sound->Length;
@@ -63,156 +68,155 @@ uint16_t YoManager::PlayWavFile(const std::string & filename, bool loop, float v
 	newVoice->Pitch = pitch;
 	newVoice->IsLooping = loop;
 
-	if (newVoice != nullptr)
-	{
-		sInstance->QueueVoice(newVoice);
+	this->QueueVoice(newVoice);
 
-		printf("%s got ID: %i\n", filename.c_str(), newVoice->ID);
-		return newVoice->ID;
-	}
-	else
-	{
-		fprintf(stderr, "[%s:\t%d]\nError: Can't queue NULL voice!\n\n", __FILE__, __LINE__);
-		return 0;
-	}
+	printf("%s got ID: %i\n", filename.c_str(), newVoice->ID);
+	return newVoice->ID;
 }
 
-bool YoManager::StopVoice(uint16_t id)
+bool YoManager::StopVoice(uint16_t id) noexcept
 {
-	if (id == 0 || id > ResourceManager::GetInstance()->GetVoiceCount())
+	if (m_device == nullptr)
+	{
+		printf("NULL Error: no Device present!");
+		return false;
+	}
+
+	if (id == 0 || id > m_resources->GetVoiceCount())
 	{
 		printf("Invadid ID: %i\nCan't stop specified Voice as it does not exist!\n\n", id);
 		return false;
 	}
 
-	std::vector<Voice*>::iterator it = m_playingAudio.begin();
-	std::vector<Voice*>::iterator end = m_playingAudio.end();
-
-	for (; it != end; ++it)
+	for (auto sound : m_playingAudio)
 	{
-		if ((*it._Ptr)->ID == id)
-		{
-			SDL_LockAudioDevice(Device->DeviceID);
-			m_playingAudio.erase(it);
-			SDL_UnlockAudioDevice(Device->DeviceID);
+		if (sound->ID != id)
+			continue;
 
-			if ((*it._Ptr)->State != Stopped)
-			{
-				printf("Stopped Voice: %i\n", id);
-				(*it._Ptr)->State = Stopped;
-				return true;
-			}
+		if (sound->State != Stopped)
+		{
+			SDL_LockAudioDevice(m_device->DeviceID);
+			sound->State = Stopping;
+			SDL_UnlockAudioDevice(m_device->DeviceID);
+
+			printf("Stopped Voice: %i\n", id);
 		}
+
+		return true;
 	}
 
 	return false;
 }
 
-void YoManager::Pause(bool pause)
+void YoManager::Pause(bool pause) noexcept
 {
-	if (Device == nullptr)
+	if (m_device == nullptr)
 	{
 		printf("NULL Error: no Device present!");
 		return;
 	}
 
-	if(pause == true)
+	if (!m_Paused)
 	{
-		if (mPaused == true)
+		if(pause)
 		{
-			printf("Yo Audio already paused\n");
-			// already paused
+			printf("Yo Audio pausing\n");
+			SDL_PauseAudioDevice(m_device->DeviceID, 1);
+			m_Paused = true;
 		}
 		else
 		{
-			printf("Yo Audio pausing\n");
-			SDL_PauseAudioDevice(Device->DeviceID, 1);
-			mThreadRunning = false;
-			mPaused = true;
+			printf("Yo Audio already paused\n");
 		}
 	}
 	else
 	{
-		if (mPaused == false)
+		if (m_Paused)
 		{
-			printf("Yo Audio already playing\n");
-			// already playing
+			printf("Yo Audio resuming\n");
+			SDL_PauseAudioDevice(m_device->DeviceID, 0);
+			m_Paused = false;
 		}
 		else
 		{
-			printf("Yo Audio resuming\n");
-			mThreadRunning = true;
-			SDL_PauseAudioDevice(Device->DeviceID, 0);
-			mPaused = false;
+			printf("Yo Audio already playing\n");
 		}
 	}
 }
 
-bool YoManager::IsPaused()
+bool YoManager::IsPaused() noexcept
 {
-	return mPaused;
+	return m_Paused;
 }
 
 void YoManager::Run()
 {
 	printf("Thread started!\n");
 
-	while (mQuit == false)
+	std::unique_ptr<Timer> time = std::make_unique<Timer>();
+	m_resources = std::make_unique<ResourceManager>();
+	m_device = std::make_unique<AudioDevice>();
+
+	SDL_memset(&(m_device->SpecWanted), 0, sizeof(m_device->SpecWanted));
+
+	(m_device->SpecWanted).freq = AUDIO_FREQUENCY;
+	(m_device->SpecWanted).format = AUDIO_FORMAT;
+	(m_device->SpecWanted).channels = AUDIO_CHANNELS;
+	(m_device->SpecWanted).samples = AUDIO_SAMPLES;
+	(m_device->SpecWanted).callback = AudioCallback;
+	(m_device->SpecWanted).userdata = this;
+
+	if ((m_device->DeviceID = SDL_OpenAudioDevice(nullptr, 0, &(m_device->SpecWanted), &(m_device->SpecObtained), ALLOWED_CHANGES)) == 0)
 	{
-		if (mThreadRunning == false)
+		fprintf(stderr, "[%s:\t%d]Warning: failed to open audio device: %s\n\n", __FILE__, __LINE__, SDL_GetError());
+		m_Quit = true;
+	}
+
+	// unpause SDL audio callback
+	this->Pause(false);
+
+	// main thread loop
+	while (m_Quit == false)
+	{
+		if (m_ThreadRunning == false)
 		{
 			continue;
 		}
 
-		mTimer->Update();
-		if (mTimer->DeltaTime() >= 1.0f / UPDATE_RATE)
+		// increment deltaTime
+		time->Update();
+		if (time->DeltaTime() >= 1.0f / UPDATE_RATE)
 		{
-			//printf("DeltaTime: %f\n", mTimer->DeltaTime());
+			//printf("Audio Thread DeltaTime: %f\n", mTimer->DeltaTime());
 			this->Update();
-			mTimer->Reset();
+			time->Reset();
 		}
 	}
+
+	this->Pause(true);
+
+	// close SDL audio
+	SDL_CloseAudioDevice(m_device->DeviceID);
+
+	m_resources = nullptr;
+	m_device = nullptr;
 
 	printf("Thread finished!\n");
 }
 
-void YoManager::Update()
+void YoManager::Update() noexcept
 {
-	//printf("updates!\n");
-}
+	// system updates
 
-YoManager::YoManager()
-{
-	sInitialized = Init();
-}
-
-YoManager::~YoManager()
-{
-	// stop the SDL AudioCallback
-	this->Pause(true);
-
-	mThreadRunning = false;
-	mQuit = true;
-	// wait for thread to finish
-	mThread.join();
-
-	printf("Yo Audio Quit\n");
-	if (Device == nullptr)
-	{
-		fprintf(stderr, "[%s:\t%d]\nError: no audio device initialized!\n\n", __FILE__, __LINE__);
+	if (m_Paused)
 		return;
-	}
 
-	// close SDL audio
-	SDL_CloseAudioDevice(Device->DeviceID);
-
-	free(Device);
-	Device = nullptr;
-
-	ResourceManager::Release();
+	// loop throu sound channels
+	// interpolate values
+	// update statemachines
 }
 
-bool YoManager::Init()
+YoManager::YoManager() noexcept
 {
 	if (SDL_WasInit(SDL_INIT_AUDIO) != 0)
 	{
@@ -224,76 +228,66 @@ bool YoManager::Init()
 		if (SDL_Init(SDL_INIT_AUDIO) < 0)
 		{
 			fprintf(stderr, "[%s:\t%d]Warning: failed to initilize SDL!\n\n", __FILE__, __LINE__);
-			return false;
+			return;
 		}
 	}
 
 	printf("Yo Audio Init\n");
 
-	mTimer = new Timer();
-
-	Device = (AudioDevice*)malloc(sizeof(AudioDevice));
-
-	if (Device == nullptr)
-	{
-		fprintf(stderr, "[%s:\t%d]\nFatal Error: Memory c-allocation error\n\n", __FILE__, __LINE__);
-		return false;
-	}
-
 	if (!(SDL_WasInit(SDL_INIT_AUDIO) & SDL_INIT_AUDIO))
 	{
 		fprintf(stderr, "[%s:\t%d]\nError: SDL_INIT_AUDIO not initialized\n\n", __FILE__, __LINE__);
-		return false;
+		return;
 	}
 
-	SDL_memset(&(Device->SpecWanted), 0, sizeof(Device->SpecWanted));
+	m_Quit = false;
+	m_ThreadRunning = true;
+	m_Thread = std::thread([this]() { this->Run(); });
+	// alterate: std::thread t{&Class::Run, this}
 
-	(Device->SpecWanted).freq = AUDIO_FREQUENCY;
-	(Device->SpecWanted).format = AUDIO_FORMAT;
-	(Device->SpecWanted).channels = AUDIO_CHANNELS;
-	(Device->SpecWanted).samples = AUDIO_SAMPLES;
-	(Device->SpecWanted).callback = AudioCallback;
-	(Device->SpecWanted).userdata = nullptr;
-
-	if ((Device->DeviceID = SDL_OpenAudioDevice(nullptr, 0, &(Device->SpecWanted), &(Device->SpecObtained), ALLOWED_CHANGES)) == 0)
-	{
-		fprintf(stderr, "[%s:\t%d]Warning: failed to open audio device: %s\n\n", __FILE__, __LINE__, SDL_GetError());
-		return false;
-	}
-	else
-	{
-		mQuit = false;
-		mThreadRunning = true;
-		mThread = std::thread([this]() { this->Run(); });
-		// alterate: std::thread t{&Class::Run, this}
-
-		// TODO: check SpecWanted against SpecObtained
-
-		// unpause SDL audio callback
-		this->Pause(false);
-
-		return true;
-	}
+	// TODO: check SpecWanted against SpecObtained
 }
 
-void YoManager::QueueVoice(Voice * newVoice)
+YoManager::~YoManager() noexcept
+{
+	// stop the SDL AudioCallback
+	this->Pause(true);
+
+	m_Quit = true;
+	// wait for thread to finish
+	m_Thread.join();
+
+	printf("Yo Audio Quit\n");
+
+	if (m_device == nullptr)
+	{
+		fprintf(stderr, "[%s:\t%d]\nError: no audio device initialized!\n\n", __FILE__, __LINE__);
+		return;
+	}
+
+	m_device = nullptr;
+}
+
+void YoManager::QueueVoice(std::shared_ptr<Voice> newVoice)
 {
 	// avoid duplicate Voices
-	sInstance->StopVoice(newVoice->ID); // returns true because we probably set the state to ToPlay
+	this->StopVoice(newVoice->ID); // returns true because we probably set the state to ToPlay
 	// set voice state
 	newVoice->State = ToPlay;
 
-	SDL_LockAudioDevice(Device->DeviceID);
+	SDL_LockAudioDevice(m_device->DeviceID);
 	// add voice to playing voices vector
-	sInstance->m_playingAudio.push_back(newVoice);
-	SDL_UnlockAudioDevice(Device->DeviceID);
+	this->m_playingAudio.push_back(newVoice);
+	SDL_UnlockAudioDevice(m_device->DeviceID);
 }
 
 inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 {
-	int streamLen = len / 2;
+	YoManager* instance = ((YoManager*)userdata);
+	const uint32_t streamLen = (uint32_t) len / 2;
 	
-	std::vector<float>* fstream = &(sInstance->m_stream);
+	
+	std::vector<float>* fstream = &(instance->m_stream);
 	
 	fstream->reserve(streamLen);
 	float* floatStream = fstream->begin()._Ptr;
@@ -303,7 +297,7 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 		f = 0.0f;
 	}
 
-	for (auto voice : sInstance->m_playingAudio)
+	for (auto voice : instance->m_playingAudio)
 	{
 		//Voice * voice = *it._Ptr;
 
@@ -315,13 +309,13 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 		if (voice->State == Playing)
 		{
 			// s16 to normalized float
-			float sampleFactor = 1 / 32768.0f;
+			const float sampleFactor = 1 / 32768.0f;
 			float volumeFactor = voice->Volume;
 			float pitch = voice->Pitch;
 
 			uint32_t length = (uint32_t)((streamLen > voice->LengthRemaining / 2) ? voice->LengthRemaining / 2 : streamLen);
 
-			Sint16* samples = (Sint16*)voice->PlayHead;
+			const Sint16* samples = (Sint16*)voice->PlayHead;
 			float sampleIndex = 0;
 
 			for (uint32_t i = 0; i < length; i++)
@@ -360,7 +354,7 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 	}
 
 	Sint16* current = (Sint16*)stream;
-	for (int i = 0; i < streamLen; i++)
+	for (uint32_t i = 0; i < streamLen; i++)
 	{
 		float val = floatStream[i];
 

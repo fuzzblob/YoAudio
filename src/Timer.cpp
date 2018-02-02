@@ -30,6 +30,7 @@ void Timer::Update()
 
 Timer::Timer()
 {
+	SDL_Init(SDL_INIT_TIMER);
 	Reset();
 	mTimeScale = 1.0f;
 }

@@ -4,6 +4,7 @@
 #include <thread>
 #include <atomic>
 #include <vector>
+#include <memory>
 
 #include "AudioDevice.h"
 #include "Timer.h"
@@ -24,37 +25,37 @@
 class YoManager
 {
 private:
-	static YoManager* sInstance;
+	const int UPDATE_RATE = 30; // Updates per second
+	
+	static std::unique_ptr<YoManager> sInstance;
 	static bool sInitialized;
 
-	static AudioDevice * Device;
+	bool m_Paused = true;
+	std::unique_ptr<AudioDevice> m_device = nullptr;
 	std::vector<float> m_stream;
-	std::vector<Voice*> m_playingAudio;
-	bool mPaused = true;
+	std::vector<std::shared_ptr<Voice>> m_playingAudio;
+	std::unique_ptr<ResourceManager> m_resources = nullptr;
 	
-	std::thread mThread;
-	const int UPDATE_RATE = 30; // Updates per second
-	std::atomic_bool mQuit = false;
-	std::atomic_bool mThreadRunning = true;
-	Timer * mTimer = nullptr;
+	std::thread m_Thread;
+	std::atomic_bool m_Quit = false;
+	std::atomic_bool m_ThreadRunning = true;
 public:
 	static YoManager* GetInstance();
 	static void Release(bool quitSDL);
 	static bool IsInitialized();
 
-	uint16_t PlayWavFile(const std::string & filename, bool loop, float volume, float pitch);
-	bool StopVoice(uint16_t id);
-	void Pause(bool pause);
-	bool IsPaused();
-private:
-	YoManager();
-	~YoManager();
-
-	bool Init();
-	void Run();
-	void Update();
+	YoManager() noexcept;
+	~YoManager() noexcept;
 	
-	void QueueVoice(Voice * newVoice);
+	uint16_t PlayWavFile(const std::string & filename, bool loop, float volume, float pitch);
+	bool StopVoice(uint16_t id) noexcept;
+	void Pause(bool pause) noexcept;
+	bool IsPaused() noexcept;
+private:
+	void Run();
+	void Update() noexcept;
+	
+	void QueueVoice(std::shared_ptr<Voice> newVoice);
 	static inline void AudioCallback(void * userdata, uint8_t * stream, int len);
 };
 

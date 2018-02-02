@@ -1,26 +1,5 @@
 #include "ResourceManager.h"
 
-ResourceManager* ResourceManager::sInstance = nullptr;
-
-ResourceManager * ResourceManager::GetInstance()
-{
-	if (sInstance == nullptr)
-	{
-		sInstance = new ResourceManager();
-	}
-
-	return sInstance;
-}
-
-void ResourceManager::Release()
-{
-	if (sInstance == nullptr)
-		return;
-
-	delete sInstance;
-	sInstance = nullptr;
-}
-
 std::string ResourceManager::GetPath(const std::string & filename)
 {
 	std::string fullPath = std::string(SDL_GetBasePath());
@@ -28,7 +7,7 @@ std::string ResourceManager::GetPath(const std::string & filename)
 	return fullPath;
 }
 
-Sound * ResourceManager::GetSound(const std::string & filename)
+std::shared_ptr<Sound >ResourceManager::GetSound(const std::string & filename)
 {
 	std::string fullPath = GetPath(filename);
 
@@ -40,20 +19,13 @@ Sound * ResourceManager::GetSound(const std::string & filename)
 	return mSounds[fullPath];
 }
 
-Sound * ResourceManager::LoadSound(const std::string & filename)
+std::shared_ptr<Sound> ResourceManager::LoadSound(const std::string & filename)
 {
-	Sound * newSound = (Sound*)malloc(sizeof(Sound));
-
-	if (newSound == nullptr)
-	{
-		fprintf(stderr, "[%s:\t%d]\nError: Memory allocation error\n\n", __FILE__, __LINE__);
-		return nullptr;
-	}
+	std::shared_ptr<Sound> newSound = std::make_shared<Sound>();
 
 	if (SDL_LoadWAV(filename.c_str(), &(newSound->Spec), &(newSound->Buffer), &(newSound->Length)) == nullptr)
 	{
 		fprintf(stderr, "[%s:\t%d]\nWarning: failed to open wave file: %s error: %s\n\n", __FILE__, __LINE__, filename, SDL_GetError());
-		free(newSound);
 		return nullptr;
 	}
 
@@ -63,7 +35,7 @@ Sound * ResourceManager::LoadSound(const std::string & filename)
 	return newSound;
 }
 
-bool ResourceManager::FreeSound(Sound* sound)
+bool ResourceManager::FreeSound(Sound* sound) noexcept
 {
 	if (sound == nullptr)
 	{
@@ -79,14 +51,14 @@ bool ResourceManager::FreeSound(Sound* sound)
 	return false;
 }
 
-uint16_t ResourceManager::GetVoiceCount()
+uint16_t ResourceManager::GetVoiceCount() noexcept
 {
 	return lastVoice;
 }
 
-Voice * ResourceManager::GetVoice()
+std::shared_ptr<Voice> ResourceManager::GetVoice()
 {
-	Voice * newVoice = nullptr;
+	std::shared_ptr<Voice> newVoice = nullptr;
 
 	// Try getting a voice for recycling
 	for (auto voice : mVoices)
@@ -101,7 +73,7 @@ Voice * ResourceManager::GetVoice()
 	// else make a new voice
 	if (newVoice == nullptr)
 	{
-		newVoice = (Voice*)malloc(sizeof(Voice));
+		newVoice = std::make_shared<Voice>();
 
 		if (newVoice == nullptr)
 		{
@@ -128,12 +100,12 @@ Voice * ResourceManager::GetVoice()
 	return newVoice;
 }
 
-ResourceManager::ResourceManager()
+ResourceManager::ResourceManager() noexcept
 {
 	lastVoice = 0;
 }
 
-ResourceManager::~ResourceManager()
+ResourceManager::~ResourceManager() noexcept
 {
 	for (auto snd : mSounds)
 	{
@@ -148,7 +120,7 @@ ResourceManager::~ResourceManager()
 	{
 		if (voice.second != nullptr)
 		{
-			free(voice.second);
+			voice.second = nullptr; // .~shared_ptr()
 		}
 	}
 	mSounds.clear();
