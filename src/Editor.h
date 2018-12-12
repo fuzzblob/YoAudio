@@ -10,7 +10,10 @@ class Editor
 {
 private:
 	const int FRAME_RATE = 30;
+	bool m_quit = false;
+
 	void App();
+	void Menu();
 public:
 	void Run();
 };
