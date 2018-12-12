@@ -57,6 +57,11 @@ uint16_t YoManager::PlayWavFile(const std::string & filename, bool loop, float v
 	}
 
 	std::shared_ptr<Voice> newVoice = m_resources->GetVoice();
+	if (newVoice == nullptr)
+	{
+		printf("Could not load sound at path: %s", filename);
+		return 0;
+	}
 	newVoice->Sound = sound;
 	newVoice->Sound->Spec.userdata = this;
 
@@ -320,6 +325,7 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 					voice = voice;
 				}
 
+				// TODO: sample mixing by adding values together
 				floatStream[i] = (samples[(int)sampleIndex] * 1.0f) * sampleFactor * volumeFactor;
 
 				// TODO: implement interpolating pitching & resampling
@@ -346,22 +352,12 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 				}
 			}
 		}
-
-		// basic sample clipping
-		for (float f : *fstream)
-		{
-			if (f > 1.0f)
-				f = 1.0f;
-			else if (f < 1.0f)
-				f = 1.0f;
-		}
 	}
 
 	Sint16* current = (Sint16*)stream;
 	for (uint32_t i = 0; i < streamLen; i++)
 	{
 		float val = floatStream[i];
-
 		// clipping
 		if (val > 1.0f)
 			val = 1.0f;
