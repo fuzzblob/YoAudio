@@ -49,17 +49,15 @@ uint16_t YoManager::PlayWavFile(const std::string & filename, bool loop, float v
 		return 0;
 	}
 
-	std::shared_ptr<Voice> newVoice = m_resources->GetVoice();
-	newVoice->Sound = m_resources->GetSound(filename);
-	
-	if (newVoice->Sound == nullptr)
+	std::shared_ptr<Sound> sound = m_resources->GetSound(filename);
+	if (sound == nullptr)
 	{
-		newVoice->State = Stopped;
-		
 		printf("Could not load sound at path: %s", filename);
 		return 0;
 	}
 
+	std::shared_ptr<Voice> newVoice = m_resources->GetVoice();
+	newVoice->Sound = sound;
 	newVoice->Sound->Spec.userdata = this;
 
 	newVoice->PlayHead = newVoice->Sound->Buffer;
@@ -68,7 +66,19 @@ uint16_t YoManager::PlayWavFile(const std::string & filename, bool loop, float v
 	newVoice->Pitch = pitch;
 	newVoice->IsLooping = loop;
 
-	this->QueueVoice(newVoice);
+	{
+		// avoid duplicate Voices
+		if (this->StopVoice(newVoice->ID) == true)
+		{
+			printf("Had to stop Voice: %i\n", newVoice->ID);
+		}
+		
+		// add voice to playing voices vector
+		SDL_LockAudioDevice(m_device->DeviceID);
+		this->m_playingAudio.push_back(newVoice);
+		newVoice->State = ToPlay;
+		SDL_UnlockAudioDevice(m_device->DeviceID);
+	}
 
 	printf("%s got ID: %i\n", filename.c_str(), newVoice->ID);
 	return newVoice->ID;
@@ -88,17 +98,21 @@ bool YoManager::StopVoice(uint16_t id) noexcept
 		return false;
 	}
 
-	for (auto sound : m_playingAudio)
+	int i = -1;
+	for (auto voice : m_playingAudio)
 	{
-		if (sound->ID != id)
+		i++;
+		if (voice->ID != id)
 			continue;
 
-		if (sound->State != Stopped)
+		if (voice->State != Stopped)
 		{
 			SDL_LockAudioDevice(m_device->DeviceID);
-			sound->State = Stopping;
+			voice->State = Stopped;
+			// TODO: this doesn't seem to work right...
+			this->m_playingAudio.erase(m_playingAudio.begin() + i);
 			SDL_UnlockAudioDevice(m_device->DeviceID);
-
+			
 			printf("Stopped Voice: %i\n", id);
 		}
 
@@ -257,35 +271,13 @@ YoManager::~YoManager() noexcept
 	// wait for thread to finish
 	m_Thread.join();
 
-	printf("Yo Audio Quit\n");
-
-	if (m_device == nullptr)
-	{
-		fprintf(stderr, "[%s:\t%d]\nError: no audio device initialized!\n\n", __FILE__, __LINE__);
-		return;
-	}
-
-	m_device = nullptr;
-}
-
-void YoManager::QueueVoice(std::shared_ptr<Voice> newVoice)
-{
-	// avoid duplicate Voices
-	this->StopVoice(newVoice->ID); // returns true because we probably set the state to ToPlay
-	// set voice state
-	newVoice->State = ToPlay;
-
-	SDL_LockAudioDevice(m_device->DeviceID);
-	// add voice to playing voices vector
-	this->m_playingAudio.push_back(newVoice);
-	SDL_UnlockAudioDevice(m_device->DeviceID);
+	printf("Yo Audio Shutdown sucessfully\n");
 }
 
 inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 {
 	YoManager* instance = ((YoManager*)userdata);
 	const uint32_t streamLen = (uint32_t) len / 2;
-	
 	
 	std::vector<float>* fstream = &(instance->m_stream);
 	
@@ -299,13 +291,16 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 
 	for (auto voice : instance->m_playingAudio)
 	{
-		//Voice * voice = *it._Ptr;
-
-		if (voice->State == ToPlay)
+		if (voice->State == Stopped
+			|| voice->State == Paused)
+		{
+			continue;
+		}
+		else if (voice->State == ToPlay)
 		{
 			voice->State = Playing;
 		}
-
+		
 		if (voice->State == Playing)
 		{
 			// s16 to normalized float
@@ -350,6 +345,15 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 					voice->State = Stopped;
 				}
 			}
+		}
+
+		// basic sample clipping
+		for (float f : *fstream)
+		{
+			if (f > 1.0f)
+				f = 1.0f;
+			else if (f < 1.0f)
+				f = 1.0f;
 		}
 	}
 

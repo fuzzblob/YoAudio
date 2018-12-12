@@ -63,18 +63,23 @@ std::shared_ptr<Voice> ResourceManager::GetVoice()
 	// Try getting a voice for recycling
 	for (auto voice : mVoices)
 	{
-		if (voice.second->State == Stopped)
+		if (voice.second != nullptr && voice.second->State == Stopped)
 		{
-			voice.second->State = ToPlay;
 			newVoice = voice.second;
+			break;
 		}
 	}
 	
 	// else make a new voice
 	if (newVoice == nullptr)
 	{
+		if(lastVoice >= maxVoices)
+		{
+			fprintf(stderr, "[%s:\t%d]\nError: Voice limit of %i\n\n", __FILE__, __LINE__, maxVoices);
+			return nullptr;
+		}
+			
 		newVoice = std::make_shared<Voice>();
-
 		if (newVoice == nullptr)
 		{
 			fprintf(stderr, "[%s:\t%d]\nError: Memory allocation error\n\n", __FILE__, __LINE__);
@@ -84,19 +89,10 @@ std::shared_ptr<Voice> ResourceManager::GetVoice()
 		// set Voice ID
 		lastVoice++;
 		newVoice->ID = lastVoice;
+		mVoices[newVoice->ID] != newVoice;
 	}
 	
 	newVoice->Sound = nullptr;
-
-	if (mVoices[newVoice->ID] != nullptr && mVoices[newVoice->ID] != newVoice)
-	{
-		fprintf(stderr, "[%s:\t%d]\nError: New Voice could not be stored in voice map!\n\n", __FILE__, __LINE__);
-	}
-	else
-	{
-		mVoices[newVoice->ID] = newVoice;
-	}
-
 	return newVoice;
 }
 
@@ -120,8 +116,8 @@ ResourceManager::~ResourceManager() noexcept
 	{
 		if (voice.second != nullptr)
 		{
-			voice.second = nullptr; // .~shared_ptr()
+			voice.second = nullptr;
 		}
 	}
-	mSounds.clear();
+	mVoices.clear();
 }

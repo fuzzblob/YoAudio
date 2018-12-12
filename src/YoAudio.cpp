@@ -19,7 +19,7 @@ uint16_t YOA_PlayWavFile(const char * filename, bool loop, float volume, float p
 
 int YOA_StopVoice(uint16_t id)
 {
-	return YoManager::GetInstance()->StopVoice(id) ? 0 : 1;
+	return YoManager::GetInstance()->StopVoice(id) ? 1 : 0;
 }
 
 void YOA_Pause(void)

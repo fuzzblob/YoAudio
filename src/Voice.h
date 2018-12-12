@@ -7,11 +7,9 @@
 
 enum VoiceState
 {
-	Initialize = 0,
 	ToPlay = 1,
 	Playing = 2,
 	Paused = 3,
-	Stopping = 4,
 	Stopped = 5
 };
 

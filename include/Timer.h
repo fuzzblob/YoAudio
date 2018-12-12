@@ -10,16 +10,12 @@ private:
 	unsigned int mSTartTicks;
 	unsigned int mElapsedTicks;
 	float mDeltaTime;
-	float mTimeScale;
 public:
 	Timer();
 	~Timer();
 
 	void Reset();
 	float DeltaTime();
-
-	void SetTimeScale(float t);
-	float TimeScale();
 
 	void Update();
 };

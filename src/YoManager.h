@@ -55,7 +55,6 @@ private:
 	void Run();
 	void Update() noexcept;
 	
-	void QueueVoice(std::shared_ptr<Voice> newVoice);
 	static inline void AudioCallback(void * userdata, uint8_t * stream, int len);
 };
 

@@ -12,16 +12,6 @@ float Timer::DeltaTime()
 	return mDeltaTime;
 }
 
-void Timer::SetTimeScale(float t)
-{
-	mTimeScale = t;
-}
-
-float Timer::TimeScale()
-{
-	return mTimeScale;
-}
-
 void Timer::Update()
 {
 	mElapsedTicks = SDL_GetTicks() - mSTartTicks;
@@ -32,7 +22,6 @@ Timer::Timer()
 {
 	SDL_Init(SDL_INIT_TIMER);
 	Reset();
-	mTimeScale = 1.0f;
 }
 
 Timer::~Timer()
