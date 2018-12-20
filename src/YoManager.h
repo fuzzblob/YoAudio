@@ -41,14 +41,14 @@ private:
 	std::atomic_bool m_ThreadRunning = true;
 public:
 	static YoManager* GetInstance();
-	static void Release(bool quitSDL);
-	static bool IsInitialized();
+	static void Release(bool quitSDL) noexcept;
+	static bool IsInitialized() noexcept;
 
 	YoManager() noexcept;
-	~YoManager() noexcept;
+	~YoManager();
 	
 	uint16_t PlayWavFile(const std::string & filename, bool loop, float volume, float pitch);
-	bool StopVoice(uint16_t id) noexcept;
+	bool StopVoice(uint16_t id);
 	void Pause(bool pause) noexcept;
 	bool IsPaused() noexcept;
 private:

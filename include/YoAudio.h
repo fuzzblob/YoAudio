@@ -8,17 +8,17 @@ extern "C"
 {
 #endif
 
-bool IMPORT_EXPORT YOA_Init(void);
+bool YOA_API YOA_Init(void);
 
-void IMPORT_EXPORT YOA_Quit(bool quitSDL);
+void YOA_API YOA_Quit(bool quitSDL);
 
-uint16_t IMPORT_EXPORT YOA_PlayWavFile(const char * filename, bool loop, float volume, float pitch);
+uint16_t YOA_API YOA_PlayWavFile(const char * filename, bool loop, float volume, float pitch);
 
-int IMPORT_EXPORT YOA_StopVoice(uint16_t id);
+bool YOA_API YOA_StopVoice(uint16_t id);
 
-void IMPORT_EXPORT YOA_Pause(void);
+void YOA_API YOA_Pause(void);
 
-void IMPORT_EXPORT YOA_Resume(void);
+void YOA_API YOA_Resume(void);
 
 #ifdef __cplusplus
 }

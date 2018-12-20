@@ -15,10 +15,10 @@ enum VoiceState
 
 struct Voice
 {
-	uint16_t ID;
-	VoiceState State;
+	uint16_t ID = 0;
+	VoiceState State = Stopped;
 	std::shared_ptr<Sound> Sound;
-	uint32_t LengthRemaining;
+	uint32_t LengthRemaining = 0;
 	uint8_t * PlayHead;
 	bool IsLooping;
 	float Volume;

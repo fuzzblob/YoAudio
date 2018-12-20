@@ -4,20 +4,20 @@
 #include "Defs.h"
 #include "DllImportExport.h"
 
-class IMPORT_EXPORT Timer
+class YOA_API Timer
 {
 private:
-	unsigned int mSTartTicks;
-	unsigned int mElapsedTicks;
-	float mDeltaTime;
+	unsigned int mSTartTicks = 0;
+	unsigned int mElapsedTicks = 0;
+	float mDeltaTime = 0.0f;
 public:
-	Timer();
-	~Timer();
+	Timer() noexcept;
+	~Timer() noexcept;
 
-	void Reset();
-	float DeltaTime();
+	void Reset() noexcept;
+	float DeltaTime() noexcept;
 
-	void Update();
+	void Update() noexcept;
 };
 
 #endif // !_TIMER_H

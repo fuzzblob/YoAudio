@@ -101,7 +101,7 @@ ResourceManager::ResourceManager() noexcept
 	lastVoice = 0;
 }
 
-ResourceManager::~ResourceManager() noexcept
+ResourceManager::~ResourceManager()
 {
 	for (auto snd : mSounds)
 	{
@@ -112,12 +112,5 @@ ResourceManager::~ResourceManager() noexcept
 	}
 	mSounds.clear();
 
-	for (auto voice : mVoices)
-	{
-		if (voice.second != nullptr)
-		{
-			voice.second = nullptr;
-		}
-	}
 	mVoices.clear();
 }

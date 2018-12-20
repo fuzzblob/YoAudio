@@ -27,7 +27,7 @@ public:
 	uint16_t GetVoiceCount() noexcept;
 	std::shared_ptr<Voice> GetVoice();
 	ResourceManager() noexcept;
-	~ResourceManager() noexcept;
+	~ResourceManager();
 };
 
 #endif // !_RESOURCEMANAGER_H

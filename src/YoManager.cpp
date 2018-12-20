@@ -15,7 +15,7 @@ YoManager * YoManager::GetInstance()
 	return sInstance.get();
 }
 
-void YoManager::Release(bool quitSDL)
+void YoManager::Release(bool quitSDL) noexcept
 {
 	if(sInstance == nullptr)
 		return;
@@ -34,7 +34,7 @@ void YoManager::Release(bool quitSDL)
 	}
 }
 
-bool YoManager::IsInitialized()
+bool YoManager::IsInitialized() noexcept
 {
 	return sInitialized;
 }
@@ -89,7 +89,7 @@ uint16_t YoManager::PlayWavFile(const std::string & filename, bool loop, float v
 	return newVoice->ID;
 }
 
-bool YoManager::StopVoice(uint16_t id) noexcept
+bool YoManager::StopVoice(uint16_t id)
 {
 	if (m_device == nullptr)
 	{
@@ -103,27 +103,19 @@ bool YoManager::StopVoice(uint16_t id) noexcept
 		return false;
 	}
 
-	int i = -1;
-	for (auto voice : m_playingAudio)
-	{
-		i++;
+	// loop throu sound channels removing stopped voices
+	std::vector<std::shared_ptr<Voice>>::iterator it = m_playingAudio.begin();
+	std::vector<std::shared_ptr<Voice>>::iterator end = m_playingAudio.end();
+	for (; it != end; ++it) {
+		auto voice = (*it);
 		if (voice->ID != id)
 			continue;
-
-		if (voice->State != Stopped)
-		{
-			SDL_LockAudioDevice(m_device->DeviceID);
-			voice->State = Stopped;
-			// TODO: this doesn't seem to work right...
-			this->m_playingAudio.erase(m_playingAudio.begin() + i);
-			SDL_UnlockAudioDevice(m_device->DeviceID);
-			
-			printf("Stopped Voice: %i\n", id);
-		}
-
+		SDL_LockAudioDevice(m_device->DeviceID);
+		voice->State = Stopped;
+		m_playingAudio.erase(it);
+		SDL_UnlockAudioDevice(m_device->DeviceID);
 		return true;
 	}
-
 	return false;
 }
 
@@ -206,7 +198,6 @@ void YoManager::Run()
 		time->Update();
 		if (time->DeltaTime() >= 1.0f / UPDATE_RATE)
 		{
-			//printf("Audio Thread DeltaTime: %f\n", mTimer->DeltaTime());
 			this->Update();
 			time->Reset();
 		}
@@ -219,8 +210,6 @@ void YoManager::Run()
 
 	m_resources = nullptr;
 	m_device = nullptr;
-
-	printf("Thread finished!\n");
 }
 
 void YoManager::Update() noexcept
@@ -230,7 +219,6 @@ void YoManager::Update() noexcept
 	if (m_Paused)
 		return;
 
-	// loop throu sound channels
 	// interpolate values
 	// update statemachines
 }
@@ -241,14 +229,13 @@ YoManager::YoManager() noexcept
 	{
 		printf("Audio is already initialized.\n");
 	}
-	else
+	
+	// initialize logging
+	// initialize SDL audio
+	if (SDL_Init(SDL_INIT_AUDIO) < 0)
 	{
-		// initialize SDL audio
-		if (SDL_Init(SDL_INIT_AUDIO) < 0)
-		{
 			fprintf(stderr, "[%s:\t%d]Warning: failed to initilize SDL!\n\n", __FILE__, __LINE__);
-			return;
-		}
+		return;
 	}
 
 	printf("Yo Audio Init\n");
@@ -267,7 +254,7 @@ YoManager::YoManager() noexcept
 	// TODO: check SpecWanted against SpecObtained
 }
 
-YoManager::~YoManager() noexcept
+YoManager::~YoManager()
 {
 	// stop the SDL AudioCallback
 	this->Pause(true);
@@ -281,8 +268,8 @@ YoManager::~YoManager() noexcept
 
 inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 {
-	YoManager* instance = ((YoManager*)userdata);
-	const uint32_t streamLen = (uint32_t) len / 2;
+	YoManager* instance = static_cast<YoManager*>(userdata);
+	const uint32_t streamLen = uint32_t(len / 2);
 	
 	std::vector<float>* fstream = &(instance->m_stream);
 	
@@ -294,61 +281,64 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 		f = 0.0f;
 	}
 
-	for (auto voice : instance->m_playingAudio)
+	// s16 to normalized float
+	const float sampleFactor = 1.0f / 32768.0f;
 	{
-		if (voice->State == Stopped
-			|| voice->State == Paused)
+	{
+	{
+		for (auto voice : instance->m_playingAudio)
 		{
-			continue;
-		}
-		else if (voice->State == ToPlay)
-		{
-			voice->State = Playing;
-		}
-		
-		if (voice->State == Playing)
-		{
-			// s16 to normalized float
-			const float sampleFactor = 1 / 32768.0f;
-			float volumeFactor = voice->Volume;
-			float pitch = voice->Pitch;
-
-			uint32_t length = (uint32_t)((streamLen > voice->LengthRemaining / 2) ? voice->LengthRemaining / 2 : streamLen);
-
-			const Sint16* samples = (Sint16*)voice->PlayHead;
-			float sampleIndex = 0;
-
-			for (uint32_t i = 0; i < length; i++)
+			if (voice->State == Stopped
+				|| voice->State == Paused)
 			{
-				if (i == length - 1)
-				{
-					voice = voice;
-				}
-
-				// TODO: sample mixing by adding values together
-				floatStream[i] = (samples[(int)sampleIndex] * 1.0f) * sampleFactor * volumeFactor;
-
-				// TODO: implement interpolating pitching & resampling
-				// non-interpolating pitching
-				sampleIndex += pitch;
+				continue;
+			}
+			else if (voice->State == ToPlay)
+			{
+				voice->State = Playing;
 			}
 
-			voice->PlayHead += length * 2;
-			voice->LengthRemaining -= length * 2;
-
-			if (voice->LengthRemaining <= 0)
+			if (voice->State == Playing)
 			{
-				if (voice->IsLooping == true)
-				{
-					voice->PlayHead = voice->Sound->Buffer;
-					voice->LengthRemaining = voice->Sound->Length;
+				const float volumeFactor = voice->Volume;
+				const float pitch = voice->Pitch;
 
-					length = streamLen - length;
-				}
-				else
+				uint32_t length = ((streamLen > voice->LengthRemaining / 2) ? voice->LengthRemaining / 2 : streamLen);
+
+				const Sint16* samples = (Sint16*)voice->PlayHead;
+				float sampleIndex = 0;
+
+				for (uint32_t i = 0; i < length; i++)
 				{
-					// Non looping sound has no more mixable samples
-					voice->State = Stopped;
+					if (i == length - 1)
+					{
+						voice = voice;
+					}
+
+					// TODO: sample mixing by adding values together
+					floatStream[i] = (samples[static_cast<int>(sampleIndex)] * 1.0f) * sampleFactor * volumeFactor;
+
+					// TODO: implement interpolating pitching & resampling
+					sampleIndex += pitch; // non-interpolating pitching
+				}
+
+				voice->PlayHead += length * 2;
+				voice->LengthRemaining -= length * 2;
+
+				if (voice->LengthRemaining <= 0)
+				{
+					if (voice->IsLooping == true)
+					{
+						voice->PlayHead = voice->Sound->Buffer;
+						voice->LengthRemaining = voice->Sound->Length;
+
+						length = streamLen - length;
+					}
+					else
+					{
+						// Non looping sound has no more mixable samples
+						voice->State = Stopped;
+					}
 				}
 			}
 		}
@@ -365,6 +355,6 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 			val = -1.0f;
 
 		// convert float back to s16
-		current[i] = (Sint16)(val * 32767);
+		current[i] = static_cast<Sint16>(val * 32767);
 	}
 }
