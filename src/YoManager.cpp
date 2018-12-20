@@ -324,7 +324,7 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 				}
 
 				// TODO: sample mixing by adding values together
-				mixBuffer[i] = (samples[static_cast<int>(sampleIndex)] * 1.0f) * sampleFactor * volumeFactor;
+				mixBuffer[i] += (samples[static_cast<int>(sampleIndex)] * 1.0f) * sampleFactor * volumeFactor;
 
 				// TODO: implement interpolating pitching & resampling
 				sampleIndex += pitch; // non-interpolating pitching
