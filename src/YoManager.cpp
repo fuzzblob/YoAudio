@@ -284,62 +284,58 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 
 	// s16 to normalized float
 	const float sampleFactor = 1.0f / 32768.0f;
+	for (auto voice : instance->m_playingAudio)
 	{
-	{
-	{
-		for (auto voice : instance->m_playingAudio)
+		if (voice->State == Stopped
+			|| voice->State == Paused)
 		{
-			if (voice->State == Stopped
-				|| voice->State == Paused)
+			continue;
+		}
+		else if (voice->State == ToPlay)
+		{
+			voice->State = Playing;
+		}
+
+		if (voice->State == Playing)
+		{
+			const float volumeFactor = voice->Volume;
+			const float pitch = voice->Pitch;
+
+			uint32_t length = ((streamLen > voice->LengthRemaining / 2) ? voice->LengthRemaining / 2 : streamLen);
+
+			const Sint16* samples = (Sint16*)voice->PlayHead;
+			float sampleIndex = 0;
+
+			for (uint32_t i = 0; i < length; i++)
 			{
-				continue;
-			}
-			else if (voice->State == ToPlay)
-			{
-				voice->State = Playing;
-			}
-
-			if (voice->State == Playing)
-			{
-				const float volumeFactor = voice->Volume;
-				const float pitch = voice->Pitch;
-
-				uint32_t length = ((streamLen > voice->LengthRemaining / 2) ? voice->LengthRemaining / 2 : streamLen);
-
-				const Sint16* samples = (Sint16*)voice->PlayHead;
-				float sampleIndex = 0;
-
-				for (uint32_t i = 0; i < length; i++)
+				if (i == length - 1)
 				{
-					if (i == length - 1)
-					{
-						voice = voice;
-					}
-
-					// TODO: sample mixing by adding values together
-					floatStream[i] = (samples[static_cast<int>(sampleIndex)] * 1.0f) * sampleFactor * volumeFactor;
-
-					// TODO: implement interpolating pitching & resampling
-					sampleIndex += pitch; // non-interpolating pitching
+					voice = voice;
 				}
 
-				voice->PlayHead += length * 2;
-				voice->LengthRemaining -= length * 2;
+				// TODO: sample mixing by adding values together
+				floatStream[i] = (samples[static_cast<int>(sampleIndex)] * 1.0f) * sampleFactor * volumeFactor;
 
-				if (voice->LengthRemaining <= 0)
+				// TODO: implement interpolating pitching & resampling
+				sampleIndex += pitch; // non-interpolating pitching
+			}
+
+			voice->PlayHead += length * 2;
+			voice->LengthRemaining -= length * 2;
+
+			if (voice->LengthRemaining <= 0)
+			{
+				if (voice->IsLooping == true)
 				{
-					if (voice->IsLooping == true)
-					{
-						voice->PlayHead = voice->Sound->Buffer;
-						voice->LengthRemaining = voice->Sound->Length;
+					voice->PlayHead = voice->Sound->Buffer;
+					voice->LengthRemaining = voice->Sound->Length;
 
-						length = streamLen - length;
-					}
-					else
-					{
-						// Non looping sound has no more mixable samples
-						voice->State = Stopped;
-					}
+					length = streamLen - length;
+				}
+				else
+				{
+					// Non looping sound has no more mixable samples
+					voice->State = Stopped;
 				}
 			}
 		}
