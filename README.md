@@ -20,12 +20,14 @@ A C++ audio environment. It is meant as a playground for experimentation with ga
 ### Dependencies <a name="dependencies"></a>
 
 - Simple DirectMedia Layer [SDL version 2.0.7 (stable)](http://libsdl.org/download-2.0.php)
+- (sdplog)[https://github.com/gabime/spdlog] (as a (git submodule)[https://git-scm.com/book/en/v2/Git-Tools-Submodules])
 
 ### Build Instructions <a name="build"></a>
 
 The following requirements need to be met to be able to build this project:
 
 - SDL 2.0+ Development Libraries
+- spdlog needs to be present in your project (either by using a submodule compatible client or by cloning it to "dependencies\spdlog")
 
 ### Windows
 
@@ -43,7 +45,7 @@ At the moment the build process has only ever been tested on Windows with Micros
 
 ### Linux & Mac OS
 
-If you build this project on these platforms, let me know how it went or submit a pull request ;)
+If you build this project on these platforms, let me know how it went and submit a pull request if you had to do stuff to make it work ;)
 
 ## Playing a sound <a name="sound"></a>
 
@@ -65,10 +67,16 @@ Here is the basic idea:
 		YOA_PlaySound("door_open_01.wav", false, volume, pitch);
 		
 		// Play loop and store VoiceID
-		uint16_t ambLoop = PlaySound("ambience.wav", true, volume, pitch);
+		uint16_t voiceID = PlaySound("ambience.wav", true, volume, pitch);
 
 		// Stop loop using VoiceID
-		YOA_StopVoice(ambLoop);
+		YOA_StopVoice(voiceID);
+
+
+		// pauses the entire audio engine
+		YOA_Pause();
+		// resumes the audio engine
+		YOA_Resume();
 
 		// quit YO audio
 		YOA_Quit();
