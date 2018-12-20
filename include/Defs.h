@@ -1,6 +1,8 @@
 #ifndef _YOA_DEFS_H
 #define _YOA_DEFS_H
 
+#include "../src/Log.h"
+
 #define YOA_SDL			0
 // This is a blob for switching audio rendering backends
 /*

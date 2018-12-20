@@ -23,4 +23,4 @@ Win32/
 
 # SDL2 dependency
 
-dependencies/*
+dependencies/SDL*

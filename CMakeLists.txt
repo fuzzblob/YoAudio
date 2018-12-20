@@ -16,6 +16,21 @@ if ( CMAKE_BUILD_TYPE STREQUAL "" )
 endif ( CMAKE_BUILD_TYPE STREQUAL "" )
 
 #
+# Set up spdlog dependency stuff
+#
+
+set( SPDLOG_INCLUDE_DIRS dependencies/spdlog/include )
+
+# Check if we found it!
+IF ( SPDLOG_INCLUDE_DIRS )
+	#SET( _FOUND TRUE )
+	MESSAGE(STATUS "Looking for sdpLog - found")
+ELSE ( SPDLOG_INCLUDE_DIRS )
+	#SET( _FOUND FALSE )
+	MESSAGE(STATUS "Looking for sdpLog - not found")
+ENDIF ( SPDLOG_INCLUDE_DIRS )
+
+#
 # Set up SDL2 dependency stuff
 #
 
@@ -70,6 +85,7 @@ file(GLOB_RECURSE SRCS
 include_directories(
 	include
 	${SDL2_INCLUDE_DIRS}
+	${SPDLOG_INCLUDE_DIRS}
 )
 
 add_definitions(-DBUILD_DLL)

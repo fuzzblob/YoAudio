@@ -25,7 +25,7 @@ std::shared_ptr<Sound> ResourceManager::LoadSound(const std::string & filename)
 
 	if (SDL_LoadWAV(filename.c_str(), &(newSound->Spec), &(newSound->Buffer), &(newSound->Length)) == nullptr)
 	{
-		fprintf(stderr, "[%s:\t%d]\nWarning: failed to open wave file: %s error: %s\n\n", __FILE__, __LINE__, filename, SDL_GetError());
+		YOA_WARN("Warning: failed to open wave file: ", filename, " error: ", SDL_GetError());
 		return nullptr;
 	}
 
@@ -39,7 +39,7 @@ bool ResourceManager::FreeSound(Sound* sound) noexcept
 {
 	if (sound == nullptr)
 	{
-		printf("Can't stop NULL sound!");
+		YOA_ERROR("Can't stop NULL sound!");
 		return false;
 	}
 
@@ -75,14 +75,14 @@ std::shared_ptr<Voice> ResourceManager::GetVoice()
 	{
 		if(lastVoice >= maxVoices)
 		{
-			fprintf(stderr, "[%s:\t%d]\nError: Voice limit of %i\n\n", __FILE__, __LINE__, maxVoices);
+			YOA_ERROR("[%s:\t%d]\nError: Voice limit of %i\n\n", __FILE__, __LINE__, maxVoices);
 			return nullptr;
 		}
 			
 		newVoice = std::make_shared<Voice>();
 		if (newVoice == nullptr)
 		{
-			fprintf(stderr, "[%s:\t%d]\nError: Memory allocation error\n\n", __FILE__, __LINE__);
+			YOA_ERROR("[%s:\t%d]\nError: Memory allocation error\n\n", __FILE__, __LINE__);
 			return nullptr;
 		}
 

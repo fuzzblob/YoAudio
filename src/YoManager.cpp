@@ -41,25 +41,25 @@ bool YoManager::IsInitialized() noexcept
 
 uint16_t YoManager::PlayWavFile(const std::string & filename, bool loop, float volume, float pitch)
 {
-	printf("Playing: %s\n", filename.c_str());
+	YOA_INFO("Playing: ", filename.c_str());
 
 	if (m_device == nullptr)
 	{
-		printf("NULL Error: no Device present!");
+		YOA_ERROR("NULL Error: no Device present!");
 		return 0;
 	}
 
 	std::shared_ptr<Sound> sound = m_resources->GetSound(filename);
 	if (sound == nullptr)
 	{
-		printf("Could not load sound at path: %s", filename);
+		YOA_ERROR("Could not load sound at path: ", filename);
 		return 0;
 	}
 
 	std::shared_ptr<Voice> newVoice = m_resources->GetVoice();
 	if (newVoice == nullptr)
 	{
-		printf("Could not load sound at path: %s", filename);
+		YOA_ERROR("Could not load sound at path: ", filename);
 		return 0;
 	}
 	newVoice->Sound = sound;
@@ -75,7 +75,7 @@ uint16_t YoManager::PlayWavFile(const std::string & filename, bool loop, float v
 		// avoid duplicate Voices
 		if (this->StopVoice(newVoice->ID) == true)
 		{
-			printf("Had to stop Voice: %i\n", newVoice->ID);
+			YOA_WARN("Had to stop Voice: ", newVoice->ID);
 		}
 		
 		// add voice to playing voices vector
@@ -85,7 +85,7 @@ uint16_t YoManager::PlayWavFile(const std::string & filename, bool loop, float v
 		SDL_UnlockAudioDevice(m_device->DeviceID);
 	}
 
-	printf("%s got ID: %i\n", filename.c_str(), newVoice->ID);
+	YOA_INFO(filename.c_str(), " got ID: ", newVoice->ID);
 	return newVoice->ID;
 }
 
@@ -93,13 +93,13 @@ bool YoManager::StopVoice(uint16_t id)
 {
 	if (m_device == nullptr)
 	{
-		printf("NULL Error: no Device present!");
+		YOA_ERROR("NULL Error: no Device present!");
 		return false;
 	}
 
 	if (id == 0 || id > m_resources->GetVoiceCount())
 	{
-		printf("Invadid ID: %i\nCan't stop specified Voice as it does not exist!\n\n", id);
+		YOA_ERROR("Invadid ID: ", id, " Can't stop specified Voice as it does not exist!");
 		return false;
 	}
 
@@ -123,35 +123,33 @@ void YoManager::Pause(bool pause) noexcept
 {
 	if (m_device == nullptr)
 	{
-		printf("NULL Error: no Device present!");
+		YOA_ERROR("NULL Error: no Device present!");
 		return;
 	}
 
-	if (!m_Paused)
-	{
-		if(pause)
-		{
-			printf("Yo Audio pausing\n");
-			SDL_PauseAudioDevice(m_device->DeviceID, 1);
-			m_Paused = true;
-		}
-		else
-		{
-			printf("Yo Audio already paused\n");
-		}
-	}
-	else
+	if (pause)
 	{
 		if (m_Paused)
 		{
-			printf("Yo Audio resuming\n");
-			SDL_PauseAudioDevice(m_device->DeviceID, 0);
-			m_Paused = false;
+			YOA_WARN("Yo Audio already paused");
+			return;
 		}
-		else
+		
+		YOA_INFO("Yo Audio pausing");
+		SDL_PauseAudioDevice(m_device->DeviceID, 1);
+		m_Paused = true;
+	}
+	else
+	{
+		if (!m_Paused)
 		{
-			printf("Yo Audio already playing\n");
+			YOA_WARN("Yo Audio already playing");
+			return;
 		}
+		
+		YOA_INFO("Yo Audio resuming");
+		SDL_PauseAudioDevice(m_device->DeviceID, 0);
+		m_Paused = false;
 	}
 }
 
@@ -162,7 +160,7 @@ bool YoManager::IsPaused() noexcept
 
 void YoManager::Run()
 {
-	printf("Thread started!\n");
+	YOA_INFO("Thread started!");
 
 	std::unique_ptr<Timer> time = std::make_unique<Timer>();
 	m_resources = std::make_unique<ResourceManager>();
@@ -179,7 +177,7 @@ void YoManager::Run()
 
 	if ((m_device->DeviceID = SDL_OpenAudioDevice(nullptr, 0, &(m_device->SpecWanted), &(m_device->SpecObtained), ALLOWED_CHANGES)) == 0)
 	{
-		fprintf(stderr, "[%s:\t%d]Warning: failed to open audio device: %s\n\n", __FILE__, __LINE__, SDL_GetError());
+		YOA_WARN("Warning: failed to open audio device: ", SDL_GetError());
 		m_Quit = true;
 	}
 
@@ -227,22 +225,25 @@ YoManager::YoManager() noexcept
 {
 	if (SDL_WasInit(SDL_INIT_AUDIO) != 0)
 	{
-		printf("Audio is already initialized.\n");
+		YOA_WARN("Audio is already initialized.");
 	}
 	
 	// initialize logging
+	Log::Init();
+	
 	// initialize SDL audio
 	if (SDL_Init(SDL_INIT_AUDIO) < 0)
 	{
-			fprintf(stderr, "[%s:\t%d]Warning: failed to initilize SDL!\n\n", __FILE__, __LINE__);
+
+		YOA_WARN("failed to initilize SDL! ", SDL_GetError());
 		return;
 	}
 
-	printf("Yo Audio Init\n");
+	YOA_INFO("Yo Audio Init\n");
 
 	if (!(SDL_WasInit(SDL_INIT_AUDIO) & SDL_INIT_AUDIO))
 	{
-		fprintf(stderr, "[%s:\t%d]\nError: SDL_INIT_AUDIO not initialized\n\n", __FILE__, __LINE__);
+		YOA_ERROR("Error: SDL_INIT_AUDIO not initialized");
 		return;
 	}
 
@@ -263,7 +264,7 @@ YoManager::~YoManager()
 	// wait for thread to finish
 	m_Thread.join();
 
-	printf("Yo Audio Shutdown sucessfully\n");
+	YOA_INFO("Yo Audio Shutdown sucessfully\n");
 }
 
 inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
