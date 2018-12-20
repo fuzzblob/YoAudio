@@ -73,11 +73,13 @@ std::shared_ptr<Voice> ResourceManager::GetVoice()
 	// else make a new voice
 	if (newVoice == nullptr)
 	{
-		if(lastVoice >= maxVoices)
+#if MAX_VOICES > 0
+		if(lastVoice >= MAX_VOICES)
 		{
-			YOA_ERROR("Reached Voice limit of {0}", maxVoices);
+			YOA_ERROR("Can't create new voice. Reached Voice limit of {0}", MAX_VOICES);
 			return nullptr;
 		}
+#endif
 			
 		newVoice = std::make_shared<Voice>();
 		if (newVoice == nullptr)

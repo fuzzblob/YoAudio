@@ -7,11 +7,11 @@
 #include "Voice.h"
 #include "Sound.h"
 
+#define MAX_VOICES 0
+
 class ResourceManager
 {
 private:
-	const uint16_t maxVoices = 32;
-
 	std::map<std::string, std::shared_ptr<Sound>> mSounds;
 	std::map<uint16_t, std::shared_ptr<Voice>> mVoices;
 
