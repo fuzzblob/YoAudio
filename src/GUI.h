@@ -13,7 +13,7 @@ private:
 	std::unique_ptr<Graphics> mGraphics;
 	SDL_Window* mWindow;
 public:
-	Gui();
+	Gui() noexcept;
 	~Gui();
 
 	void StartFrame();

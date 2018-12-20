@@ -1,7 +1,8 @@
 #include "Editor.h"
 #include "GUI.h"
 #include "imgui\imgui.h"
-#include "../../YoAudio/include/YOAudio.h"
+#include "YoAudio.h"
+#include "../../YoAudio/src/Log.h"
 
 void Editor::Run()
 {
@@ -15,7 +16,7 @@ void Editor::Run()
 	// init Yo AudioEngine
 	if (YOA_Init() == false)
 	{
-		printf("Yo Audio initialization error! Shutting town");
+		YOA_CRITICAL("Yo Audio initialization error! Shutting town");
 		m_quit = true;
 	}
 
@@ -61,24 +62,39 @@ void Editor::App()
 		
 		static float volume = 1.0f;
 		static float pitch = 1.0f;
-		static uint16_t ambLoop = 0u;
+		static uint16_t ambLoop_01 = 0u;
+		static uint16_t ambLoop_02 = 0u;
 		
 		ImGui::SliderFloat("volume", &volume, 0.0f, 1.0f);
 
 		ImGui::SliderFloat("pitch", &pitch, 0.0f, 4.0f);
 
-		if (ImGui::Button("Play Ambience"))
+		if (ImGui::Button("Play Ambience 01"))
 		{
-			ambLoop = YOA_PlayWavFile("ambience.wav", true, 1.0f * volume, 1.0f * pitch);
+			ambLoop_01 = YOA_PlayWavFile("ambience_01.wav", true, 1.0f * volume, 1.0f * pitch);
 		}
-		if (ambLoop != 0u && ImGui::Button("Stop Ambience"))
+		if (ambLoop_01 != 0u && ImGui::Button("Stop Ambience 01"))
 		{
 			// stop the looping sound
-			if (YOA_StopVoice(ambLoop) != 1)
+			if (YOA_StopVoice(ambLoop_01) != 1)
 			{
-				fprintf(stderr, "[%s:\t%d]\nError: could not stop amb-loop!\n\n", __FILE__, __LINE__);
+				YOA_ERROR("Error: could not stop amb-loop!");
 			}
-			ambLoop = 0u;
+			ambLoop_01 = 0u;
+		}
+
+		if (ImGui::Button("Play Ambience 02"))
+		{
+			ambLoop_02 = YOA_PlayWavFile("ambience_02.wav", true, 1.0f * volume, 1.0f * pitch);
+		}
+		if (ambLoop_02 != 0u && ImGui::Button("Stop Ambience 02"))
+		{
+			// stop the looping sound
+			if (YOA_StopVoice(ambLoop_02) != 1)
+			{
+				YOA_ERROR("Error: could not stop amb-loop!");
+			}
+			ambLoop_02 = 0u;
 		}
 
 		if (ImGui::Button("Play Door Open"))
@@ -108,7 +124,7 @@ void Editor::Menu()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			ImGui::MenuItem("(dummy menu)", NULL, false, false);
+			ImGui::MenuItem("(dummy menu)", nullptr, false, false);
 			//if (ImGui::MenuItem("New")) {}
 			//if (ImGui::MenuItem("Open", "Ctrl+O")) {}
 			//if (ImGui::BeginMenu("Open Recent"))

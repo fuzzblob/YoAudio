@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "imgui\GL\gl3w.h"
 
-Graphics::Graphics()
+Graphics::Graphics() noexcept
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) // SDL_WasInit(SDL_INIT_VIDEO)
 	{
@@ -49,7 +49,7 @@ Graphics::~Graphics()
 	SDL_Quit();
 }
 
-SDL_Window * Graphics::GetWindow()
+SDL_Window * Graphics::GetWindow() noexcept
 {
 	return mWindow;
 }

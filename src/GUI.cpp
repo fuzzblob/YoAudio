@@ -2,7 +2,7 @@
 #include "imgui\GL\imgui_impl_sdl_gl3.h"
 #include "imgui\GL\gl3w.h"
 
-Gui::Gui()
+Gui::Gui() noexcept 
 {
 	mGraphics = std::make_unique<Graphics>();
 	mWindow = mGraphics->GetWindow();
@@ -27,8 +27,8 @@ void Gui::EndFrame()
 	(
 		0, 
 		0, 
-		(int) ImGui::GetIO().DisplaySize.x,
-		(int) ImGui::GetIO().DisplaySize.y
+		int(ImGui::GetIO().DisplaySize.x),
+		int(ImGui::GetIO().DisplaySize.y)
 	);
 	
 	glClearColor
