@@ -32,7 +32,7 @@ private:
 
 	bool m_Paused = true;
 	std::unique_ptr<AudioDevice> m_device = nullptr;
-	std::vector<float> m_stream;
+	std::vector<float> m_mixStream;
 	std::vector<std::shared_ptr<Voice>> m_playingAudio;
 	std::unique_ptr<ResourceManager> m_resources = nullptr;
 	

@@ -173,15 +173,28 @@ void YoManager::Run()
 	(m_device->SpecWanted).channels = AUDIO_CHANNELS;
 	(m_device->SpecWanted).samples = AUDIO_SAMPLES;
 	(m_device->SpecWanted).callback = AudioCallback;
-	(m_device->SpecWanted).userdata = this;
+	(m_device->SpecWanted).userdata = nullptr;
 
 	if ((m_device->DeviceID = SDL_OpenAudioDevice(nullptr, 0, &(m_device->SpecWanted), &(m_device->SpecObtained), ALLOWED_CHANGES)) == 0)
 	{
-		YOA_WARN("Warning: failed to open audio device: {0}", SDL_GetError());
+		YOA_CRITICAL("Warning: failed to open audio device: {0}", SDL_GetError());
 		m_Quit = true;
 	}
 	else
 	{
+		if (m_device->SpecObtained.freq != AUDIO_FREQUENCY
+			|| m_device->SpecObtained.format != AUDIO_FORMAT
+			|| m_device->SpecObtained.channels != AUDIO_CHANNELS
+			|| m_device->SpecObtained.samples != AUDIO_SAMPLES)
+		{
+			YOA_ERROR("Failed to open audio device with requested parameters!");
+		}
+
+		m_mixStream.reserve(m_device->SpecObtained.channels * m_device->SpecObtained.samples);
+		for (int i = 0; i < m_mixStream.capacity(); i++) {
+			m_mixStream.push_back(0.0f);
+		}
+
 		// unpause SDL audio callback
 		this->Pause(false);
 	}
@@ -271,22 +284,17 @@ YoManager::~YoManager()
 
 inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 {
-	YoManager* instance = static_cast<YoManager*>(userdata);
+	// convert from bytes to amount of 16bit samples expected
 	const uint32_t streamLen = uint32_t(len / 2);
-	
-	std::vector<float>* fstream = &(instance->m_stream);
-	
-	fstream->reserve(streamLen);
-	float* floatStream = fstream->begin()._Ptr;
-
-	for (float f : *fstream)
-	{
-		f = 0.0f;
+	// fill float buffer with silence
+	std::vector<float> mixBuffer = sInstance->m_mixStream;
+	for (int i = 0; i < streamLen; i++) {
+		mixBuffer[i] = 0.0f;
 	}
 
 	// s16 to normalized float
 	const float sampleFactor = 1.0f / 32768.0f;
-	for (auto voice : instance->m_playingAudio)
+	for (auto voice : sInstance->m_playingAudio)
 	{
 		if (voice->State == Stopped
 			|| voice->State == Paused)
@@ -316,7 +324,7 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 				}
 
 				// TODO: sample mixing by adding values together
-				floatStream[i] = (samples[static_cast<int>(sampleIndex)] * 1.0f) * sampleFactor * volumeFactor;
+				mixBuffer[i] = (samples[static_cast<int>(sampleIndex)] * 1.0f) * sampleFactor * volumeFactor;
 
 				// TODO: implement interpolating pitching & resampling
 				sampleIndex += pitch; // non-interpolating pitching
@@ -342,18 +350,17 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 			}
 		}
 	}
-
+	// fill 16bit output buffer
 	Sint16* current = (Sint16*)stream;
 	for (uint32_t i = 0; i < streamLen; i++)
 	{
-		float val = floatStream[i];
-		// clipping
-		if (val > 1.0f)
-			val = 1.0f;
-		else if (val < -1.0f)
-			val = -1.0f;
-
-		// convert float back to s16
-		current[i] = static_cast<Sint16>(val * 32767);
+		// clipping if float buffer outside of render range
+		if (mixBuffer[i] > 1.0f)
+			mixBuffer[i] = 1.0f;
+		else if (mixBuffer[i] < -1.0f)
+			mixBuffer[i] = -1.0f;
+		// convert float back to 16bit
+		current[i] = static_cast<Sint16>(mixBuffer[i] * 32767);
 	}
 }
+
