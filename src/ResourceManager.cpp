@@ -25,7 +25,7 @@ std::shared_ptr<Sound> ResourceManager::LoadSound(const std::string & filename)
 
 	if (SDL_LoadWAV(filename.c_str(), &(newSound->Spec), &(newSound->Buffer), &(newSound->Length)) == nullptr)
 	{
-		YOA_WARN("Warning: failed to open wave file: ", filename, " error: ", SDL_GetError());
+		YOA_WARN("Failed to open wave file: {0}\nerror: {1}", filename, SDL_GetError());
 		return nullptr;
 	}
 
@@ -75,14 +75,14 @@ std::shared_ptr<Voice> ResourceManager::GetVoice()
 	{
 		if(lastVoice >= maxVoices)
 		{
-			YOA_ERROR("[%s:\t%d]\nError: Voice limit of %i\n\n", __FILE__, __LINE__, maxVoices);
+			YOA_ERROR("Reached Voice limit of {0}", maxVoices);
 			return nullptr;
 		}
 			
 		newVoice = std::make_shared<Voice>();
 		if (newVoice == nullptr)
 		{
-			YOA_ERROR("[%s:\t%d]\nError: Memory allocation error\n\n", __FILE__, __LINE__);
+			YOA_ERROR("Memory allocation error while making new Voice");
 			return nullptr;
 		}
 
