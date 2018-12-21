@@ -71,12 +71,12 @@ void Editor::App()
 
 		if (ImGui::Button("Play Ambience 01"))
 		{
-			ambLoop_01 = YOA_PlayWavFile("ambience_01.wav", true, 1.0f * volume, 1.0f * pitch);
+			ambLoop_01 = YOA_PlayWavFile("ambience_01.wav", true, 1.0f * volume, 1.0f * pitch, 12.0f);
 		}
 		if (ambLoop_01 != 0u && ImGui::Button("Stop Ambience 01"))
 		{
 			// stop the looping sound
-			if (YOA_StopVoice(ambLoop_01) != 1)
+			if (YOA_StopVoice(ambLoop_01, 2.5f) != 1)
 			{
 				YOA_ERROR("Error: could not stop amb-loop!");
 			}
@@ -85,12 +85,12 @@ void Editor::App()
 
 		if (ImGui::Button("Play Ambience 02"))
 		{
-			ambLoop_02 = YOA_PlayWavFile("ambience_02.wav", true, 1.0f * volume, 1.0f * pitch);
+			ambLoop_02 = YOA_PlayWavFile("ambience_02.wav", true, 1.0f * volume, 1.0f * pitch, 5.0f);
 		}
 		if (ambLoop_02 != 0u && ImGui::Button("Stop Ambience 02"))
 		{
 			// stop the looping sound
-			if (YOA_StopVoice(ambLoop_02) != 1)
+			if (YOA_StopVoice(ambLoop_02, 0.0f) != 1)
 			{
 				YOA_ERROR("Error: could not stop amb-loop!");
 			}
@@ -99,12 +99,12 @@ void Editor::App()
 
 		if (ImGui::Button("Play Door Open"))
 		{
-			YOA_PlayWavFile("door_open_01.wav", false, 0.5f * volume, 1.0f * pitch);
+			YOA_PlayWavFile("door_open_01.wav", false, 0.5f * volume, 1.0f * pitch, 0.0f);
 		}
 
 		if (ImGui::Button("Play Door Close"))
 		{
-			YOA_PlayWavFile("door_close_01.wav", false, 0.5f * volume, 1.0f * pitch);
+			YOA_PlayWavFile("door_close_01.wav", false, 0.5f * volume, 1.0f * pitch, 0.0f);
 		}
 
 		ImGui::Spacing();
