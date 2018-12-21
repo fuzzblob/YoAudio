@@ -21,7 +21,7 @@ A C++ audio environment. It is meant as a playground for experimentation with ga
 ### Dependencies <a name="dependencies"></a>
 
 - Simple DirectMedia Layer [SDL version 2.0.7 (stable)](http://libsdl.org/download-2.0.php)
-- (sdplog)[https://github.com/gabime/spdlog] (as a (git submodule)[https://git-scm.com/book/en/v2/Git-Tools-Submodules])
+- [sdplog](https://github.com/gabime/spdlog) (as a [git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules))
 
 ### Build Instructions <a name="build"></a>
 
@@ -34,15 +34,15 @@ The following requirements need to be met to be able to build this project:
 
 At the moment the build process has only ever been tested on Windows with Microsoft Visual Studio 2017 Community Edition. Follow these steps to generate a Visual Studio project:
 
-- extract **SDL2** to `dependencies/SDL2` (see #dependencies)
+- extract **SDL2** to `dependencies/SDL2` (see [Dependencies section](#dependencies))
 	- make sure to copy *include*, *lib* and *bin* directories
-- to run (**cmake**)[https://cmake.org/] on Windows simply execute `m.bat` (assuming it's installed)
+- to run [**cmake**](https://cmake.org/) on Windows simply execute `m.bat` (assuming it's installed)
 - Open the solution at `build/YoAudio.snl`
 - build (by hitting `ctrl + shift + b` if using Visual Studio)
 - the output will be built to `bin/Debug` or `bin/Release`
 	- YoAudio.dll for runtime
 	- YoAudio.pdb for debug symbols
-- if you want a quick and easy sandbox to test stuff in clone the (YoAudio Editor repo)[https://github.com/fuzzblob/YoAudioEditor] to the same folder as the YoAudio repo was cloned into and build that. It will find the YoAudio sources, and copy the built *YoAudio.dll* so it can run.
+- if you want a quick and easy sandbox to test stuff in clone the [YoAudio Editor repo](https://github.com/fuzzblob/YoAudioEditor) to the same folder as the YoAudio repo was cloned into and build that. It will find the YoAudio sources, and copy the built *YoAudio.dll* so it can run.
 
 ### Linux & Mac OS
 
