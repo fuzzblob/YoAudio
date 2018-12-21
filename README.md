@@ -2,7 +2,8 @@
 
 - [About](#about)
 - [Overview](#overview)
-- [Build Instructions](#build)
+	- [Dependencies](#dependencies)
+	- [Build Instructions](#build)
 - [Playing a sound](#sound)
 - [TODO](#todo)
 
@@ -33,20 +34,19 @@ The following requirements need to be met to be able to build this project:
 
 At the moment the build process has only ever been tested on Windows with Microsoft Visual Studio 2017 Community Edition. Follow these steps to generate a Visual Studio project:
 
-- extract **SDL2** to `dependencies/SDL2`
+- extract **SDL2** to `dependencies/SDL2` (see #dependencies)
 	- make sure to copy *include*, *lib* and *bin* directories
-- run **cmake**
-	- on Windows simply execute `m.bat`
+- to run (**cmake**)[https://cmake.org/] on Windows simply execute `m.bat` (assuming it's installed)
 - Open the solution at `build/YoAudio.snl`
-- build by hitting `ctrl + shift + b`
+- build (by hitting `ctrl + shift + b` if using Visual Studio)
 - the output will be built to `bin/Debug` or `bin/Release`
 	- YoAudio.dll for runtime
 	- YoAudio.pdb for debug symbols
-- if you want a quick and easy sandbox to test stuff in clone the (YoAudio Editor repo)[https://github.com/fuzzblob/YoAudioEditor] into the same folder as this one and build it.
+- if you want a quick and easy sandbox to test stuff in clone the (YoAudio Editor repo)[https://github.com/fuzzblob/YoAudioEditor] to the same folder as the YoAudio repo was cloned into and build that. It will find the YoAudio sources, and copy the built *YoAudio.dll* so it can run.
 
 ### Linux & Mac OS
 
-If you build this project on these platforms, let me know how it went and submit a pull request if you had to do stuff to make it work ;)
+If you build this project on these platforms, let me know how it went. If you have to make changes to *CMakeLists.txt* or the source code, please submit a pull request so I can try get your changes into the main repo.
 
 ## Playing a sound <a name="sound"></a>
 
@@ -63,16 +63,18 @@ Here is the basic idea:
 		
 		float volume = 1.0f;
 		float pitch = 1.0f;
+		float fadeTime = 0.75f
 		
 		// Play Oneshot
-		YOA_PlaySound("door_open_01.wav", false, volume, pitch);
+		YOA_PlaySound("door_open_01.wav", false, volume, pitch, 0.0f);
 		
 		// Play loop and store VoiceID
-		uint16_t voiceID = PlaySound("ambience.wav", true, volume, pitch);
+		uint16_t voiceID = PlaySound("ambience.wav", true, volume, pitch, fadeTime);
 
 		// Stop loop using VoiceID
-		YOA_StopVoice(voiceID);
-
+		YOA_StopVoice(voiceID, fadeTime);
+		// when stopping a voice with a fade time of 0.0f
+		// the audio engine will set a 10ms fade to avoid artifacts
 
 		// pauses the entire audio engine
 		YOA_Pause();
@@ -89,29 +91,26 @@ Here is the basic idea:
 
 These are things I'd like to explore with this library / tool in the future (in no particular order):
 
-- multithreading
-	- create MessageQueue
-	- create AudioRenderer (filling AudioFrame queue for the callback to copy out of)
-- create SampleGenerator interface to generalize audio sources (sample playback, synthesis, streaming)
-	- GenerateSamples()
-	- SamplesRemaining()
-- create Mixer graph	
-	- AudioListener
-		- MixerGroup
-		- Voice
-			- SamplePlayer
-			- Synth
-	- AudioEffect
-		- limiter for final output
-		- Filter
-			- HighPass
-			- LowPass
-		- RingModulator
-- Voice statemachine
-	- add a small fade-out when stopping, pausing, virtualizing
-	- fade-in on un-pausing / de-virtualizing
-- re-sample from WAV spec to device spec
-- proper pitch algorithm
+- Voice management
+	- limit concurrently playing voices
+		- add virtual state (tracking playback position without adding samples to the mix)
+	- remove voices from playing vector when stopped
+- add resampling of WAV data (spec to device spec)
+	- proper pitch algorithm
 - instead of hard coded 16bit int
 	- convert from WAV spec format to float
 	- convert from float to Device spec format
+- add Audio Graph	
+	- AudioListener
+	- MixerGroups
+	- add SampleGenerator interface
+		- generalize audio sources (sample playback, synthesis, streaming)
+		- GenerateSamples()
+		- SamplesRemaining()
+		- AudioEffect
+			- limiter for final output
+			- Filter (HighPass & LowPass)
+- multithreading
+	- create MessageQueue
+	- create AudioRenderer
+		- fill circular buffer of AudioFrames for the callback to consume (copy out of)
