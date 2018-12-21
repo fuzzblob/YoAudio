@@ -19,7 +19,22 @@ endif ( CMAKE_BUILD_TYPE STREQUAL "" )
 # Set up spdlog dependency stuff
 #
 
-set( SPDLOG_INCLUDE_DIRS dependencies/spdlog/include )
+#set( SPDLOG_INCLUDE_DIRS dependencies/spdlog/include )
+
+# spdlog include
+FIND_PATH( SPDLOG_INCLUDE_DIRS
+	NAMES
+		spdlog.h
+		formatter.h
+	PATHS
+		# TODO: find path recursively
+		dependencies/spdlog/
+		dependencies/spdlog/include/spdlog
+	PATH_SUFFIXES
+		include
+	DOC
+		"The directory where SDL.h resides"
+)
 
 # Check if we found it!
 IF ( SPDLOG_INCLUDE_DIRS )
@@ -39,7 +54,9 @@ FIND_PATH( SDL2_INCLUDE_DIRS
 	NAMES
 		SDL.h
 	PATHS
-		dependencies/SDL2
+		# TODO: find path recursively instead of per version number
+		dependencies/SDL2/
+		dependencies/SDL2/SDL2-2.0.9/
         /usr/local/opt/sdl2/include/SDL2
 	PATH_SUFFIXES
 		include
@@ -52,7 +69,9 @@ FIND_LIBRARY( SDL2_LIBRARIES
 	NAMES
 		SDL2 SDL2main
 	PATHS
-		dependencies/SDL2
+		# TODO: find path recursively instead of per version number
+		dependencies/SDL2/
+		dependencies/SDL2/SDL2-2.0.9/
         /usr/local/opt/sdl2/lib
 	PATH_SUFFIXES
 		lib
