@@ -42,7 +42,7 @@ At the moment the build process has only ever been tested on Windows with Micros
 - the output will be built to `bin/Debug` or `bin/Release`
 	- YoAudio.dll for runtime
 	- YoAudio.pdb for debug symbols
-- if you want a quick and easy sandbox to test stuff in clone the (YoAudioEditor repo)[https://github.com/fuzzblob/YoAudioEditor] into the same folder as this one and build it.
+- if you want a quick and easy sandbox to test stuff in clone the (YoAudio Editor repo)[https://github.com/fuzzblob/YoAudioEditor] into the same folder as this one and build it.
 
 ### Linux & Mac OS
 

@@ -10,11 +10,11 @@ extern "C"
 
 bool YOA_API YOA_Init(void);
 
-void YOA_API YOA_Quit(bool quitSDL);
+void YOA_API YOA_Quit(const bool quitSDL);
 
-uint16_t YOA_API YOA_PlayWavFile(const char * filename, bool loop, float volume, float pitch);
+uint16_t YOA_API YOA_PlayWavFile(const char * filename, const bool loop, const float volume, const float pitch, const float fadeIn);
 
-bool YOA_API YOA_StopVoice(uint16_t id);
+bool YOA_API YOA_StopVoice(const uint16_t id, const float fadeOut);
 
 void YOA_API YOA_Pause(void);
 

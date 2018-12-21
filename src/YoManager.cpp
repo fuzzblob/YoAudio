@@ -15,7 +15,7 @@ YoManager * YoManager::GetInstance()
 	return sInstance.get();
 }
 
-void YoManager::Release(bool quitSDL) noexcept
+void YoManager::Release(const bool quitSDL) noexcept
 {
 	if(sInstance == nullptr)
 		return;
@@ -39,67 +39,74 @@ bool YoManager::IsInitialized() noexcept
 	return sInitialized;
 }
 
-uint16_t YoManager::PlayWavFile(const std::string & filename, bool loop, float volume, float pitch)
+uint16_t YoManager::PlayWavFile(const std::string & filename, const bool loop, const float volume, const float pitch, const float fadeIn)
 {
-	YOA_INFO("Playing: {0}", filename.c_str());
-
 	if (m_device == nullptr)
 	{
-		YOA_ERROR("No Device present!");
+		YOA_CRITICAL("Can't play audio. No Device present!");
 		return 0;
 	}
 
 	std::shared_ptr<Sound> sound = m_resources->GetSound(filename);
 	if (sound == nullptr)
 	{
-		YOA_ERROR("Could not load sound at path: {0}", filename);
+		YOA_CRITICAL("Can't play audio. Could not load sound at path: {0}", filename);
 		return 0;
 	}
 
-	std::shared_ptr<Voice> newVoice = m_resources->GetVoice();
-	if (newVoice == nullptr)
+	std::shared_ptr<Voice> voice = m_resources->GetVoice();
+	if (voice == nullptr)
 	{
-		YOA_ERROR("Could not load sound at path: {0}", filename);
+		YOA_ERROR("Can't play audio. Could not aquire a Voice!");
 		return 0;
 	}
-	newVoice->Sound = sound;
-	newVoice->Sound->Spec.userdata = this;
+	voice->Sound = sound;
+	voice->Sound->Spec.userdata = this;
 
-	newVoice->PlayHead = newVoice->Sound->Buffer;
-	newVoice->LengthRemaining = newVoice->Sound->Length;
-	newVoice->Volume = volume;
-	newVoice->Pitch = pitch;
-	newVoice->IsLooping = loop;
+	voice->PlayHead = voice->Sound->Buffer;
+	voice->LengthRemaining = voice->Sound->Length;
+	voice->Volume = volume;
+	if (fadeIn > 0.0f) {
+		// ensure current target and value are at 0.0f
+		voice->smoothVolume.SetValue(0.0f);
+		voice->smoothVolume.SetFadeLength(0);
+		voice->smoothVolume.UpdateTarget();
+		voice->smoothVolume.GetNext();
+		// set fade duration (so the audio callback doesn't snap to the newly set value)
+		voice->smoothVolume.SetFadeLength(static_cast<int>(fadeIn * m_device->SpecObtained.freq));
+	}
+	// set fader target
+	voice->smoothVolume.SetValue(1.0f);
+	voice->Pitch = pitch;
+	voice->IsLooping = loop;
 
+	// avoid duplicate Voices
+	if (this->StopVoice(voice->ID) == true)
 	{
-		// avoid duplicate Voices
-		if (this->StopVoice(newVoice->ID) == true)
-		{
-			YOA_WARN("Had to stop Voice: {0}", newVoice->ID);
-		}
+		YOA_WARN("Had to stop Voice: {0}", voice->ID);
+	}
 		
-		// add voice to playing voices vector
-		SDL_LockAudioDevice(m_device->DeviceID);
-		this->m_playingAudio.push_back(newVoice);
-		newVoice->State = ToPlay;
-		SDL_UnlockAudioDevice(m_device->DeviceID);
-	}
+	// add voice to playing voices vector
+	SDL_LockAudioDevice(m_device->DeviceID);
+	this->m_playingAudio.push_back(voice);
+	voice->State = ToPlay;
+	SDL_UnlockAudioDevice(m_device->DeviceID);
 
-	YOA_INFO("{0} got ID: {1}", filename.c_str(), newVoice->ID);
-	return newVoice->ID;
+	YOA_INFO("Playing audio: {0} with voiceID: {1}", filename.c_str(), voice->ID);
+	return voice->ID;
 }
 
-bool YoManager::StopVoice(uint16_t id)
+bool YoManager::StopVoice(const uint16_t id, const float fadeOut)
 {
 	if (m_device == nullptr)
 	{
-		YOA_ERROR("NULL Error: no Device present!");
+		YOA_CRITICAL("Voice stopping failed! no Device present!");
 		return false;
 	}
 
 	if (id == 0 || id > m_resources->GetVoiceCount())
 	{
-		YOA_ERROR("Invadid ID: ", id, " Can't stop specified Voice as it does not exist!");
+		YOA_ERROR("Can't stop specified Voice. Invadid voiceID: {0}", id);
 		return false;
 	}
 
@@ -110,16 +117,22 @@ bool YoManager::StopVoice(uint16_t id)
 		auto voice = (*it);
 		if (voice->ID != id)
 			continue;
+		float fade = fadeOut;
+		if(fadeOut <= 0.0f)
+			fade = 0.01f;
+		voice->smoothVolume.SetValue(0.0f);
+		voice->smoothVolume.SetFadeLength(static_cast<int>(fade * m_device->SpecObtained.freq));
+		
 		SDL_LockAudioDevice(m_device->DeviceID);
-		voice->State = Stopped;
-		m_playingAudio.erase(it);
+		voice->State = Stopping;
+		//m_playingAudio.erase(it);
 		SDL_UnlockAudioDevice(m_device->DeviceID);
 		return true;
 	}
 	return false;
 }
 
-void YoManager::Pause(bool pause) noexcept
+void YoManager::Pause(const bool pause) noexcept
 {
 	if (m_device == nullptr)
 	{
@@ -131,11 +144,11 @@ void YoManager::Pause(bool pause) noexcept
 	{
 		if (m_Paused)
 		{
-			YOA_WARN("Yo Audio already paused");
+			YOA_WARN("YoAudio already paused");
 			return;
 		}
 		
-		YOA_INFO("Yo Audio pausing");
+		YOA_INFO("YoAudio pausing");
 		SDL_PauseAudioDevice(m_device->DeviceID, 1);
 		m_Paused = true;
 	}
@@ -143,11 +156,11 @@ void YoManager::Pause(bool pause) noexcept
 	{
 		if (!m_Paused)
 		{
-			YOA_WARN("Yo Audio already playing");
+			YOA_WARN("YoAudio already playing");
 			return;
 		}
 		
-		YOA_INFO("Yo Audio resuming");
+		YOA_INFO("YoAudio resuming");
 		SDL_PauseAudioDevice(m_device->DeviceID, 0);
 		m_Paused = false;
 	}
@@ -232,6 +245,21 @@ void YoManager::Update() noexcept
 	if (m_Paused)
 		return;
 
+	// loop throu sound channels removing stopped voices
+	/*std::vector<std::shared_ptr<Voice>>::iterator it = m_playingAudio.begin();
+	std::vector<std::shared_ptr<Voice>>::iterator end = m_playingAudio.end();
+	for (int i = 0; it + i != end;) {
+		auto voice = (*it);
+		if (voice->State != Stopped) {
+			i++;
+			continue;
+		}
+		SDL_LockAudioDevice(m_device->DeviceID);
+		m_playingAudio.erase(it + i);
+		SDL_UnlockAudioDevice(m_device->DeviceID);
+		end = m_playingAudio.end();
+	}*/
+
 	// interpolate values
 	// update statemachines
 }
@@ -296,17 +324,9 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 	const float sampleFactor = 1.0f / 32768.0f;
 	for (auto voice : sInstance->m_playingAudio)
 	{
-		if (voice->State == Stopped
-			|| voice->State == Paused)
-		{
-			continue;
-		}
-		else if (voice->State == ToPlay)
-		{
+		if (voice->State == ToPlay)
 			voice->State = Playing;
-		}
-
-		if (voice->State == Playing)
+		if (voice->State == Playing || voice->State == Stopping)
 		{
 			const float volumeFactor = voice->Volume;
 			const float pitch = voice->Pitch;
@@ -315,28 +335,28 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 
 			const Sint16* samples = (Sint16*)voice->PlayHead;
 			float sampleIndex = 0;
+			float sample;
 
+			voice->smoothVolume.UpdateTarget();
 			for (uint32_t i = 0; i < length; i++)
 			{
-				if (i == length - 1)
-				{
-					voice = voice;
-				}
-
-				// TODO: sample mixing by adding values together
-				mixBuffer[i] += (samples[static_cast<int>(sampleIndex)] * 1.0f) * sampleFactor * volumeFactor;
-
+				sample = samples[static_cast<int>(sampleIndex)] * sampleFactor;
+				mixBuffer[i] += sample * volumeFactor * voice->smoothVolume.GetNext();
 				// TODO: implement interpolating pitching & resampling
 				sampleIndex += pitch; // non-interpolating pitching
 			}
 
-			voice->PlayHead += length * 2;
-			voice->LengthRemaining -= length * 2;
+			voice->PlayHead += (int)(length * 2 * pitch);
+			voice->LengthRemaining -= (int)(length * 2 * pitch);
 
+			if (voice->State == Stopping
+				&& voice->smoothVolume.HasReachedTarget())
+				voice->State = Stopped;
 			if (voice->LengthRemaining <= 0)
 			{
 				if (voice->IsLooping == true)
 				{
+					// TODO: make seamless
 					voice->PlayHead = voice->Sound->Buffer;
 					voice->LengthRemaining = voice->Sound->Length;
 

@@ -3,6 +3,7 @@
 
 #include "Defs.h"
 #include "Sound.h"
+#include "LinearSmooothValue.h"
 #include <memory>
 
 enum VoiceState
@@ -10,6 +11,7 @@ enum VoiceState
 	ToPlay = 1,
 	Playing = 2,
 	Paused = 3,
+	Stopping = 4,
 	Stopped = 5
 };
 
@@ -21,6 +23,7 @@ struct Voice
 	uint32_t LengthRemaining = 0;
 	uint8_t * PlayHead;
 	bool IsLooping;
+	LinearSmooothValue smoothVolume;
 	float Volume;
 	float Pitch;
 };
