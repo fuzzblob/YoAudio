@@ -1,7 +1,7 @@
 #ifndef _AUDIODEVICE_H
 #define _AUDIODEVICE_H
 
-#include <SDL.h>
+#include "Platform.h"
 
 struct AudioDevice
 {

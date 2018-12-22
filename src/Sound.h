@@ -1,7 +1,7 @@
 #ifndef _SOUND_H
 #define _SOUND_H
 
-#include "Defs.h"
+#include "Platform.h"
 
 struct Sound
 {

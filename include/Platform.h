@@ -1,11 +1,10 @@
 #ifndef _YOA_DEFS_H
 #define _YOA_DEFS_H
 
-#include "../src/Log.h"
+#include "YoaConfig.h"
 
 #define YOA_SDL			0
 // This is a blob for switching audio rendering backends
-/*
 #define YOA_WINDOWS		1
 #define YOA_MAC			2
 #define YOA_UNIX		3
@@ -18,11 +17,9 @@
 // unix OSes should use SDL - https://www.libsdl.org/
 #define YOA_PLATFORM YOA_SDL
 #endif
-*/
 
 // define this to force SDL backend
 #define YOA_FORCE_SDL
-
 #ifdef YOA_FORCE_SDL
 #undef YOA_PLATFORM
 #define YOA_PLATFORM YOA_SDL
@@ -30,7 +27,11 @@
 
 // TODO: handle other platform specific backends
 #if YOA_PLATFORM == YOA_SDL
+#ifdef SDL2_ENABLED
 #include <SDL.h>
+#else
+#error YoAudio platform is set to SDL but SDL is not avaialable as a rendering backend!
+#endif
 #endif
 
 // Here are some builtin types and their value ranges

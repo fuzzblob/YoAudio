@@ -1,7 +1,8 @@
 #ifndef _VOICE_H
 #define _VOICE_H
 
-#include "Defs.h"
+#include "Platform.h"
+
 #include "Sound.h"
 #include "LinearSmooothValue.h"
 #include <memory>

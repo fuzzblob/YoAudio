@@ -1,7 +1,7 @@
 #ifndef _TIMER_H
 #define _TIMER_H
 
-#include "Defs.h"
+#include "Platform.h"
 #include "DllImportExport.h"
 
 class YOA_API Timer

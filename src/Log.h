@@ -1,5 +1,6 @@
 #pragma once
 
+#include "YoaConfig.h"
 #include "DllImportExport.h"
 
 #if SDPLOG_ENABLED
@@ -25,9 +26,11 @@ private:
 #define YOA_ERROR(...)			::Log::GetCoreLogger()->error(__VA_ARGS__)
 #define YOA_CRITICAL(...)	    ::Log::GetCoreLogger()->critical(__VA_ARGS__)
 #else
-#define YOA_TRACE(...)			//printf(__VA_ARGS__)
-#define YOA_INFO(...)			//printf(__VA_ARGS__)
-#define YOA_WARN(...)			//printf(__VA_ARGS__)
-#define YOA_ERROR(...)			//printf(__VA_ARGS__)
+// logging disabled (maybe the sdplog library was not found?)
+// only errors and critical messages will be printed (and only the first argument :P)
+#define YOA_TRACE(...)
+#define YOA_INFO(...)
+#define YOA_WARN(...)
+#define YOA_ERROR(...)			printf(__VA_ARGS__)
 #define YOA_CRITICAL(...)		printf(__VA_ARGS__)
 #endif // SDPLOG_ENABLED

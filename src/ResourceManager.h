@@ -3,7 +3,7 @@
 
 #include <map>
 
-#include "Defs.h"
+#include "Platform.h"
 #include "Voice.h"
 #include "Sound.h"
 
