@@ -1,0 +1,12 @@
+#ifndef _YOA_VERSION_H
+#define _YOA_VERSION_H
+
+// version number set through CMake prejoect build process
+#define YOA_VERSION_MAJOR @YOA_VERSION_MAJOR@
+#define YOA_VERSION_MINOR @YOA_VERSION_MINOR@
+
+// toggle certain features of YoAudio
+#define SDL2_ENABLED @SDL2_FOUND@
+#define SDPLOG_ENABLED @SPDLOG_ENABLED@
+
+#endif // _YOA_VERSION_H

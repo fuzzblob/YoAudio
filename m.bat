@@ -12,6 +12,8 @@ cd build
 
 set VS150COMNTOOLS = "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\"
 rem run CMake
+rem change the target project type if not using VisualStudio
+rem apend Win64 to build 64bit binaries
 %CM% -G "Visual Studio 15 2017" -Wdev ../
 
 cd ..

@@ -1,5 +1,6 @@
 #include "YoManager.h"
 #include "Defs.h"
+
 #include <algorithm>
 
 std::unique_ptr<YoManager> YoManager::sInstance = nullptr;
@@ -266,13 +267,18 @@ void YoManager::Update() noexcept
 
 YoManager::YoManager() noexcept
 {
+#if SPDLOG_ENABLED
+	// initialize logging
+	Log::Init();
+	YOA_INFO("YoAudio initializing. version: {0} {1}", YOA_VERSION_MAJOR, YOA_VERSION_MINOR);
+#else
+	printf("YoAudio initializing. (logging disabled). version: %i %i\n\n" , YOA_VERSION_MAJOR, YOA_VERSION_MINOR);
+#endif //SPDLOG_ENABLED
+
 	if (SDL_WasInit(SDL_INIT_AUDIO) != 0)
 	{
 		YOA_WARN("Audio is already initialized.");
 	}
-	
-	// initialize logging
-	Log::Init();
 	
 	// initialize SDL audio
 	if (SDL_Init(SDL_INIT_AUDIO) < 0)
@@ -307,7 +313,7 @@ YoManager::~YoManager()
 	// wait for thread to finish
 	m_Thread.join();
 
-	YOA_INFO("Yo Audio Shutdown sucessfully");
+	YOA_INFO("YoAudio Shutdown sucessfully");
 }
 
 inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)

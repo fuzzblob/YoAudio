@@ -1,4 +1,5 @@
 #include "ResourceManager.h"
+#include "Log.h"
 
 std::string ResourceManager::GetPath(const std::string & filename)
 {
