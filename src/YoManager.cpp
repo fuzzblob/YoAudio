@@ -205,7 +205,7 @@ void YoManager::Run()
 		}
 
 		m_mixStream.reserve(m_device->SpecObtained.channels * m_device->SpecObtained.samples);
-		for (int i = 0; i < m_mixStream.capacity(); i++) {
+		for (size_t i = 0; i < m_mixStream.capacity(); i++) {
 			m_mixStream.push_back(0.0f);
 		}
 
@@ -225,8 +225,12 @@ void YoManager::Run()
 		time->Update();
 		if (time->DeltaTime() >= 1.0f / UPDATE_RATE)
 		{
+			// call the non-rendering update
 			this->Update();
-			time->Reset();
+
+			YOA_INFO("Current DeltaTime: {0}", time->DeltaTime());
+
+			time->ResetDeltaTime();
 		}
 	}
 
@@ -267,13 +271,13 @@ void YoManager::Update() noexcept
 
 YoManager::YoManager() noexcept
 {
-#if SPDLOG_ENABLED
+#if !SPDLOG_ENABLED
+	printf("YoAudio initializing. (logging disabled). version: %i %i\n\n", YOA_VERSION_MAJOR, YOA_VERSION_MINOR);
+#endif //SPDLOG_ENABLED
+
 	// initialize logging
 	Log::Init();
 	YOA_INFO("YoAudio initializing. version: {0} {1}", YOA_VERSION_MAJOR, YOA_VERSION_MINOR);
-#else
-	printf("YoAudio initializing. (logging disabled). version: %i %i\n\n" , YOA_VERSION_MAJOR, YOA_VERSION_MINOR);
-#endif //SPDLOG_ENABLED
 
 	if (SDL_WasInit(SDL_INIT_AUDIO) != 0)
 	{
@@ -322,7 +326,7 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 	const uint32_t streamLen = uint32_t(len / 2);
 	// fill float buffer with silence
 	std::vector<float> mixBuffer = sInstance->m_mixStream;
-	for (int i = 0; i < streamLen; i++) {
+	for (size_t i = 0; i < streamLen; i++) {
 		mixBuffer[i] = 0.0f;
 	}
 
