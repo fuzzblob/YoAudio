@@ -15,4 +15,6 @@ void Log::Init()
 
 	YOA_WARN("YoAudio logging initialized\n[{0}:\t{1}]", __FILE__, __LINE__);
 }
+#else
+void Init() {}
 #endif // SDPLOG_ENABLED

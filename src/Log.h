@@ -1,17 +1,16 @@
 #pragma once
 
 #include "YoaConfig.h"
-#include "DllImportExport.h"
 
 #if SDPLOG_ENABLED
 #include "spdlog/spdlog.h"
 #endif // SDPLOG_ENABLED
 
-class YOA_API Log
+class Log
 {
 public:
-#if SDPLOG_ENABLED
 	static void Init();
+#if SDPLOG_ENABLED
 	inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return m_logger; }
 private:
 	static std::shared_ptr<spdlog::logger> m_logger;
