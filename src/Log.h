@@ -19,6 +19,12 @@ private:
 
 // log macros
 #if SDPLOG_ENABLED
+#define YOA_ASSERT(x, ...)\
+if (!(x))\
+{\
+YOA_CRITICAL("Assertion Failed: {0}"); \
+__debugbreak(); \
+} // no backslash
 #define YOA_TRACE(...)			::Log::GetCoreLogger()->trace(__VA_ARGS__)
 #define YOA_INFO(...)			::Log::GetCoreLogger()->info(__VA_ARGS__)
 #define YOA_WARN(...)			::Log::GetCoreLogger()->warn(__VA_ARGS__)
@@ -27,6 +33,7 @@ private:
 #else
 // logging disabled (maybe the sdplog library was not found?)
 // only errors and critical messages will be printed (and only the first argument :P)
+#define YOA_ASSERT(x, ...)
 #define YOA_TRACE(...)
 #define YOA_INFO(...)
 #define YOA_WARN(...)
