@@ -28,7 +28,8 @@ Mixer::Mixer()
 		YOA_ERROR("Failed to open audio device with requested parameters!");
 	}
 
-	mMixStream.reserve(mDevice->SpecObtained.channels * mDevice->SpecObtained.samples);
+	const size_t singleBufferSize = mDevice->SpecObtained.channels * mDevice->SpecObtained.samples;
+	mMixStream.reserve(singleBufferSize);
 	for (size_t i = 0; i < mMixStream.capacity(); i++) {
 		mMixStream.push_back(0.0f);
 	}
@@ -178,20 +179,16 @@ bool Mixer::StopVoice(const uint16_t id, const float fadeOut)
 	return false;
 }
 
-inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
+void Mixer::FillBuffer()
 {
-	Mixer* mixer = (Mixer*)userdata;
-	// convert from bytes to amount of 16bit samples expected
-	const uint32_t streamLen = uint32_t(len / 2);
 	// fill float buffer with silence
-	std::vector<float> mixBuffer = mixer->mMixStream;
-	for (size_t i = 0; i < streamLen; i++) {
-		mixBuffer[i] = 0.0f;
+	for (size_t i = 0; i < mMixStream.size(); i++) {
+		mMixStream[i] = 0.0f;
 	}
 
 	// s16 to normalized float
 	const float sampleFactor = 1.0f / 32768.0f;
-	for (auto voice : mixer->mPlayingAudio)
+	for (auto voice : mPlayingAudio)
 	{
 		if (voice->State == ToPlay)
 			voice->State = Playing;
@@ -200,7 +197,11 @@ inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
 			const float volumeFactor = voice->Volume;
 			const float pitch = voice->Pitch;
 
-			uint32_t length = ((streamLen > voice->LengthRemaining / 2) ? voice->LengthRemaining / 2 : streamLen);
+			uint32_t length = mMixStream.size();
+			if(voice->LengthRemaining / 2 < mMixStream.size())
+				length = voice->LengthRemaining / 2;
+
+			YOA_ASSERT(length <= mMixStream.size());
 
 			const Sint16* samples = (Sint16*)voice->PlayHead;
 			float sampleIndex = 0;
@@ -210,7 +211,7 @@ inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
 			for (uint32_t i = 0; i < length; i++)
 			{
 				sample = samples[static_cast<int>(sampleIndex)] * sampleFactor;
-				mixBuffer[i] += sample * volumeFactor * voice->smoothVolume.GetNext();
+				mMixStream[i] += sample * volumeFactor * voice->smoothVolume.GetNext();
 				// TODO: implement interpolating pitching & resampling
 				sampleIndex += pitch; // non-interpolating pitching
 			}
@@ -229,7 +230,7 @@ inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
 					voice->PlayHead = voice->Sound->Buffer;
 					voice->LengthRemaining = voice->Sound->Length;
 
-					length = streamLen - length;
+					length = mMixStream.size() - length;
 				}
 				else
 				{
@@ -239,17 +240,33 @@ inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
 			}
 		}
 	}
+
+	for (uint32_t i = 0; i < mMixStream.size(); i++)
+	{
+		// clipping if float buffer outside of render range
+		if (mMixStream[i] > 1.0f)
+			mMixStream[i] = 1.0f;
+		else if (mMixStream[i] < -1.0f)
+			mMixStream[i] = -1.0f;
+	}
+}
+
+inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
+{
+	Mixer* mixer = (Mixer*)userdata;
+	mixer->FillBuffer();
+	// convert from bytes to amount of 16bit samples expected
+	const uint32_t streamLen = uint32_t(len / 2);
+	bool asExpected = streamLen == (mixer->mDevice->SpecObtained.channels * mixer->mDevice->SpecObtained.samples);
+	YOA_ASSERT(
+		asExpected
+		, "unexpected buffer size detected!");
 	// fill 16bit output buffer
 	Sint16* current = (Sint16*)stream;
 	for (uint32_t i = 0; i < streamLen; i++)
 	{
-		// clipping if float buffer outside of render range
-		if (mixBuffer[i] > 1.0f)
-			mixBuffer[i] = 1.0f;
-		else if (mixBuffer[i] < -1.0f)
-			mixBuffer[i] = -1.0f;
 		// convert float back to 16bit
-		current[i] = static_cast<Sint16>(mixBuffer[i] * 32767);
+		current[i] = static_cast<Sint16>(mixer->mMixStream[i] * 32767);
 	}
 	// update render time
 	AudioThread::GetInstance()->mTimer->AdvancemRenderTime(streamLen);
