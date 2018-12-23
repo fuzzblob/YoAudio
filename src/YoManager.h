@@ -40,7 +40,7 @@ public:
 	bool IsPaused() noexcept;
 private:
 	void Run();
-	void Update(const double deltaTime) noexcept;
+	void Update() noexcept;
 	
 	static inline void AudioCallback(void * userdata, uint8_t * stream, int len);
 };

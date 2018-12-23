@@ -221,16 +221,14 @@ void YoManager::Run()
 			continue;
 		}
 
+		mTimer->ResetDeltaTime();
 		const double targetFrameLength = 1.0 / FRAME_RATE;
 		while (mTimer->DeltaTime() < targetFrameLength) {
 			// increment deltaTime
 			mTimer->Update();
 		}
 
-		// call the non-rendering update
-		this->Update(mTimer->DeltaTime());
-
-		mTimer->ResetDeltaTime();
+		Update();
 	}
 
 	this->Pause(true);
@@ -242,10 +240,10 @@ void YoManager::Run()
 	m_device = nullptr;
 }
 
-void YoManager::Update(const double deltaTime) noexcept
+void YoManager::Update() noexcept
 {
 	// system updates
-	//YOA_INFO("Current DeltaTime: {0}", deltaTime);
+	//YOA_INFO("Current DeltaTime: {0}", mTimer->DeltaTime());
 
 	if (m_Paused)
 		return;
