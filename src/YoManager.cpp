@@ -226,9 +226,7 @@ void YoManager::Run()
 		if (time->DeltaTime() >= 1.0f / UPDATE_RATE)
 		{
 			// call the non-rendering update
-			this->Update();
-
-			YOA_INFO("Current DeltaTime: {0}", time->DeltaTime());
+			this->Update(time->DeltaTime());
 
 			time->ResetDeltaTime();
 		}
@@ -243,9 +241,10 @@ void YoManager::Run()
 	m_device = nullptr;
 }
 
-void YoManager::Update() noexcept
+void YoManager::Update(const float deltaTime) noexcept
 {
 	// system updates
+	//YOA_INFO("Current DeltaTime: {0}", deltaTime);
 
 	if (m_Paused)
 		return;

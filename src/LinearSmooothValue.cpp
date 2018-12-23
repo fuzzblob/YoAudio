@@ -4,7 +4,8 @@
 LinearSmooothValue::LinearSmooothValue()
 {
 	currentTarget = currentValue = 1.0f;
-	step = countdown = 0;
+	step = 0.0f;
+	countdown = 0;
 	stepsToTarget = (int)std::floor(0.01 * 48000);
 }
 
@@ -14,7 +15,11 @@ LinearSmooothValue::LinearSmooothValue(float initial, double sampleRate, double 
 {
 }
 
-bool LinearSmooothValue::HasReachedTarget()
+int LinearSmooothValue::GetRemainingFadeSteps() const
+{
+	return stepsToTarget.load() - step;
+}
+bool LinearSmooothValue::HasReachedTarget() const
 {
 	return hasReacheTarget.load();
 }

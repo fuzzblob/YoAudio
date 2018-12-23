@@ -16,7 +16,8 @@ public:
 	LinearSmooothValue();
 	LinearSmooothValue(float initial, double sampleRate, double rampLengthSeconds) noexcept;
 
-	bool HasReachedTarget();
+	int GetRemainingFadeSteps() const;
+	bool HasReachedTarget() const;
 
 	void SetValue(float newValue);
 	void SetFadeLength(int samples);
