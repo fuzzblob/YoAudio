@@ -12,12 +12,12 @@ void YOA_Quit(const bool quitSDL)
 	YoManager::Release(quitSDL);
 }
 
-uint16_t YOA_PlayWavFile(const char * filename, const bool loop, const float volume, const float pitch, const float fadeIn)
+int YOA_PlayWavFile(const char * filename, const bool loop, const float volume, const float pitch, const float fadeIn)
 {
 	return YoManager::GetInstance()->PlayWavFile(std::string(filename), loop, volume, pitch, fadeIn);
 }
 
-bool YOA_StopVoice(const uint16_t id, const float fadeOut)
+bool YOA_StopVoice(const int id, const float fadeOut)
 {
 	return YoManager::GetInstance()->StopVoice(id, fadeOut);
 }
