@@ -1,5 +1,4 @@
-#ifndef _RESOURCEMANAGER_H
-#define _RESOURCEMANAGER_H
+#pragma once
 
 #include <map>
 
@@ -29,5 +28,3 @@ public:
 	ResourceManager() noexcept;
 	~ResourceManager();
 };
-
-#endif // !_RESOURCEMANAGER_H

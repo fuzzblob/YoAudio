@@ -1,5 +1,4 @@
-#ifndef _YOA_H
-#define _YOA_H
+#pragma once
 
 #include "DllImportExport.h"
 
@@ -23,5 +22,3 @@ void YOA_API YOA_Resume(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // _YOA_H

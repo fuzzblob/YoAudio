@@ -1,5 +1,4 @@
-#ifndef _TIMER_H
-#define _TIMER_H
+#pragma once
 
 #include "Platform.h"
 #include "DllImportExport.h"
@@ -27,5 +26,3 @@ public:
 	void AdvancemRenderTime(double change);
 	double RenderTime() const;
 };
-
-#endif // !_TIMER_H

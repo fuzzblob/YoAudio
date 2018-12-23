@@ -1,5 +1,4 @@
-#ifndef _VOICE_H
-#define _VOICE_H
+#pragma once
 
 #include "Platform.h"
 
@@ -28,5 +27,3 @@ struct Voice
 	float Volume;
 	float Pitch;
 };
-
-#endif // !_VOICE_H

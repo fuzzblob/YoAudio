@@ -1,5 +1,4 @@
-#ifndef _LINEARMOOTHVALUE_H
-#define _LINEARMOOTHVALUE_H
+#pragma once
 
 #include <atomic>
 
@@ -25,5 +24,3 @@ public:
 	void UpdateTarget();
 	float GetNext();
 };
-
-#endif _LINEARMOOTHVALUE_H

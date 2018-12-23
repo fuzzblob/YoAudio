@@ -1,5 +1,4 @@
-#ifndef _YOA_DEFS_H
-#define _YOA_DEFS_H
+#pragma once
 
 #include "YoaConfig.h"
 
@@ -48,5 +47,3 @@
 #define Float64 signed double;			// -1.8e308 to 1.8E308, 14 significant digits
 #define Float80 signed long	double;		// At least double (up to 80bit)
 */
-
-#endif // !_DEFS_H

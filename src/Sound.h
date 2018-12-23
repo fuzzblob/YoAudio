@@ -1,5 +1,4 @@
-#ifndef _SOUND_H
-#define _SOUND_H
+#pragma once
 
 #include "Platform.h"
 
@@ -10,5 +9,3 @@ struct Sound
 
 	SDL_AudioSpec Spec;
 };
-
-#endif // !_SOUND_H

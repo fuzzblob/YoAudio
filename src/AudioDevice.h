@@ -1,5 +1,4 @@
-#ifndef _AUDIODEVICE_H
-#define _AUDIODEVICE_H
+#pragma once
 
 #include "Platform.h"
 
@@ -17,5 +16,3 @@ struct AudioDevice
 	SDL_AudioSpec SpecWanted;
 	SDL_AudioSpec SpecObtained;
 };
-
-#endif // !_AUDIODEVICE_H
