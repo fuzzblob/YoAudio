@@ -5,14 +5,14 @@ void Timer::ResetDeltaTime() noexcept
 	mDeltaTime = 0.0f;
 }
 
-float Timer::DeltaTime() noexcept
+double Timer::DeltaTime() noexcept
 {
 	return mDeltaTime;
 }
 
 void Timer::Update() noexcept
 {
-	double lastTime = mTime;
+	const double lastTime = mTime;
 	mTime = GetTime();
 	mDeltaTime += mTime - lastTime;
 }
@@ -20,6 +20,17 @@ void Timer::Update() noexcept
 double Timer::GetTime() noexcept
 {
 	return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - mEpoch).count() / 1000000000.0;
+}
+
+void Timer::AdvancemRenderTime(double change)
+{
+	const double current = mRenderTime.load();
+	mRenderTime.store(current + change);
+}
+
+double Timer::RenderTime() const
+{
+	return mRenderTime.load();
 }
 
 Timer::Timer() noexcept

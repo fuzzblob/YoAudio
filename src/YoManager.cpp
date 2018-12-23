@@ -176,7 +176,7 @@ void YoManager::Run()
 {
 	YOA_INFO("Thread started!");
 
-	std::unique_ptr<Timer> time = std::make_unique<Timer>();
+	mTimer = std::make_unique<Timer>();
 	m_resources = std::make_unique<ResourceManager>();
 	m_device = std::make_unique<AudioDevice>();
 
@@ -221,15 +221,16 @@ void YoManager::Run()
 			continue;
 		}
 
-		// increment deltaTime
-		time->Update();
-		if (time->DeltaTime() >= 1.0f / UPDATE_RATE)
-		{
-			// call the non-rendering update
-			this->Update(time->DeltaTime());
-
-			time->ResetDeltaTime();
+		const double targetFrameLength = 1.0 / FRAME_RATE;
+		while (mTimer->DeltaTime() < targetFrameLength) {
+			// increment deltaTime
+			mTimer->Update();
 		}
+
+		// call the non-rendering update
+		this->Update(mTimer->DeltaTime());
+
+		mTimer->ResetDeltaTime();
 	}
 
 	this->Pause(true);
@@ -241,7 +242,7 @@ void YoManager::Run()
 	m_device = nullptr;
 }
 
-void YoManager::Update(const float deltaTime) noexcept
+void YoManager::Update(const double deltaTime) noexcept
 {
 	// system updates
 	//YOA_INFO("Current DeltaTime: {0}", deltaTime);
@@ -391,5 +392,7 @@ inline void YoManager::AudioCallback(void * userdata, uint8_t * stream, int len)
 		// convert float back to 16bit
 		current[i] = static_cast<Sint16>(mixBuffer[i] * 32767);
 	}
+	// update render time
+	sInstance->mTimer->AdvancemRenderTime(streamLen);
 }
 

@@ -29,8 +29,8 @@
 #if YOA_PLATFORM == YOA_SDL
 #ifdef SDL2_ENABLED
 #include <SDL.h>
-#else
-#error YoAudio platform is set to SDL but SDL is not avaialable as a rendering backend!
+//#else
+//#error YoAudio platform is set to SDL but SDL is not avaialable as a rendering backend!
 #endif
 #endif
 

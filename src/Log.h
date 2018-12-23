@@ -11,7 +11,7 @@ class Log
 public:
 	static void Init();
 #if SDPLOG_ENABLED
-	inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return m_logger; }
+	inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() noexcept { return m_logger; }
 private:
 	static std::shared_ptr<spdlog::logger> m_logger;
 #endif // SDPLOG_ENABLED

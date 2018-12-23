@@ -15,9 +15,9 @@ LinearSmooothValue::LinearSmooothValue(float initial, double sampleRate, double 
 {
 }
 
-int LinearSmooothValue::GetRemainingFadeSteps() const
+uint32_t LinearSmooothValue::GetRemainingFadeSteps() const
 {
-	return stepsToTarget.load() - step;
+	return countdown;
 }
 bool LinearSmooothValue::HasReachedTarget() const
 {
@@ -27,12 +27,12 @@ bool LinearSmooothValue::HasReachedTarget() const
 void LinearSmooothValue::SetValue(float newValue) {
 	target.store(newValue);
 }
-void LinearSmooothValue::SetFadeLength(int samples)
+void LinearSmooothValue::SetFadeLength(uint32_t samples)
 {
 	stepsToTarget.store(samples);
 }
 void LinearSmooothValue::UpdateTarget() {
-	float newTarget = target.load();
+	const float newTarget = target.load();
 	if (newTarget == currentTarget)
 		return;
 	currentTarget = newTarget;
