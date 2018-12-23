@@ -1,33 +1,48 @@
-#include "YoManager.h"
 #include "YoAudio.h"
+
+#include "AudioThread.h"
 #include <memory>
 
 bool YOA_Init(void)
 {
-	return (YoManager::GetInstance() != nullptr);
+	return (AudioThread::GetInstance(true) != nullptr);
 }
 
 void YOA_Quit(const bool quitSDL)
 { 
-	YoManager::Release(quitSDL);
+	AudioThread::Release(quitSDL);
 }
 
 int YOA_PlayWavFile(const char * filename, const bool loop, const float volume, const float pitch, const float fadeIn)
 {
-	return YoManager::GetInstance()->PlayWavFile(std::string(filename), loop, volume, pitch, fadeIn);
+	AudioThread* inst = AudioThread::GetInstance();
+	if (inst != nullptr) {
+		return inst->mMixer->PlayWavFile(std::string(filename), loop, volume, pitch, fadeIn);
+	}
+	return 0u;
 }
 
 bool YOA_StopVoice(const int id, const float fadeOut)
 {
-	return YoManager::GetInstance()->StopVoice(id, fadeOut);
+	AudioThread* inst = AudioThread::GetInstance();
+	if (inst != nullptr) {
+		return inst->mMixer->StopVoice(id, fadeOut);
+	}
+	return false;
 }
 
 void YOA_Pause(void)
 {
-	YoManager::GetInstance()->Pause(true);
+	AudioThread* inst = AudioThread::GetInstance();
+	if (inst != nullptr) {
+		inst->mMixer->Pause(true);
+	}
 }
 
 void YOA_Resume(void)
 {
-	YoManager::GetInstance()->Pause(false);
+	AudioThread* inst = AudioThread::GetInstance();
+	if (inst != nullptr) {
+		inst->mMixer->Pause(false);
+	}
 }
