@@ -2,23 +2,23 @@
 
 #include "YoaConfig.h"
 
-#if SDPLOG_ENABLED
+#if LOGGING_ENABLED
 #include "spdlog/spdlog.h"
-#endif // SDPLOG_ENABLED
+#endif
 
 class Log
 {
 public:
 	static void Init();
-#if SDPLOG_ENABLED
+#if LOGGING_ENABLED
 	inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() noexcept { return m_logger; }
 private:
 	static std::shared_ptr<spdlog::logger> m_logger;
-#endif // SDPLOG_ENABLED
+#endif
 };
 
 // log macros
-#if SDPLOG_ENABLED
+#if LOGGING_ENABLED
 #define YOA_ASSERT(x, ...)\
 if (!(x))\
 {\
@@ -39,4 +39,4 @@ __debugbreak(); \
 #define YOA_WARN(...)
 #define YOA_ERROR(...)			printf(__VA_ARGS__)
 #define YOA_CRITICAL(...)		printf(__VA_ARGS__)
-#endif // SDPLOG_ENABLED
+#endif

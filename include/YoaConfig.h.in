@@ -11,7 +11,13 @@
 
 // toggle certain features of YoAudio
 #define SDL2_ENABLED @SDL2_FOUND@
-#define SDPLOG_ENABLED @SPDLOG_ENABLED@
+
+#ifdef _DEBUG
+#define LOGGING_ENABLED @SPDLOG_ENABLED@
+#else
+#define LOGGING_ENABLED false
+#endif
+
 
 // calls to YoManager::Update() per second
 #define FRAME_RATE 60;

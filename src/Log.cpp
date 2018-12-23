@@ -1,6 +1,8 @@
 #include "Log.h"
 
-#if SDPLOG_ENABLED
+#if LOGGING_ENABLED == false
+void Init() {}
+#else
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 std::shared_ptr<spdlog::logger> Log::m_logger;
@@ -15,6 +17,4 @@ void Log::Init()
 
 	YOA_WARN("YoAudio logging initialized\n[{0}:\t{1}]", __FILE__, __LINE__);
 }
-#else
-void Init() {}
-#endif // SDPLOG_ENABLED
+#endif
