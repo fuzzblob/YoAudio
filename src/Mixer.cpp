@@ -8,10 +8,10 @@ Mixer::Mixer()
 	mDevice = std::make_unique<AudioDevice>();
 	SDL_memset(&(mDevice->SpecWanted), 0, sizeof(mDevice->SpecWanted));
 
-	(mDevice->SpecWanted).freq = AUDIO_FREQUENCY;
+	(mDevice->SpecWanted).freq = TARGET_SAMPLERATE;
 	(mDevice->SpecWanted).format = AUDIO_FORMAT;
-	(mDevice->SpecWanted).channels = AUDIO_CHANNELS;
-	(mDevice->SpecWanted).samples = AUDIO_SAMPLES;
+	(mDevice->SpecWanted).channels = TARGET_CHANNELS;
+	(mDevice->SpecWanted).samples = TARGET_BUFFER;
 	(mDevice->SpecWanted).callback = AudioCallback;
 	(mDevice->SpecWanted).userdata = this;
 
@@ -20,10 +20,10 @@ Mixer::Mixer()
 		YOA_CRITICAL("Warning: failed to open audio device: {0}", SDL_GetError());
 		return;
 	}
-	else if (mDevice->SpecObtained.freq != AUDIO_FREQUENCY
+	else if (mDevice->SpecObtained.freq != TARGET_SAMPLERATE
 		|| mDevice->SpecObtained.format != AUDIO_FORMAT
-		|| mDevice->SpecObtained.channels != AUDIO_CHANNELS
-		|| mDevice->SpecObtained.samples != AUDIO_SAMPLES)
+		|| mDevice->SpecObtained.channels != TARGET_CHANNELS
+		|| mDevice->SpecObtained.samples != TARGET_BUFFER)
 	{
 		YOA_ERROR("Failed to open audio device with requested parameters!");
 	}
@@ -34,6 +34,8 @@ Mixer::Mixer()
 		mMixStream.push_back(0.0f);
 	}
 
+	mPlayingAudio.reserve(MAX_VOICES > 0 ? MAX_VOICES : 32);
+	
 	mResources = std::make_unique<ResourceManager>();
 }
 
@@ -88,42 +90,41 @@ bool Mixer::IsPaused() noexcept
 
 uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const float volume, const float pitch, const float fadeIn)
 {
-	if (mDevice == nullptr)
-	{
+	if (mDevice == nullptr) {
 		YOA_CRITICAL("Can't play audio. No Device present!");
 		return 0;
 	}
 
 	std::shared_ptr<Sound> sound = mResources->GetSound(filename);
-	if (sound == nullptr)
-	{
+	if (sound == nullptr) {
 		YOA_CRITICAL("Can't play audio. Could not load sound at path: {0}", filename);
 		return 0;
 	}
 
-	std::shared_ptr<Voice> voice = mResources->GetVoice();
-	if (voice == nullptr)
-	{
+	std::shared_ptr<Voice> voice = GetVoice();
+	if (voice == nullptr) {
 		YOA_ERROR("Can't play audio. Could not aquire a Voice!");
 		return 0;
 	}
+	
 	voice->Sound = sound;
-	voice->Sound->Spec.userdata = this;
+	voice->Sound->Spec.userdata = nullptr;
 
 	voice->PlayHead = voice->Sound->Buffer;
 	voice->LengthRemaining = voice->Sound->Length;
 	voice->Volume = volume;
 	if (fadeIn > 0.0f) {
 		// ensure current target and value are at 0.0f
-		voice->smoothVolume.SetValue(0.0f);
-		voice->smoothVolume.SetFadeLength(0);
-		voice->smoothVolume.UpdateTarget();
-		voice->smoothVolume.GetNext();
+		voice->smoothVolume.Reset(0.0f);
 		// set fade duration (so the audio callback doesn't snap to the newly set value)
 		voice->smoothVolume.SetFadeLength(static_cast<int>(fadeIn * mDevice->SpecObtained.freq));
+		// set fader target
+		voice->smoothVolume.SetValue(1.0f);
 	}
-	// set fader target
-	voice->smoothVolume.SetValue(1.0f);
+	else {
+		// ensure current target and value are at 0.0f
+		voice->smoothVolume.Reset(1.0f);
+	}
 	voice->Pitch = pitch;
 	voice->IsLooping = loop;
 
@@ -151,7 +152,7 @@ bool Mixer::StopVoice(const uint16_t id, const float fadeOut)
 		return false;
 	}
 
-	if (id == 0 || id > mResources->GetVoiceCount())
+	if (id == 0 || id > mVoiceCount)
 	{
 		YOA_ERROR("Can't stop specified Voice. Invadid voiceID: {0}", id);
 		return false;
@@ -170,13 +171,44 @@ bool Mixer::StopVoice(const uint16_t id, const float fadeOut)
 		voice->smoothVolume.SetValue(0.0f);
 		voice->smoothVolume.SetFadeLength(static_cast<int>(fade * mDevice->SpecObtained.freq));
 
+		// TODO is lock needed? maybe make state atomic?
 		SDL_LockAudioDevice(mDevice->DeviceID);
 		voice->State = Stopping;
-		//m_playingAudio.erase(it);
 		SDL_UnlockAudioDevice(mDevice->DeviceID);
 		return true;
 	}
 	return false;
+}
+
+std::shared_ptr<Voice> Mixer::GetVoice()
+{
+	std::shared_ptr<Voice> newVoice = nullptr;
+
+	// Try getting a voice for recycling
+	// TODO: use stack
+	if (mAvailableVoices.size() > 0) {
+		newVoice = mAvailableVoices.top();
+		mAvailableVoices.pop();
+		YOA_ASSERT(newVoice->State == Stopped);
+	}
+	else {
+#if MAX_VOICES > 0
+		if (lastVoice >= MAX_VOICES) {
+			YOA_ERROR("Can't create new voice. Reached Voice limit of {0}", MAX_VOICES);
+			return nullptr;
+		}
+#endif
+		newVoice = std::make_shared<Voice>();
+		if (newVoice == nullptr) {
+			YOA_ERROR("Memory allocation error while making new Voice");
+			return nullptr;
+		}
+		// set Voice ID
+		newVoice->ID = ++mVoiceCount;
+	}
+
+	newVoice->Sound = nullptr;
+	return newVoice;
 }
 
 void Mixer::FillBuffer()
@@ -221,7 +253,9 @@ void Mixer::FillBuffer()
 
 			if (voice->State == Stopping
 				&& voice->smoothVolume.HasReachedTarget())
+			{
 				voice->State = Stopped;
+			}
 			if (voice->LengthRemaining <= 0)
 			{
 				if (voice->IsLooping == true)
@@ -239,6 +273,18 @@ void Mixer::FillBuffer()
 				}
 			}
 		}
+	}
+
+	// remove stopped voies
+	for (int i = mPlayingAudio.size() - 1; i >= 0; i--) {
+		if (mPlayingAudio[i]->State != Stopped)
+			continue;
+		auto voice = mPlayingAudio[i];
+		voice->smoothVolume.SetFadeLength(0);
+		voice->smoothVolume.SetValue(1.0f);
+		voice->smoothVolume.UpdateTarget();
+		mAvailableVoices.push(voice);
+		mPlayingAudio.erase(mPlayingAudio.begin() + i);
 	}
 
 	for (uint32_t i = 0; i < mMixStream.size(); i++)

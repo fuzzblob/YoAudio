@@ -1,18 +1,20 @@
 #include "LinearSmooothValue.h"
-#include <cmath>
 
-LinearSmooothValue::LinearSmooothValue()
-{
-	currentTarget = currentValue = 1.0f;
-	step = 0.0f;
-	countdown = 0;
-	stepsToTarget = (int)std::floor(0.01 * 48000);
-}
+#include <cmath>
 
 LinearSmooothValue::LinearSmooothValue(float initial, double sampleRate, double rampLengthSeconds) noexcept
 	: currentValue(initial), currentTarget(initial), step(0), countdown(0),
 	stepsToTarget((int)std::floor(rampLengthSeconds * sampleRate))
 {
+}
+
+void LinearSmooothValue::Reset(const float startValue)
+{
+	SetValue(startValue);
+	uint32_t steps = stepsToTarget.load();
+	stepsToTarget.store(0);
+	UpdateTarget();
+	stepsToTarget.store(steps);
 }
 
 uint32_t LinearSmooothValue::GetRemainingFadeSteps() const

@@ -19,9 +19,11 @@
 
 
 // calls to YoManager::Update() per second
-#define FRAME_RATE 60;
+#define FRAME_RATE			60
+// set to 0 for no limit on playing voices
+#define MAX_VOICES 			0
 
 // audio device configuration
-#define AUDIO_FREQUENCY 48000
-#define AUDIO_CHANNELS 2
-#define AUDIO_SAMPLES 4096
+#define TARGET_SAMPLERATE	48000
+#define TARGET_CHANNELS		2
+#define TARGET_BUFFER		4096

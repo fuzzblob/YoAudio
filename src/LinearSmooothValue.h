@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include "YoaConfig.h"
 
 class LinearSmooothValue {
 private:
@@ -11,9 +12,9 @@ private:
 	uint32_t countdown;
 
 public:
-	
-	LinearSmooothValue();
-	LinearSmooothValue(float initial, double sampleRate, double rampLengthSeconds) noexcept;
+	LinearSmooothValue(float initial = 1.0f, double sampleRate = TARGET_SAMPLERATE,
+		double rampLengthSeconds = 0.01) noexcept;
+	void Reset(const float startValue);
 
 	uint32_t GetRemainingFadeSteps() const;
 	bool HasReachedTarget() const;
