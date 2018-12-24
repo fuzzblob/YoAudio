@@ -147,6 +147,10 @@ add_custom_command(
 
 add_custom_command(
     TARGET ${PROJECT_NAME}
-    POST_BUILD
+    PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${YOA_BINARIES}/YoAudio.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
 
+add_custom_command(
+    TARGET ${PROJECT_NAME}
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${YOA_BINARIES}/YoAudio.pdb" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)

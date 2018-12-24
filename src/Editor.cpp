@@ -59,7 +59,6 @@ void Editor::App()
 		//ImGui::Begin("Sound Caster", &bTrue);
 		//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
-		
 		static float volume = 1.0f;
 		static float pitch = 1.0f;
 		
@@ -68,57 +67,58 @@ void Editor::App()
 		ImGui::SliderFloat("pitch", &pitch, 0.0f, 4.0f);
 
 		static uint16_t ambLoop_01 = 0u;
-		if (ambLoop_01 == 0u && ImGui::Button("Play Ambience 01"))
-		{
+		if (ambLoop_01 == 0u && ImGui::Button("Play Ambience 01")) {
 			ambLoop_01 = YOA_PlayWavFile("ambience_01.wav", true, 1.0f * volume, 1.0f * pitch, 12.0f);
 		}
-		if (ambLoop_01 != 0u && ImGui::Button("Stop Ambience 01"))
-		{
+		if (ambLoop_01 != 0u && ImGui::Button("Stop Ambience 01")) {
 			// stop the looping sound
-			if (YOA_StopVoice(ambLoop_01, 2.5f) != 1)
-			{
+			if (YOA_StopVoice(ambLoop_01, 2.5f) != 1) {
 				printf("Error: could not stop amb-loop!\n");
 			}
 			ambLoop_01 = 0u;
 		}
 
 		static uint16_t ambLoop_02 = 0u;
-		if (ambLoop_02 == 0u && ImGui::Button("Play Ambience 02"))
-		{
+		if (ambLoop_02 == 0u && ImGui::Button("Play Ambience 02")) {
 			ambLoop_02 = YOA_PlayWavFile("ambience_02.wav", true, 1.0f * volume, 1.0f * pitch, 5.0f);
 		}
-		if (ambLoop_02 != 0u && ImGui::Button("Stop Ambience 02"))
-		{
+		if (ambLoop_02 != 0u && ImGui::Button("Stop Ambience 02")) {
 			// stop the looping sound
-			if (YOA_StopVoice(ambLoop_02, 0.0f) != 1)
-			{
+			if (YOA_StopVoice(ambLoop_02, 0.0f) != 1) {
 				printf("Error: could not stop amb-loop!\n");
 			}
 			ambLoop_02 = 0u;
 		}
 
 		static uint16_t engineLoop = 0u;
-		if (engineLoop == 0u && ImGui::Button("Play Engine"))
-		{
+		if (engineLoop == 0u && ImGui::Button("Play Engine")) {
 			engineLoop = YOA_PlayWavFile("engine.wav", true, 1.0f * volume, 1.0f * pitch, 5.0f);
 		}
-		if (engineLoop != 0u && ImGui::Button("Stop Engine"))
-		{
+		if (engineLoop != 0u && ImGui::Button("Stop Engine")) {
 			// stop the looping sound
-			if (YOA_StopVoice(engineLoop, 0.0f) != 1)
-			{
+			if (YOA_StopVoice(engineLoop, 0.0f) != 1) {
 				printf("Error: could not stop Engine!\n");
 			}
 			engineLoop = 0u;
 		}
 
-		if (ImGui::Button("Play Door Open"))
-		{
+		static uint16_t musicLoop = 0u;
+		if (musicLoop == 0u && ImGui::Button("Play Music")) {
+			musicLoop = YOA_PlayWavFile("DasRied_loop_mono_8bit.wav", true, 1.0f * volume, 1.0f * pitch, 0.0f);
+		}
+		if (musicLoop != 0u && ImGui::Button("Stop Music")) {
+			// stop the looping sound
+			if (YOA_StopVoice(musicLoop, 1.5f) != 1) {
+				printf("Error: could not stop Music!\n");
+			}
+			engineLoop = 0u;
+		}
+
+		if (ImGui::Button("Play Door Open")) {
 			YOA_PlayWavFile("door_open_01.wav", false, 0.5f * volume, 1.0f * pitch, 0.0f);
 		}
 
-		if (ImGui::Button("Play Door Close"))
-		{
+		if (ImGui::Button("Play Door Close")) {
 			YOA_PlayWavFile("door_close_01.wav", false, 0.5f * volume, 1.0f * pitch, 0.0f);
 		}
 
