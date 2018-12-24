@@ -2,15 +2,13 @@
 #define _EDITOR_H
 
 #include <memory>
-#include "../../YoAudio/include/Timer.h"
-#include "InputManager.h"
-#include "GUI.h"
+#include "Timer.h"
 
 class Editor
 {
 private:
-	const int FRAME_RATE = 30;
-	bool m_quit = false;
+	bool mQuit = false;
+	std::unique_ptr<Timer> mTimer;
 
 	void App();
 	void Menu();

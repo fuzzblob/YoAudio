@@ -1,14 +1,16 @@
 #include "Editor.h"
+#include "InputManager.h"
 #include "GUI.h"
 #include "imgui\imgui.h"
+
+#include "Timer.h"
 #include "YoAudio.h"
-#include "../../YoAudio/src/Log.h"
 
 void Editor::Run()
 {
 	// UI implicitly starts SDL for OpenGL rendering
 	std::unique_ptr<Gui> ui = std::make_unique<Gui>();
-	std::unique_ptr<Timer> timer = std::make_unique<Timer>();
+	mTimer = std::make_unique<Timer>();
 	std::unique_ptr<InputManager> inputManager = std::make_unique<InputManager>();
 	SDL_Event mEvents;
 	float deltaTime = 0.0f;
@@ -16,34 +18,32 @@ void Editor::Run()
 	// init Yo AudioEngine
 	if (YOA_Init() == false)
 	{
-		YOA_CRITICAL("Yo Audio initialization error! Shutting town");
-		m_quit = true;
+		printf("Yo Audio initialization error! Shutting town\n");
+		mQuit = true;
 	}
 
-	while (m_quit == false)
+	while (mQuit == false)
 	{
-		timer->Update();
-		deltaTime = timer->DeltaTime();
-
 		while (SDL_PollEvent(&mEvents) != 0)
 		{
 			ui->ProcessEvent(&mEvents);
 			if (mEvents.type == SDL_QUIT)
-				m_quit = true;
+				mQuit = true;
 		}
-
-		if (deltaTime >= 1.0f / FRAME_RATE)
-		{
-			inputManager->Update();
-			ui->StartFrame();
-			// TODO: display GUI label "DeltaTime: %f\n" + deltaTime);
-
-			// main GUI
-			App();
-
-			ui->EndFrame();
-			timer->Reset();
+		// reset deltaTime
+		mTimer->ResetDeltaTime();
+		// wait for frame rate
+		const double targetFrameLength = 1.0 / FRAME_RATE;
+		while (mTimer->DeltaTime() < targetFrameLength) {
+			mTimer->Update();
 		}
+		inputManager->Update();
+		// begin GUI
+		ui->StartFrame();
+		// main GUI
+		App();
+		// end GUI
+		ui->EndFrame();
 	}
 
 	// quit Yo audio system
@@ -62,14 +62,13 @@ void Editor::App()
 		
 		static float volume = 1.0f;
 		static float pitch = 1.0f;
-		static uint16_t ambLoop_01 = 0u;
-		static uint16_t ambLoop_02 = 0u;
 		
 		ImGui::SliderFloat("volume", &volume, 0.0f, 1.0f);
 
 		ImGui::SliderFloat("pitch", &pitch, 0.0f, 4.0f);
 
-		if (ImGui::Button("Play Ambience 01"))
+		static uint16_t ambLoop_01 = 0u;
+		if (ambLoop_01 == 0u && ImGui::Button("Play Ambience 01"))
 		{
 			ambLoop_01 = YOA_PlayWavFile("ambience_01.wav", true, 1.0f * volume, 1.0f * pitch, 12.0f);
 		}
@@ -78,12 +77,13 @@ void Editor::App()
 			// stop the looping sound
 			if (YOA_StopVoice(ambLoop_01, 2.5f) != 1)
 			{
-				YOA_ERROR("Error: could not stop amb-loop!");
+				printf("Error: could not stop amb-loop!\n");
 			}
 			ambLoop_01 = 0u;
 		}
 
-		if (ImGui::Button("Play Ambience 02"))
+		static uint16_t ambLoop_02 = 0u;
+		if (ambLoop_02 == 0u && ImGui::Button("Play Ambience 02"))
 		{
 			ambLoop_02 = YOA_PlayWavFile("ambience_02.wav", true, 1.0f * volume, 1.0f * pitch, 5.0f);
 		}
@@ -92,9 +92,24 @@ void Editor::App()
 			// stop the looping sound
 			if (YOA_StopVoice(ambLoop_02, 0.0f) != 1)
 			{
-				YOA_ERROR("Error: could not stop amb-loop!");
+				printf("Error: could not stop amb-loop!\n");
 			}
 			ambLoop_02 = 0u;
+		}
+
+		static uint16_t engineLoop = 0u;
+		if (engineLoop == 0u && ImGui::Button("Play Engine"))
+		{
+			engineLoop = YOA_PlayWavFile("engine.wav", true, 1.0f * volume, 1.0f * pitch, 5.0f);
+		}
+		if (engineLoop != 0u && ImGui::Button("Stop Engine"))
+		{
+			// stop the looping sound
+			if (YOA_StopVoice(engineLoop, 0.0f) != 1)
+			{
+				printf("Error: could not stop Engine!\n");
+			}
+			engineLoop = 0u;
 		}
 
 		if (ImGui::Button("Play Door Open"))
@@ -168,7 +183,7 @@ void Editor::Menu()
 			}
 			if (ImGui::MenuItem("Quit", "Alt+F4"))
 			{
-				m_quit = true;
+				mQuit = true;
 			}
 			ImGui::EndMenu();
 		}
@@ -182,6 +197,12 @@ void Editor::Menu()
 			if (ImGui::MenuItem("Paste", "CTRL+V")) {}
 			ImGui::EndMenu();
 		}
+
+		ImGui::Separator();
+
+		float delta = this->mTimer->DeltaTime();
+		ImGui::InputFloat("FPS: ", &delta);
+		
 		ImGui::EndMainMenuBar();
 	}
 }

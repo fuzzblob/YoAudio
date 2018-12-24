@@ -16,22 +16,6 @@ if ( CMAKE_BUILD_TYPE STREQUAL "" )
 endif ( CMAKE_BUILD_TYPE STREQUAL "" )
 
 #
-# Set up spdlog dependency stuff
-#
-
-set( SPDLOG_INCLUDE_DIRS ../YoAudio/dependencies/spdlog/include )
-
-# Check if we found it!
-IF ( SPDLOG_INCLUDE_DIRS )
-	#SET( _FOUND TRUE )
-	MESSAGE(STATUS "Looking for sdpLog - found")
-ELSE ( SPDLOG_INCLUDE_DIRS )
-	#SET( _FOUND FALSE )
-	MESSAGE(STATUS "Looking for sdpLog - not found")
-ENDIF ( SPDLOG_INCLUDE_DIRS )
-
-
-#
 # Set up SDL2 dependency stuff
 #
 set(SDL2_SEARCH_PATHS ../YoAudio/dependencies/SDL2)
@@ -146,7 +130,6 @@ file(GLOB_RECURSE SRCS
 include_directories(
 	${SDL2_INCLUDE_DIRS}
 	${YOA_INCLUDE_DIRS}
-	${SPDLOG_INCLUDE_DIRS}
 )
 
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin )
