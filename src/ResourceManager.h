@@ -12,10 +12,6 @@ class ResourceManager
 {
 private:
 	std::map<std::string, std::shared_ptr<Sound>> mSounds;
-	std::map<uint16_t, std::shared_ptr<Voice>> mVoices;
-
-	uint16_t lastVoice = 0;
-
 public:
 	static std::string GetPath(const std::string & filename);
 
@@ -23,8 +19,6 @@ public:
 	std::shared_ptr<Sound> LoadSound(const std::string & filename);
 	bool FreeSound(Sound* sound) noexcept;
 
-	uint16_t GetVoiceCount() noexcept;
-	std::shared_ptr<Voice> GetVoice();
 	ResourceManager() noexcept;
 	~ResourceManager();
 };

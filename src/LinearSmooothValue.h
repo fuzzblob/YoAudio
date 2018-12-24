@@ -6,11 +6,13 @@
 class LinearSmooothValue {
 private:
 	std::atomic<float> target;
-	float currentValue, currentTarget, step;
+	float currentValue;
+	float currentTarget;
+	
 	std::atomic<bool> hasReacheTarget;
 	std::atomic<uint32_t> stepsToTarget;
 	uint32_t countdown;
-
+	float stepSize;
 public:
 	LinearSmooothValue(float initial = 1.0f, double sampleRate = TARGET_SAMPLERATE,
 		double rampLengthSeconds = 0.01) noexcept;

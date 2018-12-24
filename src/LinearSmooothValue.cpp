@@ -3,7 +3,7 @@
 #include <cmath>
 
 LinearSmooothValue::LinearSmooothValue(float initial, double sampleRate, double rampLengthSeconds) noexcept
-	: currentValue(initial), currentTarget(initial), step(0), countdown(0),
+	: currentValue(initial), currentTarget(initial), stepSize(0), countdown(0),
 	stepsToTarget((int)std::floor(rampLengthSeconds * sampleRate))
 {
 }
@@ -46,7 +46,7 @@ void LinearSmooothValue::UpdateTarget() {
 	}
 	else
 	{
-		step = (currentTarget - currentValue) / countdown;
+		stepSize = (currentTarget - currentValue) / countdown;
 		hasReacheTarget.store(false);
 	}
 }
@@ -58,6 +58,6 @@ float LinearSmooothValue::GetNext() {
 		hasReacheTarget.store(true);
 		return currentValue;
 	}
-	currentValue += step;
+	currentValue += stepSize;
 	return currentValue;
 }

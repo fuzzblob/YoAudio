@@ -52,56 +52,9 @@ bool ResourceManager::FreeSound(Sound* sound) noexcept
 	return false;
 }
 
-uint16_t ResourceManager::GetVoiceCount() noexcept
-{
-	return lastVoice;
-}
-
-std::shared_ptr<Voice> ResourceManager::GetVoice()
-{
-	std::shared_ptr<Voice> newVoice = nullptr;
-
-	// Try getting a voice for recycling
-	for (auto voice : mVoices)
-	{
-		if (voice.second != nullptr && voice.second->State == Stopped)
-		{
-			newVoice = voice.second;
-			break;
-		}
-	}
-	
-	// else make a new voice
-	if (newVoice == nullptr)
-	{
-#if MAX_VOICES > 0
-		if(lastVoice >= MAX_VOICES)
-		{
-			YOA_ERROR("Can't create new voice. Reached Voice limit of {0}", MAX_VOICES);
-			return nullptr;
-		}
-#endif
-			
-		newVoice = std::make_shared<Voice>();
-		if (newVoice == nullptr)
-		{
-			YOA_ERROR("Memory allocation error while making new Voice");
-			return nullptr;
-		}
-
-		// set Voice ID
-		lastVoice++;
-		newVoice->ID = lastVoice;
-		mVoices[newVoice->ID] != newVoice;
-	}
-	
-	newVoice->Sound = nullptr;
-	return newVoice;
-}
-
 ResourceManager::ResourceManager() noexcept
 {
-	lastVoice = 0;
+
 }
 
 ResourceManager::~ResourceManager()
@@ -114,6 +67,4 @@ ResourceManager::~ResourceManager()
 		}
 	}
 	mSounds.clear();
-
-	mVoices.clear();
 }
