@@ -6,14 +6,14 @@
 Mixer::Mixer()
 {
 	mDevice = std::make_unique<AudioDevice>();
-	SDL_memset(&(mDevice->SpecWanted), 0, sizeof(mDevice->SpecWanted));
+	SDL_memset(&mDevice->SpecWanted, 0, sizeof(mDevice->SpecWanted));
 
-	(mDevice->SpecWanted).freq = TARGET_SAMPLERATE;
-	(mDevice->SpecWanted).format = AUDIO_FORMAT;
-	(mDevice->SpecWanted).channels = TARGET_CHANNELS;
-	(mDevice->SpecWanted).samples = TARGET_BUFFER;
-	(mDevice->SpecWanted).callback = AudioCallback;
-	(mDevice->SpecWanted).userdata = this;
+	mDevice->SpecWanted.freq = TARGET_SAMPLERATE;
+	mDevice->SpecWanted.format = AUDIO_FORMAT;
+	mDevice->SpecWanted.channels = TARGET_CHANNELS;
+	mDevice->SpecWanted.samples = TARGET_BUFFER;
+	mDevice->SpecWanted.callback = AudioCallback;
+	mDevice->SpecWanted.userdata = this;
 
 	mDevice->DeviceID = SDL_OpenAudioDevice(nullptr, 0, &(mDevice->SpecWanted), &(mDevice->SpecObtained), ALLOWED_CHANGES);
 	if (mDevice->DeviceID == 0) {
@@ -28,8 +28,11 @@ Mixer::Mixer()
 		YOA_ERROR("Failed to open audio device with requested parameters!");
 	}
 
-	const size_t singleBufferSize = mDevice->SpecObtained.channels * mDevice->SpecObtained.samples;
-	mMixStream.reserve(singleBufferSize);
+	YOA_INFO("Opened AudioDevice \"{0}\" ID: {1}\n\t{2} sample rate, {5}bit, {3} channels, buffer size {4}", 
+		mDevice->GetDeviceName(), mDevice->DeviceID, mDevice->SpecObtained.freq,
+		mDevice->SpecObtained.channels, mDevice->SpecObtained.samples, mDevice->BitSize());
+
+	mMixStream.reserve(mDevice->SpecObtained.channels * mDevice->SpecObtained.samples);
 	for (size_t i = 0; i < mMixStream.capacity(); i++) {
 		mMixStream.push_back(0.0f);
 	}
@@ -57,35 +60,16 @@ void Mixer::Pause(const bool pause) noexcept
 		return;
 	}
 
-	if (pause)
-	{
-		if (m_Paused)
-		{
-			YOA_WARN("YoAudio already paused");
-			return;
-		}
-
-		YOA_INFO("YoAudio pausing");
-		SDL_PauseAudioDevice(mDevice->DeviceID, 1);
-		m_Paused = true;
-	}
-	else
-	{
-		if (!m_Paused)
-		{
-			YOA_WARN("YoAudio already playing");
-			return;
-		}
-
-		YOA_INFO("YoAudio resuming");
-		SDL_PauseAudioDevice(mDevice->DeviceID, 0);
-		m_Paused = false;
-	}
+	if (mPaused == pause)
+		return;
+	mPaused = pause;
+	SDL_PauseAudioDevice(mDevice->DeviceID, pause ? 1 : 0);
+	YOA_INFO("audio engine state set to \"paused = {0}\"", pause);
 }
 
 bool Mixer::IsPaused() noexcept
 {
-	return m_Paused;
+	return mPaused;
 }
 
 uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const float volume, const float pitch, const float fadeIn)
@@ -303,19 +287,37 @@ void Mixer::FillBuffer()
 inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
 {
 	Mixer* mixer = (Mixer*)userdata;
+	// fill mixing buffer
 	mixer->FillBuffer();
-	// convert from bytes to amount of 16bit samples expected
-	const uint32_t streamLen = uint32_t(len / 2);
-	bool asExpected = streamLen == (mixer->mDevice->SpecObtained.channels * mixer->mDevice->SpecObtained.samples);
-	YOA_ASSERT(
-		asExpected
-		, "unexpected buffer size detected!");
-	// fill 16bit output buffer
-	Sint16* current = (Sint16*)stream;
-	for (uint32_t i = 0; i < streamLen; i++)
-	{
-		// convert float back to 16bit
-		current[i] = static_cast<Sint16>(mixer->mMixStream[i] * 32767);
+	// fill output buffer
+	AudioDevice* device = mixer->mDevice.get();
+	if (device->IsFloat()) {
+		float* output = (float*)stream;
+		for (uint32_t i = 0; i < mixer->mMixStream.size(); i++)
+			output[i] = mixer->mMixStream[i];
 	}
-	// update render time
+	else {
+		// convert from float mixBuffer to int targetBuffer
+		const int bitSize = device->BitSize();
+		if (device->IsSigned()) {
+			if (bitSize == 16) {
+				int16_t* current = (int16_t*)stream;
+				for (uint32_t i = 0; i < mixer->mMixStream.size(); i++)
+					current[i] = static_cast<int16_t>(mixer->mMixStream[i] * 32767);
+			}
+			else if (bitSize == 8) {
+				int8_t* current = (int8_t*)stream;
+				for (uint32_t i = 0; i < mixer->mMixStream.size(); i++)
+					current[i] = static_cast<int8_t>(mixer->mMixStream[i] * 127);
+			}
+			else if (bitSize == 32) {
+				int32_t* current = (int32_t*)stream;
+				for (uint32_t i = 0; i < mixer->mMixStream.size(); i++)
+					current[i] = static_cast<int32_t>(mixer->mMixStream[i] * 2147483647);
+			}
+			else {
+				YOA_ERROR("Unsupported output bitdepth of {0} bit", bitSize);
+			}
+		}
+	}
 }
