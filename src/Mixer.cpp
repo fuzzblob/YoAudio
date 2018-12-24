@@ -295,6 +295,9 @@ void Mixer::FillBuffer()
 		else if (mMixStream[i] < -1.0f)
 			mMixStream[i] = -1.0f;
 	}
+
+	// update render time
+	AudioThread::GetInstance()->mTimer->AdvancemRenderTime(mMixStream.size());
 }
 
 inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
@@ -315,5 +318,4 @@ inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
 		current[i] = static_cast<Sint16>(mixer->mMixStream[i] * 32767);
 	}
 	// update render time
-	AudioThread::GetInstance()->mTimer->AdvancemRenderTime(streamLen);
 }

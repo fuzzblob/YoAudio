@@ -102,7 +102,6 @@ These are things I'd like to explore with this library / tool in the future (in 
 - Voice management
 	- limit concurrently playing voices
 		- add virtual state (tracking playback position without adding samples to the mix)
-	- remove voices from playing vector when stopped
 - add resampling of WAV data (spec to device spec)
 	- proper pitch algorithm
 - instead of hard coded 16bit int
