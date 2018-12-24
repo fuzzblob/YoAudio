@@ -21,7 +21,7 @@ struct Voice
 	VoiceState State = Stopped;
 	std::shared_ptr<Sound> Sound;
 	uint32_t LengthRemaining = 0;
-	uint8_t * PlayHead = nullptr;
+	uint8_t* PlayHead = nullptr;
 	bool IsLooping;
 	LinearSmooothValue smoothVolume;
 	float Volume;

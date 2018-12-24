@@ -38,10 +38,10 @@ struct AudioDevice
 	bool IsFloat() const {
 		return SDL_AUDIO_ISFLOAT(SpecObtained.format);
 	}
-	bool IsSigned() {
+	bool IsSigned() const {
 		return SDL_AUDIO_ISSIGNED(SpecObtained.format);
 	}
-	bool IsBigEndian() {
+	bool IsBigEndian() const {
 		return SDL_AUDIO_ISBIGENDIAN(SpecObtained.format);
 	}
 };
