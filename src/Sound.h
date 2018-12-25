@@ -14,7 +14,7 @@ struct Sound {
 	// sample format (used to convers buffer to float for mixing)
 	SampleFormat Format;
 
-	float GetSample(uint32_t position) {
+	float GetSample(const uint32_t position) {
 		switch (Format) {
 		case YOA_Format_Float:
 			return ((float*)Buffer)[position];

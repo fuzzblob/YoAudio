@@ -209,7 +209,7 @@ void Mixer::FillBuffer()
 			uint32_t length = mixL.size();
 			if (voice->IsLooping == false)
 			{
-				uint32_t samplesRemaining = voice->GetSamplesRemaining() / voice->Sound->Channels;
+				uint32_t samplesRemaining = voice->GetSamplesRemaining() / (voice->Sound->Channels * pitch);
 				if (samplesRemaining >= 0 && samplesRemaining < length)
 					length = samplesRemaining;
 			}
@@ -220,28 +220,37 @@ void Mixer::FillBuffer()
 			}
 			YOA_ASSERT(length <= mixL.size());
 			YOA_ASSERT(voice->Sound->Channels <= 2);
-			float sampleIndex = 0;
+			float sampleIndex = 0.0f;
 			if (voice->Sound->Channels == 1) {
 				float sample;
 				for (uint32_t i = 0; i < length; i++) {
-					sample = voice->GetSample(uint16_t(sampleIndex)) * voice->smoothVolume.GetNext();
+					if(pitch == 1.0f)
+						sample = voice->GetSample(uint32_t(sampleIndex)) * voice->smoothVolume.GetNext();
+					else
+						sample = voice->GetReSample(sampleIndex) * voice->smoothVolume.GetNext();
 					mixL[i] += sample;
 					mixR[i] += sample;
-					sampleIndex++;// += pitch; // non-interpolating pitching
+					sampleIndex += pitch; // non-interpolating pitching
 				}
-				voice->AdvancePlayhead(length);
+				voice->AdvancePlayhead(length * pitch);
 			}
 			else if (voice->Sound->Channels == 2) {
 				float volume;
 				for (uint32_t i = 0; i < length; i++) {
 					volume = voice->smoothVolume.GetNext();
-					mixL[i] += voice->GetSample(uint16_t(sampleIndex));
-					sampleIndex++;
-					mixR[i] += voice->GetSample(uint16_t(sampleIndex));
-					sampleIndex++;
-					//sampleIndex += pitch; // non-interpolating pitching
+					if (pitch == 1.0f)
+					{
+						mixL[i] += voice->GetSample(uint32_t(sampleIndex), 0) * volume;
+						mixR[i] += voice->GetSample(uint32_t(sampleIndex), 1) * volume;
+					}
+					else
+					{
+						mixL[i] += voice->GetReSample(sampleIndex, 0) * volume;
+						mixR[i] += voice->GetReSample(sampleIndex, 1) * volume;
+					}
+					sampleIndex += pitch; // non-interpolating pitching
 				}
-				voice->AdvancePlayhead(length * voice->Sound->Channels);
+				voice->AdvancePlayhead(length * pitch * voice->Sound->Channels);
 			}
 
 			if (voice->State == Stopping
