@@ -20,7 +20,7 @@
 #define LOGGING_ENABLED false
 #endif
 
-
+#define AUDIO_THREAD_UPDATES false
 // calls to YoManager::Update() per second
 #define FRAME_RATE			60
 // set to 0 for no limit on playing voices

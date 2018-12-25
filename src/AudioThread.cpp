@@ -1,6 +1,9 @@
 #include "AudioThread.h"
 
 #include "Log.h"
+#if AUDIO_THREAD_UPDATES == false
+#include <stdlib.h>
+#endif
 
 std::unique_ptr<AudioThread> AudioThread::sInstance = nullptr;
 bool AudioThread::sInitialized = false;
@@ -73,7 +76,7 @@ void AudioThread::Run()
 	{
 		if (mThreadRunning == false)
 			continue;
-
+#if AUDIO_THREAD_UPDATES
 		constexpr double targetFrameLength = 1.0 / FRAME_RATE;
 		while (mTimer->DeltaTime() < targetFrameLength) {
 			// increment deltaTime
@@ -82,34 +85,23 @@ void AudioThread::Run()
 
 		Update();
 		mTimer->ResetDeltaTime();
+#else
+		// wait for 10 ms before checking if the thread should continue running
+		Sleep(10);
+#endif
 	}
 }
 
 void AudioThread::Update() noexcept
 {
-	// system updates
 	//YOA_INFO("Current DeltaTime: {0}", mTimer->DeltaTime());
 
 	if (mMixer == nullptr || mMixer->IsPaused())
 		return;
 
-	// loop throu sound channels removing stopped voices
-	/*std::vector<std::shared_ptr<Voice>>::iterator it = m_playingAudio.begin();
-	std::vector<std::shared_ptr<Voice>>::iterator end = m_playingAudio.end();
-	for (int i = 0; it + i != end;) {
-		auto voice = (*it);
-		if (voice->State != Stopped) {
-			i++;
-			continue;
-		}
-		SDL_LockAudioDevice(m_device->DeviceID);
-		m_playingAudio.erase(it + i);
-		SDL_UnlockAudioDevice(m_device->DeviceID);
-		end = m_playingAudio.end();
-	}*/
-
 	// interpolate values
 	// update statemachines
+	// fill ring buffer
 }
 
 AudioThread::AudioThread()
