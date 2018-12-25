@@ -1,20 +1,21 @@
 #include "ResourceManager.h"
+
 #include "Log.h"
 #include "AudioDevice.h"
 
-std::string ResourceManager::GetPath(const std::string & filename)
-{
-	std::string fullPath = std::string(SDL_GetBasePath());
-	fullPath.append("assets/" + filename);
-	return fullPath;
-}
-
 std::shared_ptr<Sound >ResourceManager::GetSound(const std::string & filename)
 {
-	std::string fullPath = GetPath(filename);
+	if (assetPath.size() == 0) {
+		auto sdl_path = SDL_GetBasePath();
+		assetPath = std::string(sdl_path);
+		assetPath.append("assets/");
+		SDL_free(sdl_path);
+	}
+	std::string fullPath = assetPath;
+	fullPath.append(filename);
 
-	if (mSounds[fullPath] == nullptr)
-	{
+	if (mSounds[fullPath] == nullptr) {
+		// load file if needed
 		mSounds[fullPath] = LoadSound(fullPath);
 	}
 
@@ -73,11 +74,6 @@ bool ResourceManager::FreeSound(Sound* sound) noexcept
 	sound->Buffer = nullptr;
 
 	return false;
-}
-
-ResourceManager::ResourceManager() noexcept
-{
-
 }
 
 ResourceManager::~ResourceManager()
