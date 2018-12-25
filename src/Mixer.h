@@ -25,7 +25,6 @@ private:
 	void FillBuffer();
 	static inline void AudioCallback(void * userdata, uint8_t * stream, int len);
 private:
-	bool mPaused = true;
 	std::unique_ptr<AudioDevice> mDevice = nullptr;
 	std::vector<float> mixL;
 	std::vector<float> mixR;

@@ -19,7 +19,7 @@ Mixer::Mixer()
 
 	mDevice->DeviceID = SDL_OpenAudioDevice(nullptr, 0, &want, &get, ALLOWED_CHANGES);
 	if (mDevice->DeviceID == 0) {
-		YOA_CRITICAL("Warning: failed to open audio device: {0}", SDL_GetError());
+		YOA_CRITICAL("Failed to open audio device: {0}", SDL_GetError());
 		return;
 	}
 	else if (get.freq != TARGET_SAMPLERATE
@@ -27,7 +27,7 @@ Mixer::Mixer()
 		|| get.channels != TARGET_CHANNELS
 		|| get.samples != TARGET_BUFFER)
 	{
-		YOA_ERROR("Failed to open audio device with requested parameters!");
+		YOA_ERROR("AudioDevice opened with different parameters than requested!");
 	}
 
 	mDevice->Samples = get.samples;
@@ -52,11 +52,7 @@ Mixer::Mixer()
 
 Mixer::~Mixer()
 {
-	Pause(true);
-	// close SDL audio
-	SDL_CloseAudioDevice(mDevice->DeviceID);
 	mDevice = nullptr;
-	// clean up resources
 	mResources = nullptr;
 }
 
@@ -68,16 +64,15 @@ void Mixer::Pause(const bool pause) noexcept
 		return;
 	}
 
-	if (mPaused == pause)
+	if (mDevice->mPaused == pause)
 		return;
-	mPaused = pause;
-	SDL_PauseAudioDevice(mDevice->DeviceID, pause ? 1 : 0);
+	mDevice->SetPaused(pause);
 	YOA_INFO("audio engine state set to \"paused = {0}\"", pause);
 }
 
 bool Mixer::IsPaused() noexcept
 {
-	return mPaused;
+	return mDevice->mPaused;
 }
 
 uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const float volume, const float pitch, const float fadeIn)

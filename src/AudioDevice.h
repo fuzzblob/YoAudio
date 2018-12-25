@@ -20,20 +20,36 @@
 #error unsupported target bitdepth
 #endif;
 
-struct AudioDevice
-{
+struct AudioDevice {
 	SDL_AudioDeviceID DeviceID;
 
+	// is the audio device paused
+	bool mPaused = true;
+	// audio callback buffer size (per channel)
 	uint32_t Samples;
+	// audio callback channel count
 	uint8_t Channels;
+	// audio callback sample rate
 	uint32_t Frequency;
+	// audio callback bit depth
 	SampleFormat Format;
 
-	const char* GetDeviceName() {
+	~AudioDevice() {
+		SetPaused(true);
+		// close SDL audio
+		SDL_CloseAudioDevice(DeviceID);
+	}
+
+	void SetPaused(const bool pause) noexcept {
+		mPaused = pause;
+		SDL_PauseAudioDevice(DeviceID, pause ? 1 : 0);
+	}
+
+	const char* GetDeviceName() const {
 		return SDL_GetCurrentAudioDriver();
 	}
 
-	static SampleFormat ConvertFormat(SDL_AudioSpec& spec) {
+	static SampleFormat ConvertFormat(const SDL_AudioSpec& spec) {
 		if (SDL_AUDIO_ISFLOAT(spec.format)) {
 			return YOA_Format_Float;
 		}
