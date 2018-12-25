@@ -38,27 +38,27 @@ endif ( CMAKE_BUILD_TYPE STREQUAL "" )
 #
 
 # should we allow logging?
-option (SPDLOG_ENABLED 
+option (LOGGING_ENABLED 
         "enable logging" ON) 
 
-IF ( SPDLOG_ENABLED )
+IF ( LOGGING_ENABLED )
 	set( SPDLOG_INCLUDE_DIRS dependencies/spdlog/include )
 	# Check if we found it!
 	IF ( SPDLOG_INCLUDE_DIRS )
-		SET( SPDLOG_ENABLED true )
+		SET( LOGGING_ENABLED true )
 		MESSAGE(STATUS "Looking for sdpLog - found")
 		include_directories(
 			include
 			${SPDLOG_INCLUDE_DIRS}
 		)
 	ELSE ( SPDLOG_INCLUDE_DIRS )
-		SET( SPDLOG_ENABLED false )
+		SET( LOGGING_ENABLED false )
 		MESSAGE(STATUS "Looking for sdpLog - not found")
 	ENDIF ( SPDLOG_INCLUDE_DIRS )
-ELSE ( SPDLOG_ENABLED )
-	SET( SPDLOG_ENABLED false )
+ELSE ( LOGGING_ENABLED )
+	SET( LOGGING_ENABLED false )
 	MESSAGE(STATUS "disabled sdpLog")
-ENDIF ( SPDLOG_ENABLED )
+ENDIF ( LOGGING_ENABLED )
 
 #
 # Set up SDL2 dependency stuff

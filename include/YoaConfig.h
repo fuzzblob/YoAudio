@@ -9,7 +9,10 @@
 #define YOA_VERSION_MINOR 0
 
 // toggle certain features of YoAudio
-#define SDL2_ENABLED true
+#define SDL2_FOUND true
+#if SDL2_FOUND
+#define FORCE_SDL 
+#endif
 
 #ifdef _DEBUG
 #define LOGGING_ENABLED true
