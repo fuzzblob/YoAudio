@@ -15,6 +15,8 @@ int YOA_API YOA_PlayWavFile(const char * filename, const bool loop, const float 
 
 bool YOA_API YOA_StopVoice(const int id, const float fadeOut);
 
+void YOA_API YOA_SetVoiceVolume(const int id, const float newVolume);
+
 void YOA_API YOA_Pause(void);
 
 void YOA_API YOA_Resume(void);

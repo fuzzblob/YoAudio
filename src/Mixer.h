@@ -18,9 +18,11 @@ public:
 
 	uint16_t PlayWavFile(const std::string & filename, const bool loop = false, const float volume = 1.0f, const float pitch = 1.0f, const float fadeIn = 0.0f);
 	bool StopVoice(const uint16_t id, const float fadeOut = 0.0f);
+	void SetVoiceVolume(const int id, const float newVolume);
 	// TODO: StopSound (useful for unloading also)
 private:
-	std::shared_ptr<Voice> GetVoice();
+	std::shared_ptr<Voice> GetVoiceAvailable();
+	std::shared_ptr<Voice> GetVoiceActive(const uint16_t id);
 	
 	void FillBuffer();
 	static inline void AudioCallback(void * userdata, uint8_t * stream, int len);

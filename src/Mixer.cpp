@@ -88,7 +88,7 @@ uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const
 		return 0;
 	}
 	// get voice
-	std::shared_ptr<Voice> voice = GetVoice();
+	std::shared_ptr<Voice> voice = GetVoiceAvailable();
 	if (voice == nullptr) {
 		YOA_ERROR("Can't play audio. Could not aquire a Voice!");
 		return 0;
@@ -124,35 +124,32 @@ uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const
 
 bool Mixer::StopVoice(const uint16_t id, const float fadeOut)
 {
-	if (mDevice == nullptr) {
-		YOA_CRITICAL("Voice stopping failed! no Device present!");
+	auto voice = GetVoiceActive(id);
+	if (voice == nullptr)
 		return false;
-	}
-	else if (id == 0 || id > mVoiceCount) {
-		YOA_ERROR("Can't stop specified Voice. Invadid voiceID: {0}", id);
-		return false;
-	}
+	float fade = fadeOut;
+	if (fadeOut <= 0.0f)
+		fade = 0.01f;
+	voice->smoothVolume.SetValue(0.0f);
+	voice->smoothVolume.SetFadeLength(static_cast<int>(fade * mDevice->Frequency));
 
-	// loop throu sound channels removing stopped voices
-	for (auto voice : mPlayingAudio) {
-		if (voice->ID != id)
-			continue;
-		float fade = fadeOut;
-		if (fadeOut <= 0.0f)
-			fade = 0.01f;
-		voice->smoothVolume.SetValue(0.0f);
-		voice->smoothVolume.SetFadeLength(static_cast<int>(fade * mDevice->Frequency));
-
-		// TODO is lock needed? maybe make state atomic?
-		SDL_LockAudioDevice(mDevice->DeviceID);
-		voice->State = Stopping;
-		SDL_UnlockAudioDevice(mDevice->DeviceID);
-		return true;
-	}
-	return false;
+	// TODO is lock needed? maybe make state atomic?
+	SDL_LockAudioDevice(mDevice->DeviceID);
+	voice->State = Stopping;
+	SDL_UnlockAudioDevice(mDevice->DeviceID);
+	return true;
 }
 
-std::shared_ptr<Voice> Mixer::GetVoice()
+void Mixer::SetVoiceVolume(const int id, const float newVolume)
+{
+	auto voice = GetVoiceActive(id);
+	if (voice == nullptr)
+		return;
+	voice->smoothVolume.SetValue(newVolume);
+	voice->smoothVolume.SetFadeLength(static_cast<int>(0.01f * mDevice->Frequency));
+}
+
+std::shared_ptr<Voice> Mixer::GetVoiceAvailable()
 {
 	std::shared_ptr<Voice> newVoice = nullptr;
 
@@ -182,6 +179,26 @@ std::shared_ptr<Voice> Mixer::GetVoice()
 	newVoice->Sound = nullptr;
 	newVoice->NextSample = 0;
 	return newVoice;
+}
+
+std::shared_ptr<Voice> Mixer::GetVoiceActive(const uint16_t id)
+{
+	if (mDevice == nullptr) {
+		YOA_CRITICAL("Voice stopping failed! no Device present!");
+		return nullptr;
+	}
+	else if (id == 0 || id > mVoiceCount) {
+		YOA_ERROR("Can't stop specified Voice. Invadid voiceID: {0}", id);
+		return nullptr;
+	}
+
+	// loop throu sound channels removing stopped voices
+	for (auto voice : mPlayingAudio) {
+		if (voice->ID != id)
+			continue;
+		return voice;
+	}
+	return nullptr;
 }
 
 void Mixer::FillBuffer()

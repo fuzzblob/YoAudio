@@ -31,6 +31,14 @@ bool YOA_StopVoice(const int id, const float fadeOut)
 	return false;
 }
 
+void YOA_API YOA_SetVoiceVolume(const int id, const float newVolume)
+{
+	AudioThread* inst = AudioThread::GetInstance();
+	if (inst != nullptr) {
+		inst->mMixer->SetVoiceVolume(id, newVolume);
+	}
+}
+
 void YOA_Pause(void)
 {
 	AudioThread* inst = AudioThread::GetInstance();
