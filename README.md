@@ -6,10 +6,11 @@
 	- [Dependencies](#dependencies)
 - [Build Instructions](#build)
 - [TODO](#todo)
+- [Acknowledgements](#acknowledge)
 
 ### About <a name="about"></a>
 
-A C++ audio environment. It is meant as a playground for experimentation with game audio concepts and DSP algorithms. The initial development was heavily inspired by this [Simple SDL2 Audio example](https://github.com/jakebesworth/Simple-SDL2-Audio).
+A C++ audio environment. It is meant as a playground for experimentation with game audio concepts and DSP algorithms.
 
 **Goals**
 
@@ -100,13 +101,10 @@ If you build this project on these platforms, let me know how it went. If you ha
 These are things I'd like to explore with this library / tool in the future (in no particular order):
 
 - Voice management
-	- limit concurrently playing voices
-		- add virtual state (tracking playback position without adding samples to the mix)
+	- enforce voice limit
+		- virtual state: tracking playback position without mixing
 - add resampling of WAV data (spec to device spec)
 	- proper pitch algorithm
-- instead of hard coded 16bit int
-	- convert from WAV spec format to float
-	- convert from float to Device spec format
 - add Audio Graph	
 	- AudioListener
 	- MixerGroups
@@ -121,3 +119,7 @@ These are things I'd like to explore with this library / tool in the future (in 
 	- create MessageQueue
 	- create AudioRenderer
 		- fill circular buffer of AudioFrames for the callback to consume (copy out of)
+
+## Acknowledgements<a name="acknowledge"></a>
+
+The initial development was heavily inspired by this [Simple SDL2 Audio example](https://github.com/jakebesworth/Simple-SDL2-Audio).
