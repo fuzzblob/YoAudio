@@ -198,6 +198,8 @@ void Mixer::FillBuffer()
 			voice->State = Playing;
 		if (voice->State == Playing || voice->State == Stopping)
 		{
+			// TODO: factor in resampling to device frequency
+			// * (1.0f * mDevice->Frequency / voice->Sound->Frequency)
 			const float pitch = voice->Pitch;
 			voice->smoothVolume.UpdateTarget();
 
