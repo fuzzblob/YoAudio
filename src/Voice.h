@@ -23,7 +23,6 @@ struct Voice
 	uint32_t NextSample = 0;
 	bool IsLooping;
 	LinearSmooothValue smoothVolume;
-	float Volume;
 	float Pitch;
 
 	void AdvancePlayhead(uint32_t samples) {

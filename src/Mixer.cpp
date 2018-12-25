@@ -86,47 +86,41 @@ uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const
 		YOA_CRITICAL("Can't play audio. No Device present!");
 		return 0;
 	}
-
+	// load sound
 	std::shared_ptr<Sound> sound = mResources->GetSound(filename);
 	if (sound == nullptr) {
 		YOA_CRITICAL("Can't play audio. Could not load sound at path: {0}", filename);
 		return 0;
 	}
-
+	// get voice
 	std::shared_ptr<Voice> voice = GetVoice();
 	if (voice == nullptr) {
 		YOA_ERROR("Can't play audio. Could not aquire a Voice!");
 		return 0;
 	}
-	
+	// set audio properties
 	voice->Sound = sound;
 	voice->NextSample = 0;
-	voice->Volume = volume;
+	voice->Pitch = pitch;
+	voice->IsLooping = loop;
+	// set volume & fade
 	if (fadeIn > 0.0f) {
 		// ensure current target and value are at 0.0f
 		voice->smoothVolume.Reset(0.0f);
 		// set fade duration (so the audio callback doesn't snap to the newly set value)
 		voice->smoothVolume.SetFadeLength(static_cast<int>(fadeIn * mDevice->Frequency));
 		// set fader target
-		voice->smoothVolume.SetValue(1.0f);
+		voice->smoothVolume.SetValue(volume);
 	}
 	else {
 		// ensure current target and value are at 0.0f
-		voice->smoothVolume.Reset(1.0f);
-	}
-	voice->Pitch = pitch;
-	voice->IsLooping = loop;
-
-	// avoid duplicate Voices
-	if (this->StopVoice(voice->ID) == true)
-	{
-		YOA_WARN("Had to stop Voice: {0}", voice->ID);
+		voice->smoothVolume.Reset(volume);
 	}
 
 	// add voice to playing voices vector
+	voice->State = ToPlay;
 	SDL_LockAudioDevice(mDevice->DeviceID);
 	this->mPlayingAudio.push_back(voice);
-	voice->State = ToPlay;
 	SDL_UnlockAudioDevice(mDevice->DeviceID);
 
 	YOA_INFO("Playing audio: {0} with voiceID: {1}", filename.c_str(), voice->ID);
@@ -135,23 +129,17 @@ uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const
 
 bool Mixer::StopVoice(const uint16_t id, const float fadeOut)
 {
-	if (mDevice == nullptr)
-	{
+	if (mDevice == nullptr) {
 		YOA_CRITICAL("Voice stopping failed! no Device present!");
 		return false;
 	}
-
-	if (id == 0 || id > mVoiceCount)
-	{
+	else if (id == 0 || id > mVoiceCount) {
 		YOA_ERROR("Can't stop specified Voice. Invadid voiceID: {0}", id);
 		return false;
 	}
 
 	// loop throu sound channels removing stopped voices
-	std::vector<std::shared_ptr<Voice>>::iterator it = mPlayingAudio.begin();
-	std::vector<std::shared_ptr<Voice>>::iterator end = mPlayingAudio.end();
-	for (; it != end; ++it) {
-		auto voice = (*it);
+	for (auto voice : mPlayingAudio) {
 		if (voice->ID != id)
 			continue;
 		float fade = fadeOut;
@@ -215,7 +203,6 @@ void Mixer::FillBuffer()
 			voice->State = Playing;
 		if (voice->State == Playing || voice->State == Stopping)
 		{
-			const float volumeFactor = voice->Volume;
 			const float pitch = voice->Pitch;
 			voice->smoothVolume.UpdateTarget();
 
@@ -237,7 +224,7 @@ void Mixer::FillBuffer()
 			if (voice->Sound->Channels == 1) {
 				float sample;
 				for (uint32_t i = 0; i < length; i++) {
-					sample = voice->GetSample(uint16_t(sampleIndex)) * volumeFactor * voice->smoothVolume.GetNext();
+					sample = voice->GetSample(uint16_t(sampleIndex)) * voice->smoothVolume.GetNext();
 					mixL[i] += sample;
 					mixR[i] += sample;
 					sampleIndex++;// += pitch; // non-interpolating pitching
@@ -247,7 +234,7 @@ void Mixer::FillBuffer()
 			else if (voice->Sound->Channels == 2) {
 				float volume;
 				for (uint32_t i = 0; i < length; i++) {
-					volume = volumeFactor * voice->smoothVolume.GetNext();
+					volume = voice->smoothVolume.GetNext();
 					mixL[i] += voice->GetSample(uint16_t(sampleIndex));
 					sampleIndex++;
 					mixR[i] += voice->GetSample(uint16_t(sampleIndex));
