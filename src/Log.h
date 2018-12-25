@@ -22,7 +22,7 @@ private:
 #define YOA_ASSERT(x, ...)\
 if (!(x))\
 {\
-YOA_CRITICAL("Assertion Failed: {0}"); \
+YOA_CRITICAL("Assertion Failed!"); \
 __debugbreak(); \
 } // no backslash
 #define YOA_TRACE(...)			::Log::GetCoreLogger()->trace(__VA_ARGS__)

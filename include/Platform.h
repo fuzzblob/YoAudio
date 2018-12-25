@@ -36,6 +36,15 @@
 #error audio backend for this platform currently not implemented
 #endif
 
+enum SampleFormat
+{
+	YOA_Format_Unknown = -1,
+	YOA_Format_Float = 0,
+	YOA_Format_Sint8 = 8,
+	YOA_Format_Sint16 = 16,
+	YOA_Format_Sint32 = 32
+};
+
 // Here are some builtin types and their value ranges
 /*
 #define SInt8 signed char;				// '\x80' to '\x7f' (-128 to 127) 

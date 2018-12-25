@@ -2,29 +2,30 @@
 
 #include "Platform.h"
 
-struct Sound
-{
-	uint32_t Length;
+struct Sound {
+	// sample data
 	uint8_t * Buffer;
+	// length of one channle of audio
+	uint32_t Samples;
+	// amaount of channels present in the buffer
+	uint8_t Channels;
+	// sample rate of the sample
+	uint32_t Frequency;
+	// sample format (used to convers buffer to float for mixing)
+	SampleFormat Format;
 
-	SDL_AudioSpec Spec;
-
-	int ChannelCount() const {
-		return Spec.channels;
-	}
-	int SampleRate() const {
-		return Spec.freq;
-	}
-	int BitSize() const {
-		return SDL_AUDIO_BITSIZE(Spec.format);
-	}
-	bool IsFloat() const {
-		return SDL_AUDIO_ISFLOAT(Spec.format);
-	}
-	bool IsSigned() const {
-		return SDL_AUDIO_ISSIGNED(Spec.format);
-	}
-	bool IsBigEndian() const {
-		return SDL_AUDIO_ISBIGENDIAN(Spec.format);
+	float GetSample(uint32_t position) {
+		switch (Format) {
+		case YOA_Format_Float:
+			return ((float*)Buffer)[position];
+		case YOA_Format_Sint8:
+			return (float)((int8_t*)Buffer)[position] / 128.0f;
+		case YOA_Format_Sint16:
+			return (float)((int16_t*)Buffer)[position] / 32768.0f;
+		case YOA_Format_Sint32:
+			return (float)((int32_t*)Buffer)[position] / 2147483648.0f;
+		default:
+			return 0.0f;
+		}
 	}
 };

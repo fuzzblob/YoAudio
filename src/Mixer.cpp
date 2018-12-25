@@ -6,36 +6,44 @@
 Mixer::Mixer()
 {
 	mDevice = std::make_unique<AudioDevice>();
-	SDL_memset(&mDevice->SpecWanted, 0, sizeof(mDevice->SpecWanted));
+	SDL_AudioSpec want;
+	SDL_AudioSpec get;
+	SDL_memset(&want, 0, sizeof(want));
 
-	mDevice->SpecWanted.freq = TARGET_SAMPLERATE;
-	mDevice->SpecWanted.format = AUDIO_FORMAT;
-	mDevice->SpecWanted.channels = TARGET_CHANNELS;
-	mDevice->SpecWanted.samples = TARGET_BUFFER;
-	mDevice->SpecWanted.callback = AudioCallback;
-	mDevice->SpecWanted.userdata = this;
+	want.freq = TARGET_SAMPLERATE;
+	want.format = AUDIO_FORMAT;
+	want.channels = TARGET_CHANNELS;
+	want.samples = TARGET_BUFFER;
+	want.callback = AudioCallback;
+	want.userdata = this;
 
-	mDevice->DeviceID = SDL_OpenAudioDevice(nullptr, 0, &(mDevice->SpecWanted), &(mDevice->SpecObtained), ALLOWED_CHANGES);
+	mDevice->DeviceID = SDL_OpenAudioDevice(nullptr, 0, &want, &get, ALLOWED_CHANGES);
 	if (mDevice->DeviceID == 0) {
 		YOA_CRITICAL("Warning: failed to open audio device: {0}", SDL_GetError());
 		return;
 	}
-	else if (mDevice->SpecObtained.freq != TARGET_SAMPLERATE
-		|| mDevice->SpecObtained.format != AUDIO_FORMAT
-		|| mDevice->SpecObtained.channels != TARGET_CHANNELS
-		|| mDevice->SpecObtained.samples != TARGET_BUFFER)
+	else if (get.freq != TARGET_SAMPLERATE
+		|| get.format != AUDIO_FORMAT
+		|| get.channels != TARGET_CHANNELS
+		|| get.samples != TARGET_BUFFER)
 	{
 		YOA_ERROR("Failed to open audio device with requested parameters!");
 	}
 
+	mDevice->Samples = get.samples;
+	mDevice->Channels = get.channels;
+	mDevice->Frequency = get.freq;
+	mDevice->Format = AudioDevice::ConvertFormat(get);
 	YOA_INFO("Opened AudioDevice \"{0}\" ID: {1}\n\t{2} sample rate, {5}bit, {3} channels, buffer size {4}", 
-		mDevice->GetDeviceName(), mDevice->DeviceID, mDevice->SpecObtained.freq,
-		mDevice->SpecObtained.channels, mDevice->SpecObtained.samples, mDevice->BitSize());
+		mDevice->GetDeviceName(), mDevice->DeviceID, mDevice->Frequency,
+		mDevice->Channels, mDevice->Samples, mDevice->Format);
 
-	mMixStream.reserve(mDevice->SpecObtained.channels * mDevice->SpecObtained.samples);
-	for (size_t i = 0; i < mMixStream.capacity(); i++) {
-		mMixStream.push_back(0.0f);
-	}
+	mixL.reserve(mDevice->Samples);
+	for (size_t i = 0; i < mixL.capacity(); i++)
+		mixL.push_back(0.0f);
+	mixR.reserve(mDevice->Samples);
+	for (size_t i = 0; i < mixR.capacity(); i++)
+		mixR.push_back(0.0f);
 
 	mPlayingAudio.reserve(MAX_VOICES > 0 ? MAX_VOICES : 32);
 	
@@ -92,16 +100,13 @@ uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const
 	}
 	
 	voice->Sound = sound;
-	voice->Sound->Spec.userdata = nullptr;
-
-	voice->PlayHead = voice->Sound->Buffer;
-	voice->LengthRemaining = voice->Sound->Length;
+	voice->NextSample = 0;
 	voice->Volume = volume;
 	if (fadeIn > 0.0f) {
 		// ensure current target and value are at 0.0f
 		voice->smoothVolume.Reset(0.0f);
 		// set fade duration (so the audio callback doesn't snap to the newly set value)
-		voice->smoothVolume.SetFadeLength(static_cast<int>(fadeIn * mDevice->SpecObtained.freq));
+		voice->smoothVolume.SetFadeLength(static_cast<int>(fadeIn * mDevice->Frequency));
 		// set fader target
 		voice->smoothVolume.SetValue(1.0f);
 	}
@@ -153,7 +158,7 @@ bool Mixer::StopVoice(const uint16_t id, const float fadeOut)
 		if (fadeOut <= 0.0f)
 			fade = 0.01f;
 		voice->smoothVolume.SetValue(0.0f);
-		voice->smoothVolume.SetFadeLength(static_cast<int>(fade * mDevice->SpecObtained.freq));
+		voice->smoothVolume.SetFadeLength(static_cast<int>(fade * mDevice->Frequency));
 
 		// TODO is lock needed? maybe make state atomic?
 		SDL_LockAudioDevice(mDevice->DeviceID);
@@ -192,18 +197,18 @@ std::shared_ptr<Voice> Mixer::GetVoice()
 	}
 
 	newVoice->Sound = nullptr;
+	newVoice->NextSample = 0;
 	return newVoice;
 }
 
 void Mixer::FillBuffer()
 {
 	// fill float buffer with silence
-	for (size_t i = 0; i < mMixStream.size(); i++) {
-		mMixStream[i] = 0.0f;
-	}
+	for (size_t i = 0; i < mixL.size(); i++)
+		mixL[i] = 0.0f;
+	for (size_t i = 0; i < mixR.size(); i++)
+		mixR[i] = 0.0f;
 
-	// s16 to normalized float
-	const float sampleFactor = 1.0f / 32768.0f;
 	for (auto voice : mPlayingAudio)
 	{
 		if (voice->State == ToPlay)
@@ -212,49 +217,56 @@ void Mixer::FillBuffer()
 		{
 			const float volumeFactor = voice->Volume;
 			const float pitch = voice->Pitch;
-
-			uint32_t length = mMixStream.size();
-			if(voice->LengthRemaining / 2 < mMixStream.size())
-				length = voice->LengthRemaining / 2;
-
-			YOA_ASSERT(length <= mMixStream.size());
-
-			const Sint16* samples = (Sint16*)voice->PlayHead;
-			float sampleIndex = 0;
-			float sample;
-
 			voice->smoothVolume.UpdateTarget();
-			for (uint32_t i = 0; i < length; i++)
-			{
-				sample = samples[static_cast<int>(sampleIndex)] * sampleFactor;
-				mMixStream[i] += sample * volumeFactor * voice->smoothVolume.GetNext();
-				// TODO: implement interpolating pitching & resampling
-				sampleIndex += pitch; // non-interpolating pitching
-			}
 
-			voice->PlayHead += (int)(length * 2 * pitch);
-			voice->LengthRemaining -= (int)(length * 2 * pitch);
+			uint32_t length = mixL.size();
+			if (voice->IsLooping == false)
+			{
+				uint32_t samplesRemaining = voice->GetSamplesRemaining() / voice->Sound->Channels;
+				if (samplesRemaining >= 0 && samplesRemaining < length)
+					length = samplesRemaining;
+			}
+			if (voice->State == Stopping) {
+				uint32_t steps = voice->smoothVolume.GetRemainingFadeSteps();
+				if (steps < length)
+					length = steps;
+			}
+			YOA_ASSERT(length <= mixL.size());
+			YOA_ASSERT(voice->Sound->Channels <= 2);
+			float sampleIndex = 0;
+			if (voice->Sound->Channels == 1) {
+				float sample;
+				for (uint32_t i = 0; i < length; i++) {
+					sample = voice->GetSample(uint16_t(sampleIndex)) * volumeFactor * voice->smoothVolume.GetNext();
+					mixL[i] += sample;
+					mixR[i] += sample;
+					sampleIndex++;// += pitch; // non-interpolating pitching
+				}
+				voice->AdvancePlayhead(length);
+			}
+			else if (voice->Sound->Channels == 2) {
+				float volume;
+				for (uint32_t i = 0; i < length; i++) {
+					volume = volumeFactor * voice->smoothVolume.GetNext();
+					mixL[i] += voice->GetSample(uint16_t(sampleIndex));
+					sampleIndex++;
+					mixR[i] += voice->GetSample(uint16_t(sampleIndex));
+					sampleIndex++;
+					//sampleIndex += pitch; // non-interpolating pitching
+				}
+				voice->AdvancePlayhead(length * voice->Sound->Channels);
+			}
 
 			if (voice->State == Stopping
 				&& voice->smoothVolume.HasReachedTarget())
 			{
 				voice->State = Stopped;
 			}
-			if (voice->LengthRemaining <= 0)
+			if (voice->GetSamplesRemaining() <= 0
+				&& voice->IsLooping == false)
 			{
-				if (voice->IsLooping == true)
-				{
-					// TODO: make seamless
-					voice->PlayHead = voice->Sound->Buffer;
-					voice->LengthRemaining = voice->Sound->Length;
-
-					length = mMixStream.size() - length;
-				}
-				else
-				{
-					// Non looping sound has no more mixable samples
-					voice->State = Stopped;
-				}
+				// Non looping sound has no more mixable samples
+				voice->State = Stopped;
 			}
 		}
 	}
@@ -271,53 +283,76 @@ void Mixer::FillBuffer()
 		mPlayingAudio.erase(mPlayingAudio.begin() + i);
 	}
 
-	for (uint32_t i = 0; i < mMixStream.size(); i++)
-	{
+	for (uint32_t i = 0; i < mixL.size(); i++) {
 		// clipping if float buffer outside of render range
-		if (mMixStream[i] > 1.0f)
-			mMixStream[i] = 1.0f;
-		else if (mMixStream[i] < -1.0f)
-			mMixStream[i] = -1.0f;
+		if (mixL[i] > 1.0f)
+			mixL[i] = 1.0f;
+		else if (mixL[i] < -1.0f)
+			mixL[i] = -1.0f;
+	}
+	for (uint32_t i = 0; i < mixR.size(); i++) {
+		// clipping if float buffer outside of render range
+		if (mixR[i] > 1.0f)
+			mixR[i] = 1.0f;
+		else if (mixR[i] < -1.0f)
+			mixR[i] = -1.0f;
 	}
 
 	// update render time
-	AudioThread::GetInstance()->mTimer->AdvancemRenderTime(mMixStream.size());
+	AudioThread::GetInstance()->mTimer->AdvancemRenderTime(mixL.size());
 }
 
 inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
 {
 	Mixer* mixer = (Mixer*)userdata;
-	// fill mixing buffer
+	// render to mixing buffer
 	mixer->FillBuffer();
 	// fill output buffer
-	AudioDevice* device = mixer->mDevice.get();
-	if (device->IsFloat()) {
-		float* output = (float*)stream;
-		for (uint32_t i = 0; i < mixer->mMixStream.size(); i++)
-			output[i] = mixer->mMixStream[i];
-	}
-	else {
-		// convert from float mixBuffer to int targetBuffer
-		const int bitSize = device->BitSize();
-		if (device->IsSigned()) {
-			if (bitSize == 16) {
-				int16_t* current = (int16_t*)stream;
-				for (uint32_t i = 0; i < mixer->mMixStream.size(); i++)
-					current[i] = static_cast<int16_t>(mixer->mMixStream[i] * 32767);
-			}
-			else if (bitSize == 8) {
-				int8_t* current = (int8_t*)stream;
-				for (uint32_t i = 0; i < mixer->mMixStream.size(); i++)
-					current[i] = static_cast<int8_t>(mixer->mMixStream[i] * 127);
-			}
-			else if (bitSize == 32) {
-				int32_t* current = (int32_t*)stream;
-				for (uint32_t i = 0; i < mixer->mMixStream.size(); i++)
-					current[i] = static_cast<int32_t>(mixer->mMixStream[i] * 2147483647);
-			}
-			else {
-				YOA_ERROR("Unsupported output bitdepth of {0} bit", bitSize);
-			}
+	uint32_t sampleIndex = 0;
+	switch (mixer->mDevice->Format)
+	{
+	case YOA_Format_Float:
+	{
+		float* outF = (float*)stream;
+		for (uint32_t i = 0; i < mixer->mixL.size(); i++)
+		{
+			outF[sampleIndex++] = mixer->mixL[i];
+			outF[sampleIndex++] = mixer->mixR[i];
 		}
+		break;
+	}
+	case YOA_Format_Sint8:
+	{
+		int8_t* out8 = (int8_t*)stream;
+		for (uint32_t i = 0; i < mixer->mixL.size(); i++)
+		{
+			out8[sampleIndex++] = static_cast<int8_t>(mixer->mixL[i] * 127);
+			out8[sampleIndex++] = static_cast<int8_t>(mixer->mixR[i] * 127);
+		}
+		break;
+	}
+	case YOA_Format_Sint16:
+	{
+		int16_t* out16 = (int16_t*)stream;
+		for (uint32_t i = 0; i < mixer->mixL.size(); i++)
+		{
+			out16[sampleIndex++] = static_cast<int16_t>(mixer->mixL[i] * 32767);
+			out16[sampleIndex++] = static_cast<int16_t>(mixer->mixR[i] * 32767);
+		}
+		break;
+	}
+	case YOA_Format_Sint32:
+	{
+		int32_t* out32 = (int32_t*)stream;
+		for (uint32_t i = 0; i < mixer->mixL.size(); i++)
+		{
+			out32[sampleIndex++] = static_cast<int32_t>(mixer->mixL[i] * 2147483647);
+			out32[sampleIndex++] = static_cast<int32_t>(mixer->mixR[i] * 2147483647);
+		}
+		break;
+	}
+	default:
+		YOA_ERROR("Unsupported output format: {0}", mixer->mDevice->Format);
+		break;
 	}
 }

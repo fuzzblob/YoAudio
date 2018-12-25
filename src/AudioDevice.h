@@ -14,8 +14,6 @@
 #define AUDIO_FORMAT AUDIO_S8
 #elif TARGET_BITDEPTH == 16
 #define AUDIO_FORMAT AUDIO_S16SYS
-#elif TARGET_BITDEPTH == 24
-#define AUDIO_FORMAT AUDIO_S32SYS
 #elif TARGET_BITDEPTH == 32
 #define AUDIO_FORMAT AUDIO_S32SYS
 #else
@@ -25,23 +23,31 @@
 struct AudioDevice
 {
 	SDL_AudioDeviceID DeviceID;
-	SDL_AudioSpec SpecWanted;
-	SDL_AudioSpec SpecObtained;
+
+	uint32_t Samples;
+	uint8_t Channels;
+	uint32_t Frequency;
+	SampleFormat Format;
 
 	const char* GetDeviceName() {
 		return SDL_GetCurrentAudioDriver();
 	}
 
-	int BitSize() const {
-		return SDL_AUDIO_BITSIZE(SpecObtained.format);
-	}
-	bool IsFloat() const {
-		return SDL_AUDIO_ISFLOAT(SpecObtained.format);
-	}
-	bool IsSigned() const {
-		return SDL_AUDIO_ISSIGNED(SpecObtained.format);
-	}
-	bool IsBigEndian() const {
-		return SDL_AUDIO_ISBIGENDIAN(SpecObtained.format);
+	static SampleFormat ConvertFormat(SDL_AudioSpec& spec) {
+		if (SDL_AUDIO_ISFLOAT(spec.format)) {
+			return YOA_Format_Float;
+		}
+		else {
+			switch (SDL_AUDIO_BITSIZE(spec.format)) {
+			case 8:
+				return YOA_Format_Sint8;
+			case 16:
+				return YOA_Format_Sint16;
+			case 32:
+				return YOA_Format_Sint32;
+			default:
+				return YOA_Format_Unknown;
+			}
+		}
 	}
 };

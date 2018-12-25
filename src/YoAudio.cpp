@@ -26,7 +26,7 @@ bool YOA_StopVoice(const int id, const float fadeOut)
 {
 	AudioThread* inst = AudioThread::GetInstance();
 	if (inst != nullptr) {
-		return inst->mMixer->StopVoice(id, fadeOut);
+		return inst->mMixer->StopVoice(uint16_t(id), fadeOut);
 	}
 	return false;
 }

@@ -18,6 +18,7 @@ public:
 
 	uint16_t PlayWavFile(const std::string & filename, const bool loop = false, const float volume = 1.0f, const float pitch = 1.0f, const float fadeIn = 0.0f);
 	bool StopVoice(const uint16_t id, const float fadeOut = 0.0f);
+	// TODO: StopSound (useful for unloading also)
 private:
 	std::shared_ptr<Voice> GetVoice();
 	
@@ -26,7 +27,8 @@ private:
 private:
 	bool mPaused = true;
 	std::unique_ptr<AudioDevice> mDevice = nullptr;
-	std::vector<float> mMixStream;
+	std::vector<float> mixL;
+	std::vector<float> mixR;
 	std::vector<std::shared_ptr<Voice>> mPlayingAudio;
 	std::stack<std::shared_ptr<Voice>> mAvailableVoices;
 	uint16_t mVoiceCount = 0;
