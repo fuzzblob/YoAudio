@@ -2,28 +2,28 @@
 
 - [About](#about)
 - [Overview](#overview)
-	- [Playing a sound](#sound)
+	- [Usage](#usage)
 	- [Dependencies](#dependencies)
 - [Build Instructions](#build)
 - [TODO](#todo)
 - [Acknowledgements](#acknowledge)
 
-### About <a name="about"></a>
+## About <a name="about"></a>
 
 A C++ audio environment meant as a playground for experimentation with game audio concepts and DSP algorithms.
 
-WARNING! YoAudio is not release quality!
+**WARNING! YoAudio is not release quality!**
 
-**Goals**
+### Goals
 
 - develop a usable audio framework for games (and other applications)
 - learn C++ development: low level, high performance, flexible and robust audio plaback for games as well as digital signal processing (DSP)
 
 ## Overview <a name="overview"></a>
 
-### Playing a sound <a name="sound"></a>
+### Using YoAudio <a name="usage"></a>
 
-To see how sounds are being played back check out **main.cpp**.
+To use YoaAudio in your project the first step is to call `YOA_Init()` to initialize the audio engine. After that you can call `YOA_PlayWavFile(filename, loop, volume, pitch, fadeIn, pan)` to play WAV files. The `YOA_PlayWavFile()` method returns a VoiceID which can be used to Stop a playing voice (`YOA_StopVoice(id, fadeOut)`), change it's volume (`YOA_SetVoiceVolume(id, newVolume)`) and panning(`YOA_SetVoicePan(id, newPan)`). If your application goes out of context and you wish to pause audio rendering use `YOA_Pause()` & `YOA_Resume()`. Once you wish to shut down the audio engine simply call `YOA_Quit(quitSDL)` passing a bool to signal if YoAudio, or your application will hande the Quitting of the SDL library.
 
 Here is the basic idea:
 
@@ -34,18 +34,21 @@ Here is the basic idea:
 		// initialize YO audio
 		YOA_Init();
 		
-		float volume = 1.0f;
-		float pitch = 1.0f;
-		float fadeTime = 0.75f
-		
 		// Play Oneshot
-		YOA_PlaySound("door_open_01.wav", false, volume, pitch, 0.0f);
+		// const char * fn, bool loop, float volume, float pitch, float fadeIn, float pan
+		YOA_PlayWavFile("door_open_01.wav", false, 0.4f, 0.95f, 0.2f, 1.0f);
 		
 		// Play loop and store VoiceID
-		uint16_t voiceID = PlaySound("ambience.wav", true, volume, pitch, fadeTime);
+		uint16_t voiceID = YOA_PlayWavFile("ambience.wav", true, 1.0f, 1.0f, 2.7f, 0.0f);
+		
+		// change the volume of a sound while it's playing
+		YOA_SetVoiceVolume(voiceID, 0.75f);
+		
+		// pan a sound in the stereo field while playing
+		YOA_SetVoicePan(voiceID, -0.863);
 
 		// Stop loop using VoiceID
-		YOA_StopVoice(voiceID, fadeTime);
+		YOA_StopVoice(voiceID, 0.3f);
 		// when stopping a voice with a fade time of 0.0f
 		// the audio engine will set a 10ms fade to avoid artifacts
 
@@ -54,10 +57,8 @@ Here is the basic idea:
 		// resumes the audio engine
 		YOA_Resume();
 
-		// quit YO audio
-		YOA_Quit();
-		
-		return 0;
+		// quit YoAudio (in this case informing it to also shut down SDL2)
+		YOA_Quit(true);
 	}
 
 ### Dependencies <a name="dependencies"></a>
@@ -92,37 +93,48 @@ At the moment the build process has only ever been tested on Windows with Micros
 	- YoAudio.pdb for debug symbols
 - if you want a quick and easy sandbox to test stuff in clone the [YoAudio Editor repo](https://github.com/fuzzblob/YoAudioEditor) to the same folder as the YoAudio repo was cloned into and build that. It will find the YoAudio sources, and copy the built *YoAudio.dll* so it can run.
 
-### Linux & Mac OS
+### Linux
 
-If you build this project on these platforms, let me know how it went. If you have to make changes to *CMakeLists.txt* or the source code, please submit a pull request so I can try get your changes into the main repo.
+Please provide me with information on how to make this work properly. A pull request with a build script (calling CMake), as well as any changes required to *CMakeLists.txt* and source code would be much appreciated.
 
-- when using Mac OS you can install SDL via homebrew and CMake **should** pick it up
+### Mac OS
+
+Same as Linux.
+
+- you can install SDL via homebrew. *CMakeLists.txt* is setup to find it in the default install directory and **should** pick it up
 
 ## TODO <a name="todo"></a>
 
-These are things I'd like to explore with this library / tool in the future (in no particular order):
+These are things that should be explored to move forward. In rough order of importance:
 
-- add resampling of WAV data (spec to device spec)
-	- pitch algorithm needs filter
+- add resampling of WAV data (Sample.Frequency to AudioDevice.Frequency)
+	- currently files that' don't match the device samplerate get layed back pitched
+	- possibly high quality resampling when loading sample
+	- Voice.GetReSample() pitch algorithm needs filter (currently simple lerp)
+- add Audio Graph
+	- add SampleGenerator interface
+		- generalize audio sources (sample playback, streaming (sample with callback), synthesis)
+			- GenerateSamples()
+			- SamplesRemaining()
+		- AudioEffect
+			- limiter for final output
+			- Filter (HighPass & LowPass)
+	- MixerGroups
 - Voice management
 	- enforce voice limit
 		- virtual state: tracking playback position without mixing
 	- get a collection of voices currently playing via Mixer::GetPlayingVoices()
 	- stop all voices playing the sound via Mixer::StopSound()
-- add Audio Graph	
-	- AudioListener
-	- MixerGroups
-	- add SampleGenerator interface
-		- generalize audio sources (sample playback, synthesis, streaming)
-		- GenerateSamples()
-		- SamplesRemaining()
-		- AudioEffect
-			- limiter for final output
-			- Filter (HighPass & LowPass)
+- setup proper CMake build support for Mac OS & Linux
+- setup C# bindings and test in Unity
+- think about reasonable C++ interface (currently only exposing very simple C interface in YoAudio.h)
 - multithreading
 	- create MessageQueue
-	- create AudioRenderer
-		- fill circular buffer of AudioFrames for the callback to consume (copy out of)
+	- AudioRenderer on AudioThread::Update()
+		- fill circular buffer of AudioFrames for the callback to consume
+- AudioListener
+	- 3D math
+	- vector based amplitude panning
 
 ## Acknowledgements<a name="acknowledge"></a>
 
