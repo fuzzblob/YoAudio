@@ -22,13 +22,13 @@ double Timer::GetTime() noexcept
 	return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - mEpoch).count() / 1000000000.0;
 }
 
-void Timer::AdvancemRenderTime(double change)
+void Timer::AdvancemRenderTime(double change) noexcept
 {
 	const double current = mRenderTime.load();
 	mRenderTime.store(current + change);
 }
 
-double Timer::RenderTime() const
+double Timer::RenderTime() const noexcept
 {
 	return mRenderTime.load();
 }

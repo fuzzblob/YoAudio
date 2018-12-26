@@ -66,7 +66,7 @@ void AudioThread::Run()
 	mTimer = std::make_unique<Timer>();
 
 	// initialize Mixer
-	mMixer = std::unique_ptr<Mixer>(new Mixer());
+	mMixer = std::make_unique<Mixer>();
 	mMixer->Pause(false);
 
 	YOA_INFO("Thread started!");

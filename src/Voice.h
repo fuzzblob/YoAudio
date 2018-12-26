@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Platform.h"
-
 #include <memory>
-#include "Sound.h"
+
+#include "Sample.h"
 #include "LinearSmooothValue.h"
 #include "StereoPanner.h"
 
@@ -16,39 +15,22 @@ enum VoiceState
 	Stopped = 5
 };
 
-struct Voice
+class Voice
 {
-	uint16_t ID = 0;
-	VoiceState State = Stopped;
-	std::shared_ptr<Sound> Sound;
-	uint32_t NextSample = 0;
-	bool IsLooping;
-	LinearSmooothValue smoothVolume;
-	float Pitch;
-	StereoPanner Panning;
+public:
+	void AdvancePlayhead(const uint32_t samples) noexcept;
+	uint32_t GetSamplesRemaining() const noexcept;
+	float GetSample(uint32_t position, const uint8_t channel = 0);
+	float GetReSample(float position, const uint8_t channel = 0);
 
-	void AdvancePlayhead(const uint32_t samples) {
-		NextSample += samples;
-		if (IsLooping) {
-			NextSample %= Sound->Samples;
-		}
-	}
-	uint32_t GetSamplesRemaining() const {
-		return Sound->Samples - NextSample;
-	}
-	float GetSample(uint32_t position, const uint8_t channel = 0) {
-		position += NextSample;
-		if (IsLooping)
-			position %= Sound->Samples;
-		return Sound->GetSample(position + channel);
-	}
-	float GetReSample(float position, const uint8_t channel = 0) {
-		uint32_t pos0 = NextSample + int(position);
-		uint32_t pos1 = pos0 + 1;
-		float s0 = GetSample(pos0, channel);
-		float s1 = GetSample(pos1, channel);
-		float t = position - int(position);
-		float output = s0 + t * (s1 - s0);
-		return output;
-	}
+	Voice(uint16_t id) : ID(id) { }
+public:
+	const uint16_t ID;
+	VoiceState State = Stopped;
+	std::shared_ptr<Sample> Sound;
+	LinearSmooothValue Volume;
+	StereoPanner Panning;
+	bool IsLooping = false;
+	float Pitch = 1.0f;
+	uint32_t NextSample = 0;
 };

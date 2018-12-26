@@ -22,6 +22,6 @@ public:
 	void Update() noexcept;
 	double GetTime() noexcept;
 
-	void AdvancemRenderTime(double change);
-	double RenderTime() const;
+	void AdvancemRenderTime(double change) noexcept;
+	double RenderTime() const noexcept;
 };

@@ -2,7 +2,7 @@
 
 #include "Platform.h"
 
-struct Sound {
+struct Sample {
 	// sample data
 	uint8_t * Buffer;
 	// length of one channle of audio
@@ -14,7 +14,7 @@ struct Sound {
 	// sample format (used to convers buffer to float for mixing)
 	SampleFormat Format;
 
-	float GetSample(const uint32_t position) {
+	float GetSample(const uint32_t position) noexcept {
 		switch (Format) {
 		case YOA_Format_Float:
 			return ((float*)Buffer)[position];

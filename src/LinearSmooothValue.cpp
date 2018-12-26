@@ -8,32 +8,33 @@ LinearSmooothValue::LinearSmooothValue(float initial, double sampleRate, double 
 {
 }
 
-void LinearSmooothValue::Reset(const float startValue)
+void LinearSmooothValue::Reset(const float startValue) noexcept
 {
 	SetValue(startValue);
-	uint32_t steps = stepsToTarget.load();
+	const uint32_t steps = stepsToTarget.load();
 	stepsToTarget.store(0);
 	UpdateTarget();
 	stepsToTarget.store(steps);
 }
 
-uint32_t LinearSmooothValue::GetRemainingFadeSteps() const
+uint32_t LinearSmooothValue::GetRemainingFadeSteps() const noexcept
 {
 	return countdown;
 }
-bool LinearSmooothValue::HasReachedTarget() const
+bool LinearSmooothValue::HasReachedTarget() const noexcept
 {
 	return hasReacheTarget.load();
 }
 
-void LinearSmooothValue::SetValue(float newValue) {
+void LinearSmooothValue::SetValue(float newValue) noexcept
+{
 	target.store(newValue);
 }
-void LinearSmooothValue::SetFadeLength(uint32_t samples)
+void LinearSmooothValue::SetFadeLength(uint32_t samples) noexcept
 {
 	stepsToTarget.store(samples);
 }
-void LinearSmooothValue::UpdateTarget() {
+void LinearSmooothValue::UpdateTarget() noexcept {
 	const float newTarget = target.load();
 	if (newTarget == currentTarget)
 		return;
@@ -50,7 +51,7 @@ void LinearSmooothValue::UpdateTarget() {
 		hasReacheTarget.store(false);
 	}
 }
-float LinearSmooothValue::GetNext() {
+float LinearSmooothValue::GetNext() noexcept {
 	if (hasReacheTarget.load())
 		return currentValue;
 	countdown--;

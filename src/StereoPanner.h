@@ -5,10 +5,10 @@
 struct StereoPanner {
 	LinearSmooothValue Pan;
 
-	float volL;
-	float volR;
+	float volL = 0.77f;
+	float volR = 0.77f;
 
-	StereoPanner() {
+	StereoPanner() noexcept {
 		Pan.Reset(0.0f);
 		Pan.SetFadeLength(500);
 	}
@@ -18,7 +18,7 @@ struct StereoPanner {
 	}
 
 	void CalculateNext() {
-		float t = Pan.GetNext();
+		const float t = Pan.GetNext();
 		volL = sqrt(0.5f * (1.0f - t));
 		volR = sqrt(0.5f * (1.0f + t));
 	}

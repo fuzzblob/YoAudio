@@ -1,9 +1,10 @@
 #include "ResourceManager.h"
 
+#include "Platform.h"
 #include "Log.h"
 #include "AudioDevice.h"
 
-std::shared_ptr<Sound >ResourceManager::GetSound(const std::string & filename)
+std::shared_ptr<Sample> ResourceManager::GetSound(const std::string & filename)
 {
 	if (assetPath.size() == 0) {
 		auto sdl_path = SDL_GetBasePath();
@@ -22,9 +23,9 @@ std::shared_ptr<Sound >ResourceManager::GetSound(const std::string & filename)
 	return mSounds[fullPath];
 }
 
-std::shared_ptr<Sound> ResourceManager::LoadSound(const std::string & filename)
+std::shared_ptr<Sample> ResourceManager::LoadSound(const std::string & filename)
 {
-	std::shared_ptr<Sound> newSound = std::make_shared<Sound>();
+	std::shared_ptr<Sample> newSound = std::make_shared<Sample>();
 	SDL_AudioSpec spec;
 	uint32_t audioLength;
 	if (SDL_LoadWAV(filename.c_str(), &spec, &newSound->Buffer, &audioLength) == nullptr) {
@@ -60,30 +61,21 @@ std::shared_ptr<Sound> ResourceManager::LoadSound(const std::string & filename)
 	return newSound;
 }
 
-bool ResourceManager::FreeSound(Sound* sound) noexcept
-{
-	if (sound == nullptr)
-	{
+void ResourceManager::FreeSound(std::shared_ptr<Sample> sound) noexcept {
+	if (sound == nullptr) {
 		YOA_ERROR("Can't stop NULL sound!");
-		return false;
+		return;
 	}
-
+	// free buffer if not null
 	if(sound->Buffer != nullptr)
 		SDL_FreeWAV(sound->Buffer);
-	
+	// ensure buffer points to null
 	sound->Buffer = nullptr;
-
-	return false;
 }
 
-ResourceManager::~ResourceManager()
-{
-	for (auto snd : mSounds)
-	{
-		if (snd.second != nullptr)
-		{
-			SDL_FreeWAV(snd.second->Buffer);
-		}
+ResourceManager::~ResourceManager() {
+	for (auto soundEntry : mSounds) {
+		FreeSound(soundEntry.second);
 	}
 	mSounds.clear();
 }

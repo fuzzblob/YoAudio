@@ -12,7 +12,6 @@ public:
 	static AudioThread* GetInstance(const bool creatIfNull = false);
 	static void Release(const bool quitSDL) noexcept;
 
-
 	AudioThread();
 	~AudioThread();
 

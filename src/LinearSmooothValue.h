@@ -16,14 +16,14 @@ private:
 public:
 	LinearSmooothValue(float initial = 1.0f, double sampleRate = TARGET_SAMPLERATE,
 		double rampLengthSeconds = 0.01) noexcept;
-	void Reset(const float startValue);
+	void Reset(const float startValue) noexcept;
 
-	uint32_t GetRemainingFadeSteps() const;
-	bool HasReachedTarget() const;
+	uint32_t GetRemainingFadeSteps() const noexcept;
+	bool HasReachedTarget() const noexcept;
 
-	void SetValue(float newValue);
-	void SetFadeLength(uint32_t samples);
+	void SetValue(float newValue) noexcept;
+	void SetFadeLength(uint32_t samples) noexcept;
 	
-	void UpdateTarget();
-	float GetNext();
+	void UpdateTarget() noexcept;
+	float GetNext() noexcept;
 };
