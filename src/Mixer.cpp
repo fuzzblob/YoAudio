@@ -101,7 +101,7 @@ bool Mixer::StopVoice(const uint16_t id, float fadeOut)
 	auto voice = GetVoiceActive(id);
 	if (voice == nullptr)
 		return false;
-	fadeOut = std::min(0.01f, fadeOut);
+	fadeOut = std::max(0.01f, fadeOut);
 	voice->Volume.SetValue(0.0f);
 	voice->Volume.SetFadeLength(static_cast<int>(fadeOut * mDevice->Frequency));
 
