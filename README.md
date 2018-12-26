@@ -1,3 +1,5 @@
+![image: fox with headphones](misc/fox_small.png)
+
 # YoAudio
 
 - [About](#about)
@@ -10,14 +12,11 @@
 
 ## About <a name="about"></a>
 
-A C++ audio environment meant as a playground for experimentation with game audio concepts and DSP algorithms.
+YoAudio is a C++ audio environment meant as a playground for experimentation with game audio concepts and DSP algorithms.
+
+The name Yo is based on the phonetic approximation of the korean word for fox (여우).
 
 **WARNING! YoAudio is not release quality!**
-
-### Goals
-
-- develop a usable audio framework for games (and other applications)
-- learn C++ development: low level, high performance, flexible and robust audio plaback for games as well as digital signal processing (DSP)
 
 ## Overview <a name="overview"></a>
 
