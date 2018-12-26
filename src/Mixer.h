@@ -16,9 +16,11 @@ public:
 	void Pause(const bool pause) noexcept;
 	bool IsPaused() noexcept;
 
-	uint16_t PlayWavFile(const std::string & filename, const bool loop = false, const float volume = 1.0f, const float pitch = 1.0f, const float fadeIn = 0.0f);
+	uint16_t PlayWavFile(const std::string & filename, const bool loop = false, const float volume = 1.0f, 
+		const float pitch = 1.0f, const float fadeIn = 0.0f, const float pan = 0.0f);
 	bool StopVoice(const uint16_t id, const float fadeOut = 0.0f);
-	void SetVoiceVolume(const int id, const float newVolume);
+	void SetVoiceVolume(const uint16_t id, const float value, const float fade = 0.01f);
+	void SetVoicePan(const uint16_t id, const float value);
 	// TODO: StopSound (useful for unloading also)
 private:
 	std::shared_ptr<Voice> GetVoiceAvailable();

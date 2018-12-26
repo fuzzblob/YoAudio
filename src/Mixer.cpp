@@ -1,5 +1,6 @@
 #include "Mixer.h"
 
+#include <algorithm>
 #include "AudioThread.h"
 #include "Log.h"
 
@@ -75,7 +76,8 @@ bool Mixer::IsPaused() noexcept
 	return mDevice->mPaused;
 }
 
-uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const float volume, const float pitch, const float fadeIn)
+uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const float volume, 
+	const float pitch, const float fadeIn, const float pan)
 {
 	if (mDevice == nullptr) {
 		YOA_CRITICAL("Can't play audio. No Device present!");
@@ -98,6 +100,7 @@ uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const
 	voice->NextSample = 0;
 	voice->Pitch = pitch;
 	voice->IsLooping = loop;
+	voice->Panning.Set(pan);
 	// set volume & fade
 	if (fadeIn > 0.0f) {
 		// ensure current target and value are at 0.0f
@@ -105,11 +108,11 @@ uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const
 		// set fade duration (so the audio callback doesn't snap to the newly set value)
 		voice->smoothVolume.SetFadeLength(static_cast<int>(fadeIn * mDevice->Frequency));
 		// set fader target
-		voice->smoothVolume.SetValue(volume);
+		voice->smoothVolume.SetValue(std::max(0.0f, std::min(1.0f, volume)));
 	}
 	else {
 		// ensure current target and value are at 0.0f
-		voice->smoothVolume.Reset(volume);
+		voice->smoothVolume.Reset(std::max(0.0f, std::min(1.0f, volume)));
 	}
 
 	// add voice to playing voices vector
@@ -122,16 +125,14 @@ uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const
 	return voice->ID;
 }
 
-bool Mixer::StopVoice(const uint16_t id, const float fadeOut)
+bool Mixer::StopVoice(const uint16_t id, float fadeOut)
 {
 	auto voice = GetVoiceActive(id);
 	if (voice == nullptr)
 		return false;
-	float fade = fadeOut;
-	if (fadeOut <= 0.0f)
-		fade = 0.01f;
+	fadeOut = std::min(0.01f, fadeOut);
 	voice->smoothVolume.SetValue(0.0f);
-	voice->smoothVolume.SetFadeLength(static_cast<int>(fade * mDevice->Frequency));
+	voice->smoothVolume.SetFadeLength(static_cast<int>(fadeOut * mDevice->Frequency));
 
 	// TODO is lock needed? maybe make state atomic?
 	SDL_LockAudioDevice(mDevice->DeviceID);
@@ -140,13 +141,21 @@ bool Mixer::StopVoice(const uint16_t id, const float fadeOut)
 	return true;
 }
 
-void Mixer::SetVoiceVolume(const int id, const float newVolume)
+void Mixer::SetVoiceVolume(const uint16_t id, const float value, const float fade)
 {
 	auto voice = GetVoiceActive(id);
 	if (voice == nullptr)
 		return;
-	voice->smoothVolume.SetValue(newVolume);
-	voice->smoothVolume.SetFadeLength(static_cast<int>(0.01f * mDevice->Frequency));
+	voice->smoothVolume.SetValue(std::max(0.0f, std::min(1.0f, value)));
+	voice->smoothVolume.SetFadeLength(static_cast<int>(fade * mDevice->Frequency));
+}
+
+void Mixer::SetVoicePan(const uint16_t id, const float value)
+{
+	auto voice = GetVoiceActive(id);
+	if (voice == nullptr)
+		return;
+	voice->Panning.Set(std::max(-1.0f, std::min(1.0f, value)));
 }
 
 std::shared_ptr<Voice> Mixer::GetVoiceAvailable()
@@ -215,15 +224,15 @@ void Mixer::FillBuffer()
 			voice->State = Playing;
 		if (voice->State == Playing || voice->State == Stopping)
 		{
-			// TODO: factor in resampling to device frequency
-			// * (1.0f * mDevice->Frequency / voice->Sound->Frequency)
+			// TODO: factor in "resampling to device" (1.0f * mDevice->Frequency / voice->Sound->Frequency)
 			const float pitch = voice->Pitch;
 			voice->smoothVolume.UpdateTarget();
+			voice->Panning.Pan.UpdateTarget();
 
 			uint32_t length = mixL.size();
 			if (voice->IsLooping == false)
 			{
-				uint32_t samplesRemaining = voice->GetSamplesRemaining() / (voice->Sound->Channels * pitch);
+				uint32_t samplesRemaining = uint32_t(voice->GetSamplesRemaining() / (voice->Sound->Channels * pitch));
 				if (samplesRemaining >= 0 && samplesRemaining < length)
 					length = samplesRemaining;
 			}
@@ -238,33 +247,35 @@ void Mixer::FillBuffer()
 			if (voice->Sound->Channels == 1) {
 				float sample;
 				for (uint32_t i = 0; i < length; i++) {
+					voice->Panning.CalculateNext();
 					if(pitch == 1.0f)
 						sample = voice->GetSample(uint32_t(sampleIndex)) * voice->smoothVolume.GetNext();
 					else
 						sample = voice->GetReSample(sampleIndex) * voice->smoothVolume.GetNext();
-					mixL[i] += sample;
-					mixR[i] += sample;
+					mixL[i] += sample * voice->Panning.volL;
+					mixR[i] += sample * voice->Panning.volR;
 					sampleIndex += pitch; // non-interpolating pitching
 				}
-				voice->AdvancePlayhead(length * pitch);
+				voice->AdvancePlayhead(uint32_t(length * pitch));
 			}
 			else if (voice->Sound->Channels == 2) {
 				float volume;
 				for (uint32_t i = 0; i < length; i++) {
 					volume = voice->smoothVolume.GetNext();
+					voice->Panning.CalculateNext();
 					if (pitch == 1.0f)
 					{
-						mixL[i] += voice->GetSample(uint32_t(sampleIndex), 0) * volume;
-						mixR[i] += voice->GetSample(uint32_t(sampleIndex), 1) * volume;
+						mixL[i] += voice->GetSample(uint32_t(sampleIndex), 0) * volume * voice->Panning.volL;
+						mixR[i] += voice->GetSample(uint32_t(sampleIndex), 1) * volume * voice->Panning.volR;
 					}
 					else
 					{
-						mixL[i] += voice->GetReSample(sampleIndex, 0) * volume;
-						mixR[i] += voice->GetReSample(sampleIndex, 1) * volume;
+						mixL[i] += voice->GetReSample(sampleIndex, 0) * volume * voice->Panning.volL;
+						mixR[i] += voice->GetReSample(sampleIndex, 1) * volume * voice->Panning.volR;
 					}
 					sampleIndex += pitch; // non-interpolating pitching
 				}
-				voice->AdvancePlayhead(length * pitch * voice->Sound->Channels);
+				voice->AdvancePlayhead(uint32_t(length * pitch));
 			}
 
 			if (voice->State == Stopping

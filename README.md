@@ -100,7 +100,6 @@ If you build this project on these platforms, let me know how it went. If you ha
 
 These are things I'd like to explore with this library / tool in the future (in no particular order):
 
-- implement panning
 - add resampling of WAV data (spec to device spec)
 	- pitch algorithm needs filter
 - Voice management

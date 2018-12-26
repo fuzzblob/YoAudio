@@ -2,9 +2,10 @@
 
 #include "Platform.h"
 
+#include <memory>
 #include "Sound.h"
 #include "LinearSmooothValue.h"
-#include <memory>
+#include "StereoPanner.h"
 
 enum VoiceState
 {
@@ -24,6 +25,7 @@ struct Voice
 	bool IsLooping;
 	LinearSmooothValue smoothVolume;
 	float Pitch;
+	StereoPanner Panning;
 
 	void AdvancePlayhead(const uint32_t samples) {
 		NextSample += samples;

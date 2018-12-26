@@ -11,11 +11,13 @@ bool YOA_API YOA_Init(void);
 
 void YOA_API YOA_Quit(const bool quitSDL);
 
-int YOA_API YOA_PlayWavFile(const char * filename, const bool loop, const float volume, const float pitch, const float fadeIn);
+int YOA_API YOA_PlayWavFile(const char * filename, const bool loop, const float volume, const float pitch, const float fadeIn, const float pan);
 
 bool YOA_API YOA_StopVoice(const int id, const float fadeOut);
 
 void YOA_API YOA_SetVoiceVolume(const int id, const float newVolume);
+
+void YOA_API YOA_SetVoicePan(const int id, const float newPan);
 
 void YOA_API YOA_Pause(void);
 
