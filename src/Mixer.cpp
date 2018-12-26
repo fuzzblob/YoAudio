@@ -176,10 +176,11 @@ std::shared_ptr<Voice> Mixer::GetVoiceActive(const uint16_t id)
 
 void Mixer::FillBuffer()
 {
+	const uint32_t bufferSize = mixL.size();
 	// fill float buffer with silence
-	for (size_t i = 0; i < mixL.size(); i++)
+	for (size_t i = 0; i < bufferSize; i++)
 		mixL[i] = 0.0f;
-	for (size_t i = 0; i < mixR.size(); i++)
+	for (size_t i = 0; i < bufferSize; i++)
 		mixR[i] = 0.0f;
 
 	for (auto voice : mPlayingAudio)
@@ -193,7 +194,7 @@ void Mixer::FillBuffer()
 			voice->Volume.UpdateTarget();
 			voice->Panning.Pan.UpdateTarget();
 
-			uint32_t length = mixL.size();
+			uint32_t length = bufferSize;
 			if (voice->IsLooping == false)
 			{
 				const uint32_t samplesRemaining = uint32_t(voice->GetSamplesRemaining() / (voice->Sound->Channels * pitch));
@@ -205,7 +206,7 @@ void Mixer::FillBuffer()
 				if (steps < length)
 					length = steps;
 			}
-			YOA_ASSERT(length <= mixL.size());
+			YOA_ASSERT(length <= bufferSize);
 			YOA_ASSERT(voice->Sound->Channels <= 2);
 			float sampleIndex = 0.0f;
 			if (voice->Sound->Channels == 1) {
@@ -268,14 +269,14 @@ void Mixer::FillBuffer()
 		mPlayingAudio.erase(mPlayingAudio.begin() + i);
 	}
 
-	for (uint32_t i = 0; i < mixL.size(); i++) {
+	for (uint32_t i = 0; i < bufferSize; i++) {
 		// clipping if float buffer outside of render range
 		if (mixL[i] > 1.0f)
 			mixL[i] = 1.0f;
 		else if (mixL[i] < -1.0f)
 			mixL[i] = -1.0f;
 	}
-	for (uint32_t i = 0; i < mixR.size(); i++) {
+	for (uint32_t i = 0; i < bufferSize; i++) {
 		// clipping if float buffer outside of render range
 		if (mixR[i] > 1.0f)
 			mixR[i] = 1.0f;
@@ -284,7 +285,7 @@ void Mixer::FillBuffer()
 	}
 
 	// update render time
-	AudioThread::GetInstance()->mTimer->AdvancemRenderTime(mixL.size());
+	AudioThread::GetInstance()->mTimer->AdvancemRenderTime(bufferSize);
 }
 
 inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
@@ -299,45 +300,45 @@ inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
 	case YOA_Format_Float:
 	{
 		float* outF = (float*)stream;
-		for (uint32_t i = 0; i < mixer->mixL.size(); i++)
+		for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)
 		{
-			outF[sampleIndex++] = mixer->mixL[i];
-			outF[sampleIndex++] = mixer->mixR[i];
+			outF[sampleIndex++] = mixer->mixL[mix];
+			outF[sampleIndex++] = mixer->mixR[mix];
 		}
-		break;
+		return;
 	}
 	case YOA_Format_Sint8:
 	{
 		int8_t* out8 = (int8_t*)stream;
-		for (uint32_t i = 0; i < mixer->mixL.size(); i++)
+		for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)
 		{
-			out8[sampleIndex++] = static_cast<int8_t>(mixer->mixL[i] * 127);
-			out8[sampleIndex++] = static_cast<int8_t>(mixer->mixR[i] * 127);
+			out8[sampleIndex++] = static_cast<int8_t>(mixer->mixL[mix] * 127);
+			out8[sampleIndex++] = static_cast<int8_t>(mixer->mixR[mix] * 127);
 		}
-		break;
+		return;
 	}
 	case YOA_Format_Sint16:
 	{
 		int16_t* out16 = (int16_t*)stream;
-		for (uint32_t i = 0; i < mixer->mixL.size(); i++)
+		for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)
 		{
-			out16[sampleIndex++] = static_cast<int16_t>(mixer->mixL[i] * 32767);
-			out16[sampleIndex++] = static_cast<int16_t>(mixer->mixR[i] * 32767);
+			out16[sampleIndex++] = static_cast<int16_t>(mixer->mixL[mix] * 32767);
+			out16[sampleIndex++] = static_cast<int16_t>(mixer->mixR[mix] * 32767);
 		}
-		break;
+		return;
 	}
 	case YOA_Format_Sint32:
 	{
 		int32_t* out32 = (int32_t*)stream;
-		for (uint32_t i = 0; i < mixer->mixL.size(); i++)
+		for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)
 		{
-			out32[sampleIndex++] = static_cast<int32_t>(mixer->mixL[i] * 2147483647);
-			out32[sampleIndex++] = static_cast<int32_t>(mixer->mixR[i] * 2147483647);
+			out32[sampleIndex++] = static_cast<int32_t>(mixer->mixL[mix] * 2147483647);
+			out32[sampleIndex++] = static_cast<int32_t>(mixer->mixR[mix] * 2147483647);
 		}
-		break;
+		return;
 	}
 	default:
 		YOA_ERROR("Unsupported output format: {0}", mixer->mDevice->Format);
-		break;
+		return;
 	}
 }

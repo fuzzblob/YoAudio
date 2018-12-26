@@ -10,7 +10,9 @@
 
 ### About <a name="about"></a>
 
-A C++ audio environment. It is meant as a playground for experimentation with game audio concepts and DSP algorithms.
+A C++ audio environment meant as a playground for experimentation with game audio concepts and DSP algorithms.
+
+WARNING! YoAudio is not release quality!
 
 **Goals**
 
