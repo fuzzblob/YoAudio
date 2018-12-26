@@ -6,48 +6,22 @@
 
 Mixer::Mixer()
 {
-	mDevice = std::make_unique<AudioDevice>();
-	SDL_AudioSpec want;
-	SDL_AudioSpec get;
-	SDL_memset(&want, 0, sizeof(want));
-
-	want.freq = TARGET_SAMPLERATE;
-	want.format = AUDIO_FORMAT;
-	want.channels = TARGET_CHANNELS;
-	want.samples = TARGET_BUFFER;
-	want.callback = AudioCallback;
-	want.userdata = this;
-
-	mDevice->DeviceID = SDL_OpenAudioDevice(nullptr, 0, &want, &get, ALLOWED_CHANGES);
-	if (mDevice->DeviceID == 0) {
-		YOA_CRITICAL("Failed to open audio device: {0}", SDL_GetError());
+	// initialize audio device
+	mDevice = std::unique_ptr<AudioDevice>(new AudioDevice((void*)this, AudioCallback));
+	if (mDevice->Format == YOA_Format_Unknown) {
 		return;
 	}
-	else if (get.freq != TARGET_SAMPLERATE
-		|| get.format != AUDIO_FORMAT
-		|| get.channels != TARGET_CHANNELS
-		|| get.samples != TARGET_BUFFER)
-	{
-		YOA_ERROR("AudioDevice opened with different parameters than requested!");
-	}
-
-	mDevice->Samples = get.samples;
-	mDevice->Channels = get.channels;
-	mDevice->Frequency = get.freq;
-	mDevice->Format = AudioDevice::ConvertFormat(get);
-	YOA_INFO("Opened AudioDevice \"{0}\" ID: {1}\n\t{2} sample rate, {5}bit, {3} channels, buffer size {4}", 
-		mDevice->GetDeviceName(), mDevice->DeviceID, mDevice->Frequency,
-		mDevice->Channels, mDevice->Samples, mDevice->Format);
-
+	// reserve mix buffers for callback
 	mixL.reserve(mDevice->Samples);
 	for (size_t i = 0; i < mixL.capacity(); i++)
 		mixL.push_back(0.0f);
 	mixR.reserve(mDevice->Samples);
 	for (size_t i = 0; i < mixR.capacity(); i++)
 		mixR.push_back(0.0f);
-
+	// unpause audio device
+	mDevice->SetPaused(false);
+	// initialize other resources
 	mPlayingAudio.reserve(MAX_VOICES > 0 ? MAX_VOICES : 32);
-	
 	mResources = std::make_unique<ResourceManager>();
 }
 
@@ -65,15 +39,12 @@ void Mixer::Pause(const bool pause) noexcept
 		return;
 	}
 
-	if (mDevice->mPaused == pause)
-		return;
 	mDevice->SetPaused(pause);
-	YOA_INFO("audio engine state set to \"paused = {0}\"", pause);
 }
 
 bool Mixer::IsPaused() noexcept
 {
-	return mDevice->mPaused;
+	return mDevice->IsPaused();
 }
 
 uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const float volume, 
@@ -117,9 +88,9 @@ uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const
 
 	// add voice to playing voices vector
 	voice->State = ToPlay;
-	SDL_LockAudioDevice(mDevice->DeviceID);
+	mDevice->Lock();
 	this->mPlayingAudio.push_back(voice);
-	SDL_UnlockAudioDevice(mDevice->DeviceID);
+	mDevice->Unlock();
 
 	YOA_INFO("Playing audio: {0} with voiceID: {1}", filename.c_str(), voice->ID);
 	return voice->ID;
@@ -135,9 +106,9 @@ bool Mixer::StopVoice(const uint16_t id, float fadeOut)
 	voice->smoothVolume.SetFadeLength(static_cast<int>(fadeOut * mDevice->Frequency));
 
 	// TODO is lock needed? maybe make state atomic?
-	SDL_LockAudioDevice(mDevice->DeviceID);
+	mDevice->Lock();
 	voice->State = Stopping;
-	SDL_UnlockAudioDevice(mDevice->DeviceID);
+	mDevice->Unlock();
 	return true;
 }
 
