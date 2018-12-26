@@ -2,6 +2,7 @@
 
 #include "YoaConfig.h"
 #include "Platform.h"
+#include "AudioFormat.h"
 
 // 0                                    No changes
 // SDL_AUDIO_ALLOW_FREQUENCY_CHANGE     frequency changes (e.g. AUDIO_FREQUENCY = 48000, but allow files to play at 44.100)
@@ -36,14 +37,14 @@ public:
 public:
 	// audio callback buffer size (per channel)
 	uint32_t Samples = 0;
-	// audio callback channel count
-	uint8_t Channels = 0;
 	// audio callback sample rate
 	uint32_t Frequency = 0;
 	// audio callback bit depth
 	SampleFormat Format = YOA_Format_Unknown;
+	// audio callback channel count
+	uint8_t Channels = 0;
 private:
-	SDL_AudioDeviceID DeviceID;
 	// is the audio device paused
 	bool mPaused = true;
+	SDL_AudioDeviceID DeviceID;
 };

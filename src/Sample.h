@@ -1,18 +1,18 @@
 #pragma once
 
-#include "Platform.h"
+#include "AudioFormat.h"
 
 struct Sample {
 	// sample data
 	uint8_t * Buffer;
 	// length of one channle of audio
 	uint32_t Samples;
-	// amaount of channels present in the buffer
-	uint8_t Channels;
 	// sample rate of the sample
 	uint32_t Frequency;
 	// sample format (used to convers buffer to float for mixing)
 	SampleFormat Format;
+	// amaount of channels present in the buffer
+	uint8_t Channels;
 
 	float GetSample(const uint32_t position) noexcept {
 		switch (Format) {
@@ -24,6 +24,7 @@ struct Sample {
 			return (float)((int16_t*)Buffer)[position] / 32768.0f;
 		case YOA_Format_Sint32:
 			return (float)((int32_t*)Buffer)[position] / 2147483648.0f;
+		case YOA_Format_Unknown:
 		default:
 			return 0.0f;
 		}

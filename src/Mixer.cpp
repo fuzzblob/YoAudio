@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include "AudioThread.h"
+#include "AudioFormat.h"
 #include "Log.h"
 
 Mixer::Mixer() noexcept
@@ -213,13 +214,16 @@ void Mixer::FillBuffer()
 				float sample(0.0f);
 				for (uint32_t i = 0; i < length; i++) {
 					voice->Panning.CalculateNext();
-					if(pitch == 1.0f)
+					if (pitch == 1.0f) {
 						sample = voice->GetSample(uint32_t(sampleIndex)) * voice->Volume.GetNext();
-					else
+					}
+					else {
+						// linearly interpolating between sample values
 						sample = voice->GetReSample(sampleIndex) * voice->Volume.GetNext();
+					}
 					mixL[i] += sample * voice->Panning.volL;
 					mixR[i] += sample * voice->Panning.volR;
-					sampleIndex += pitch; // non-interpolating pitching
+					sampleIndex += pitch;
 				}
 				voice->AdvancePlayhead(uint32_t(length * pitch));
 			}
@@ -228,17 +232,16 @@ void Mixer::FillBuffer()
 				for (uint32_t i = 0; i < length; i++) {
 					volume = voice->Volume.GetNext();
 					voice->Panning.CalculateNext();
-					if (pitch == 1.0f)
-					{
+					if (pitch == 1.0f) {
 						mixL[i] += voice->GetSample(uint32_t(sampleIndex), 0) * volume * voice->Panning.volL;
 						mixR[i] += voice->GetSample(uint32_t(sampleIndex), 1) * volume * voice->Panning.volR;
 					}
-					else
-					{
+					else {
+						// linearly interpolating between sample values
 						mixL[i] += voice->GetReSample(sampleIndex, 0) * volume * voice->Panning.volL;
 						mixR[i] += voice->GetReSample(sampleIndex, 1) * volume * voice->Panning.volR;
 					}
-					sampleIndex += pitch; // non-interpolating pitching
+					sampleIndex += pitch;
 				}
 				voice->AdvancePlayhead(uint32_t(length * pitch));
 			}

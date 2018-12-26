@@ -9,8 +9,8 @@ private:
 	float currentValue;
 	float currentTarget;
 	
-	std::atomic<bool> hasReacheTarget;
 	std::atomic<uint32_t> stepsToTarget;
+	std::atomic_bool hasReacheTarget;
 	uint32_t countdown;
 	float stepSize;
 public:
