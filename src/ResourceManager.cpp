@@ -12,15 +12,13 @@ std::shared_ptr<Sample> ResourceManager::GetSound(const std::string & filename)
 		assetPath.append("assets/");
 		SDL_free(sdl_path);
 	}
+	// return if file is loaded
+	if (mSounds[filename] != nullptr)
+		return mSounds[filename];
+	// load file if needed
 	std::string fullPath = assetPath;
 	fullPath.append(filename);
-
-	if (mSounds[fullPath] == nullptr) {
-		// load file if needed
-		mSounds[fullPath] = LoadSound(fullPath);
-	}
-
-	return mSounds[fullPath];
+	return mSounds[filename] = LoadSound(fullPath);
 }
 
 std::shared_ptr<Sample> ResourceManager::LoadSound(const std::string & filename)
@@ -41,21 +39,22 @@ std::shared_ptr<Sample> ResourceManager::LoadSound(const std::string & filename)
 	switch (newSound->Format)
 	{
 	case YOA_Format_Float:
-		bytesPerSample = sizeof(float);
+		bytesPerSample = 4; // sizeof(float);
 		break;
 	case YOA_Format_Sint8:
-		bytesPerSample = sizeof(AUDIO_S8);
+		bytesPerSample = 1; // sizeof(AUDIO_S8);
 		break;
 	case YOA_Format_Sint16:
-		bytesPerSample = sizeof(AUDIO_S16);
+		bytesPerSample = 2; // sizeof(AUDIO_S16);
 		break;
 	case YOA_Format_Sint32:
-		bytesPerSample = sizeof(AUDIO_S32);
+		bytesPerSample = 4; // sizeof(AUDIO_S32);
 		break;
 	default:
 		YOA_ERROR("Unknown sample format! - {0} / {1}", filename, SDL_AUDIO_BITSIZE(spec.format));
 		break;
 	}
+	YOA_INFO("size of {0} = {1}", newSound->Format, bytesPerSample);
 	newSound->Samples = (audioLength) / (bytesPerSample * newSound->Channels);
 
 	return newSound;
