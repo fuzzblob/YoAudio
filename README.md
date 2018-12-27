@@ -51,6 +51,7 @@ Plan to support:
 
 ### Example Code  <a name="code"></a>
 
+	#include <stdlib.h>
 	#include "YoAudio.h"
 
 	int main()
@@ -65,21 +66,30 @@ Plan to support:
 		// Play loop and store VoiceID
 		uint16_t voiceID = YOA_PlayWavFile("ambience.wav", true, 1.0f, 1.0f, 2.7f, 0.0f);
 		
+		// wait for 1 second
+		Sleep(1000);
+		
 		// change the volume of a sound while it's playing
 		YOA_SetVoiceVolume(voiceID, 0.75f);
 		
+		// wait for 300 ms
+		Sleep(300);
+		
+		// pauses the entire audio engine
+		YOA_Pause();
+		Sleep(300);
+		
+		// resumes the audio engine
+		YOA_Resume();
+		
 		// pan a sound in the stereo field while playing
 		YOA_SetVoicePan(voiceID, -0.863);
-
+		Sleep(2500);
+		
 		// Stop loop using VoiceID
 		YOA_StopVoice(voiceID, 0.3f);
 		// when stopping a voice with a fade time of 0.0f
 		// the audio engine will set a 10ms fade to avoid artifacts
-
-		// pauses the entire audio engine
-		YOA_Pause();
-		// resumes the audio engine
-		YOA_Resume();
 
 		// quit YoAudio (in this case informing it to also shut down SDL2)
 		YOA_Quit(true);
