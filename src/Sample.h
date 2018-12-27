@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AudioFormat.h"
+#include "Log.h"
 
 struct Sample {
 	// sample data
@@ -20,6 +21,8 @@ struct Sample {
 			return ((float*)Buffer)[position];
 		case YOA_Format_Sint8:
 			return (float)((int8_t*)Buffer)[position] / 128.0f;
+		case YOA_Format_Uint8:
+			return (float)((uint8_t*)Buffer)[position] / 128.0f - 1.0f;
 		case YOA_Format_Sint16:
 			return (float)((int16_t*)Buffer)[position] / 32768.0f;
 		case YOA_Format_Sint32:

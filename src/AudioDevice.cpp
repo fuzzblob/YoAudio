@@ -31,7 +31,10 @@ SampleFormat AudioDevice::ConvertFormat(const SDL_AudioSpec& spec) noexcept {
 	else {
 		switch (SDL_AUDIO_BITSIZE(spec.format)) {
 		case 8:
-			return YOA_Format_Sint8;
+			if (SDL_AUDIO_ISSIGNED(spec.format))
+				return YOA_Format_Sint8;
+			else
+				return YOA_Format_Uint8;
 		case 16:
 			return YOA_Format_Sint16;
 		case 32:

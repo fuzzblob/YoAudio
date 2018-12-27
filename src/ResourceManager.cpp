@@ -38,6 +38,7 @@ std::shared_ptr<Sample> ResourceManager::LoadSound(const std::string & filename)
 	size_t bytesPerSample = 0;
 	switch (newSound->Format)
 	{
+	case YOA_Format_Uint8:
 	case YOA_Format_Sint8:
 		bytesPerSample = 1;
 		break;
@@ -53,7 +54,8 @@ std::shared_ptr<Sample> ResourceManager::LoadSound(const std::string & filename)
 		break;
 	}
 	newSound->Samples = (audioLength) / (bytesPerSample * newSound->Channels);
-	YOA_INFO("Loaded {0}: {1}bit {2} kHz", filename, newSound->Format, newSound->Frequency);
+	YOA_INFO("Loaded {0}: format {1} - {2}bit {3} kHz", filename, 
+		newSound->Format, (bytesPerSample * 8), newSound->Frequency);
 
 	return newSound;
 }

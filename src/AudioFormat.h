@@ -5,6 +5,7 @@ enum SampleFormat
 	YOA_Format_Unknown = -1,
 	YOA_Format_Float = 0,
 	YOA_Format_Sint8 = 8,
+	YOA_Format_Uint8 = 9,
 	YOA_Format_Sint16 = 16,
 	YOA_Format_Sint32 = 32
 };
