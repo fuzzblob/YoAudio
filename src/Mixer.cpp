@@ -1,6 +1,8 @@
 #include "Mixer.h"
 
 #include <algorithm>
+#include <cmath>
+
 #include "AudioThread.h"
 #include "AudioFormat.h"
 #include "Log.h"
@@ -199,7 +201,7 @@ void Mixer::FillBuffer()
 			uint32_t length = bufferSize;
 			if (voice->IsLooping == false) {
 				// if not looping, will we run out of samples?
-				const uint32_t samplesRemaining = uint32_t(voice->GetSamplesRemaining() / (voice->Sound->Channels * pitch));
+				const uint32_t samplesRemaining = uint32_t(voice->GetSamplesRemaining() / pitch);
 				if (samplesRemaining >= 0 && samplesRemaining < length)
 					length = samplesRemaining;
 			}
@@ -221,7 +223,7 @@ void Mixer::FillBuffer()
 					mixR[i] += sample * voice->Panning.volR;
 					sampleIndex += pitch;
 				}
-				voice->AdvancePlayhead(uint32_t(length * pitch));
+				voice->AdvancePlayhead(std::ceil(length * pitch));
 			}
 			else if (voice->Sound->Channels == 2) {
 				float volume;
@@ -232,7 +234,7 @@ void Mixer::FillBuffer()
 					mixR[i] += voice->GetSample(sampleIndex, 1) * volume * voice->Panning.volR;
 					sampleIndex += pitch;
 				}
-				voice->AdvancePlayhead(uint32_t(length * pitch));
+				voice->AdvancePlayhead(std::ceil(length * pitch));
 			}
 
 			if (voice->State == Stopping && voice->Volume.HasReachedTarget()) {
