@@ -38,24 +38,22 @@ std::shared_ptr<Sample> ResourceManager::LoadSound(const std::string & filename)
 	size_t bytesPerSample = 0;
 	switch (newSound->Format)
 	{
-	case YOA_Format_Float:
-		bytesPerSample = 4; // sizeof(float);
-		break;
 	case YOA_Format_Sint8:
-		bytesPerSample = 1; // sizeof(AUDIO_S8);
+		bytesPerSample = 1;
 		break;
 	case YOA_Format_Sint16:
-		bytesPerSample = 2; // sizeof(AUDIO_S16);
+		bytesPerSample = 2;
 		break;
+	case YOA_Format_Float:
 	case YOA_Format_Sint32:
-		bytesPerSample = 4; // sizeof(AUDIO_S32);
+		bytesPerSample = 4;
 		break;
 	default:
 		YOA_ERROR("Unknown sample format! - {0} / {1}", filename, SDL_AUDIO_BITSIZE(spec.format));
 		break;
 	}
-	YOA_INFO("size of {0} = {1}", newSound->Format, bytesPerSample);
 	newSound->Samples = (audioLength) / (bytesPerSample * newSound->Channels);
+	YOA_INFO("Loaded {0}: {1}bit {2} kHz", filename, newSound->Format, newSound->Frequency);
 
 	return newSound;
 }

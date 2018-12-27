@@ -190,37 +190,33 @@ void Mixer::FillBuffer()
 			voice->State = Playing;
 		if (voice->State == Playing || voice->State == Stopping)
 		{
-			// TODO: factor in "resampling to device" (1.0f * mDevice->Frequency / voice->Sound->Frequency)
-			const float pitch = voice->Pitch;
+			// get pitch and resampling factor
+			const float pitch = voice->Pitch * (1.0f * voice->Sound->Frequency) / mDevice->Frequency;
+			// Update the LinearSmoothValue objects
 			voice->Volume.UpdateTarget();
 			voice->Panning.Pan.UpdateTarget();
-
+			// set amount of samples to be rendered
 			uint32_t length = bufferSize;
-			if (voice->IsLooping == false)
-			{
+			if (voice->IsLooping == false) {
+				// if not looping, will we run out of samples?
 				const uint32_t samplesRemaining = uint32_t(voice->GetSamplesRemaining() / (voice->Sound->Channels * pitch));
 				if (samplesRemaining >= 0 && samplesRemaining < length)
 					length = samplesRemaining;
 			}
 			if (voice->State == Stopping) {
+				// if stopping will the fadeout be finished in fewer samples?
 				const uint32_t steps = voice->Volume.GetRemainingFadeSteps();
 				if (steps < length)
 					length = steps;
 			}
-			YOA_ASSERT(length <= bufferSize);
-			YOA_ASSERT(voice->Sound->Channels <= 2);
+			//YOA_ASSERT(length <= bufferSize);
+			//YOA_ASSERT(voice->Sound->Channels <= 2);
 			float sampleIndex = 0.0f;
 			if (voice->Sound->Channels == 1) {
 				float sample(0.0f);
 				for (uint32_t i = 0; i < length; i++) {
 					voice->Panning.CalculateNext();
-					if (pitch == 1.0f) {
-						sample = voice->GetSample(uint32_t(sampleIndex)) * voice->Volume.GetNext();
-					}
-					else {
-						// linearly interpolating between sample values
-						sample = voice->GetReSample(sampleIndex) * voice->Volume.GetNext();
-					}
+					sample = voice->GetSample(uint32_t(sampleIndex)) * voice->Volume.GetNext();
 					mixL[i] += sample * voice->Panning.volL;
 					mixR[i] += sample * voice->Panning.volR;
 					sampleIndex += pitch;
@@ -232,28 +228,18 @@ void Mixer::FillBuffer()
 				for (uint32_t i = 0; i < length; i++) {
 					volume = voice->Volume.GetNext();
 					voice->Panning.CalculateNext();
-					if (pitch == 1.0f) {
-						mixL[i] += voice->GetSample(uint32_t(sampleIndex), 0) * volume * voice->Panning.volL;
-						mixR[i] += voice->GetSample(uint32_t(sampleIndex), 1) * volume * voice->Panning.volR;
-					}
-					else {
-						// linearly interpolating between sample values
-						mixL[i] += voice->GetReSample(sampleIndex, 0) * volume * voice->Panning.volL;
-						mixR[i] += voice->GetReSample(sampleIndex, 1) * volume * voice->Panning.volR;
-					}
+					mixL[i] += voice->GetReSample(sampleIndex, 0) * volume * voice->Panning.volL;
+					mixR[i] += voice->GetReSample(sampleIndex, 1) * volume * voice->Panning.volR;
 					sampleIndex += pitch;
 				}
 				voice->AdvancePlayhead(uint32_t(length * pitch));
 			}
 
-			if (voice->State == Stopping
-				&& voice->Volume.HasReachedTarget())
-			{
+			if (voice->State == Stopping && voice->Volume.HasReachedTarget()) {
 				voice->State = Stopped;
 			}
-			if (voice->GetSamplesRemaining() <= 0
-				&& voice->IsLooping == false)
-			{
+			else if (voice->IsLooping == false
+				&& voice->GetSamplesRemaining() <= 0) {
 				// Non looping sound has no more mixable samples
 				voice->State = Stopped;
 			}
@@ -272,6 +258,7 @@ void Mixer::FillBuffer()
 		mPlayingAudio.erase(mPlayingAudio.begin() + i);
 	}
 
+	// clip both mix buffers
 	for (uint32_t i = 0; i < bufferSize; i++) {
 		// clipping if float buffer outside of render range
 		if (mixL[i] > 1.0f)

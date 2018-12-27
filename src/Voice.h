@@ -20,10 +20,11 @@ class Voice
 public:
 	void AdvancePlayhead(const uint32_t samples) noexcept;
 	uint32_t GetSamplesRemaining() const noexcept;
-	float GetSample(uint32_t position, const uint8_t channel = 0);
-	float GetReSample(float position, const uint8_t channel = 0);
+	float GetSample(float position, const uint8_t channel = 0);
 
 	Voice(uint16_t id) : ID(id) { }
+private:
+	float LoadSample(uint32_t position, const uint8_t channel = 0);
 public:
 	const uint16_t ID;
 	VoiceState State = Stopped;
