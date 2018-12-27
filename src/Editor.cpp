@@ -3,14 +3,12 @@
 #include "GUI.h"
 #include "imgui\imgui.h"
 
-#include "Timer.h"
 #include "YoAudio.h"
 
 void Editor::Run()
 {
 	// UI implicitly starts SDL for OpenGL rendering
 	std::unique_ptr<Gui> ui = std::make_unique<Gui>();
-	mTimer = std::make_unique<Timer>();
 	std::unique_ptr<InputManager> inputManager = std::make_unique<InputManager>();
 	SDL_Event mEvents;
 	float deltaTime = 0.0f;
@@ -24,19 +22,18 @@ void Editor::Run()
 
 	while (mQuit == false)
 	{
+		uint32_t startTicks = SDL_GetTicks();
+		double deltaTime = 0.0;
 		while (SDL_PollEvent(&mEvents) != 0)
 		{
 			ui->ProcessEvent(&mEvents);
 			if (mEvents.type == SDL_QUIT)
 				mQuit = true;
 		}
-		// reset deltaTime
-		mTimer->ResetDeltaTime();
-		// wait for frame rate
-		const double targetFrameLength = 1.0 / 30; 4;
-		while (mTimer->DeltaTime() < targetFrameLength) {
-			mTimer->Update();
-		}
+
+		const static uint32_t targetFrameLength = 1000 / 30;
+		SDL_Delay(targetFrameLength);
+		
 		inputManager->Update();
 		// begin GUI
 		ui->StartFrame();
@@ -247,11 +244,6 @@ void Editor::Menu()
 			ImGui::EndMenu();
 		}
 
-		ImGui::Separator();
-
-		float delta = this->mTimer->DeltaTime();
-		ImGui::InputFloat("FPS: ", &delta, 0.0f, 0.0f, 5);
-		
 		ImGui::EndMainMenuBar();
 	}
 }
