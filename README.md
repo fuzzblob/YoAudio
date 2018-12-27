@@ -5,6 +5,8 @@
 - [About](#about)
 - [Overview](#overview)
 	- [Usage](#usage)
+	- [Supported Formats](#formats)
+	- [Example Code](#code)
 	- [Dependencies](#dependencies)
 - [Build Instructions](#build)
 - [TODO](#todo)
@@ -22,9 +24,31 @@ The name Yo is based on the phonetic approximation of the korean word for fox (ì
 
 ### Using YoAudio <a name="usage"></a>
 
-To use YoaAudio in your project the first step is to call `YOA_Init()` to initialize the audio engine. After that you can call `YOA_PlayWavFile(filename, loop, volume, pitch, fadeIn, pan)` to play WAV files. The `YOA_PlayWavFile()` method returns a VoiceID which can be used to Stop a playing voice (`YOA_StopVoice(id, fadeOut)`), change it's volume (`YOA_SetVoiceVolume(id, newVolume)`) and panning(`YOA_SetVoicePan(id, newPan)`). If your application goes out of context and you wish to pause audio rendering use `YOA_Pause()` & `YOA_Resume()`. Once you wish to shut down the audio engine simply call `YOA_Quit(quitSDL)` passing a bool to signal if YoAudio, or your application will hande the Quitting of the SDL library.
+To use YoaAudio in your project the first step is to call `YOA_Init()` to initialize the audio engine. After that you can call `YOA_PlayWavFile(filename, loop, volume, pitch, fadeIn, pan)` to play WAV files.
 
-Here is the basic idea:
+The `YOA_PlayWavFile()` method returns a VoiceID which can be used to Stop a playing voice (`YOA_StopVoice(id, fadeOut)`), change it's volume (`YOA_SetVoiceVolume(id, newVolume)`) and panning(`YOA_SetVoicePan(id, newPan)`).
+
+If your application goes out of context and you wish to pause audio rendering use `YOA_Pause()` & `YOA_Resume()`.
+
+Once you wish to shut down the audio engine simply call `YOA_Quit(quitSDL)` passing a bool to signal if YoAudio, or your application will hande the Quitting of the SDL library.
+
+### Supported playback formats <a name="formats"></a>
+
+The audio data can be at and arbitrary sample rate.
+
+- WAV 16bit (signed integer)
+- WAV 32bit (signed integer)
+- WAV 32bit (float)
+
+Plan to support:
+
+- OGG vorbis
+- ADPCM
+- MP3
+- WAV 8bit (signed integer)
+- WAV 24bit (signed integer)
+
+### Example Code  <a name="code"></a>
 
 	#include "YoAudio.h"
 
@@ -64,10 +88,19 @@ Here is the basic idea:
 
 - Simple DirectMedia Layer [download SDL Development Libraries 2.0.x (stable)](http://libsdl.org/download-2.0.php)
 	- SDL2 is being used as the audio rendering backend (potentially others will be added later)
-- [submodule] [sdplog](https://github.com/gabime/spdlog)
-	- this submodule is optional (logging will be disabled if not present during CMake build)
+  - extract (at least) the *include* & *lib* directories to `dependencies/SDL2`
+- **[submodule]** YoAudio is using [sdplog](https://github.com/gabime/spdlog) for printing to the console (not included in Release builds). It is an optional **git submodule**.
 
-On Submodules:
+**On Submodules:**
+
+YoAudio uses a git feature called submoculed to tie in other git repositories as libraries. If you don't want to or can't use them, you will have to make the dependencies work by hand (adding files to `dependencies/` and possibly editing *CMakeLists.txt*). This can be finicky as the *CMake* scripts require specific folder locations- 
+
+To clone the repository with submodules paste the following command in your terminal
+
+> git clone --recurse-submodules -j8 https://github.com/fuzzblob/YoAudio.git
+
+Alternatively use a git client that supports git submodules like [Tortoise Git](https://tortoisegit.org/) or [SourceTree](https://www.sourcetreeapp.com/).
+
 - [git documentation](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
 - [how to clone submodules](https://stackoverflow.com/questions/3796927/how-to-git-clone-including-submodules))
 
@@ -77,37 +110,33 @@ On Submodules:
 
 At the moment the build process has only ever been tested on Windows with Microsoft Visual Studio 2017 Community Edition. Follow these steps to generate a Visual Studio project:
 
-- clone repo using `git clone --recurse-submodules -j8 https://github.com/fuzzblob/YoAudio.git`
-	- alternatively use a git client that supports git submodules (see [Dependencies section](#dependencies))
-	- alternatively clone the submodule dependencies seperately and copy them to `dependencies/`
-		- this is finicky as the CMake scripts require specific folder locations
-- download the **SDL2** development libraries (see [Dependencies](#dependencies))
-	- extract (at least) the *include* & *lib* directories to `dependencies/SDL2`
-- to run [**cmake**](https://cmake.org/) on Windows simply execute `m.bat` (assuming it's installed)
-	- if not using VisualStudio 2017 you might have to futz with *CMakeLists.txt*
+- clone the repository: `git clone --recurse-submodules -j8 https://github.com/fuzzblob/YoAudio.git`
+- download the **SDL2** development libraries and add them to the `dependencies/` folder
+- on Windows simply execute `m.bat` (assuming [**cmake**](https://cmake.org/) installed)
+	- if not using VisualStudio 2017 you will have to set a different build target in `m.bat` and possibly also tweak *CMakeLists.txt*
 - Open the solution at `build/YoAudio.snl`
 - build (by hitting `ctrl + shift + b`)
 - the output will be built to `bin/Debug` or `bin/Release`
 	- YoAudio.dll for runtime
 	- YoAudio.pdb for debug symbols
-- if you want a quick and easy sandbox to test stuff in clone the [YoAudio Editor repo](https://github.com/fuzzblob/YoAudioEditor) to the same folder as the YoAudio repo was cloned into and build that. It will find the YoAudio sources, and copy the built *YoAudio.dll* so it can run.
+
+if you want a quick and easy sandbox to test stuff in clone the [YoAudio Editor](https://github.com/fuzzblob/YoAudioEditor) repository into a folder adjacent to the YoAudio repository and build. It will find the YoAudio sources, and copy the built *YoAudio.dll* and *YoAudio.pdb* (debug symbols) so it can run.
 
 ### Linux
 
-Please provide me with information on how to make this work properly. A pull request with a build script (calling CMake), as well as any changes required to *CMakeLists.txt* and source code would be much appreciated.
+Please provide me with information on how to make this work properly. A pull request with a build script (calling *CMake*), as well as any changes required to *CMakeLists.txt* and source code would be much appreciated.
 
 ### Mac OS
 
 Same as Linux.
 
-- you can install SDL via homebrew. *CMakeLists.txt* is setup to find it in the default install directory and **should** pick it up
+- you can install SDL via *homebrew*. *CMakeLists.txt* is setup to find it in the default install directory and **should** pick it up
 
 ## TODO <a name="todo"></a>
 
 These are things that should be explored to move forward. In rough order of importance:
 
-- add resampling of WAV data (Sample.Frequency to AudioDevice.Frequency)
-	- currently files that' don't match the device samplerate get layed back pitched
+- Resampling
 	- possibly high quality resampling when loading sample
 	- Voice.GetReSample() pitch algorithm needs filter (currently simple lerp)
 - add Audio Graph
