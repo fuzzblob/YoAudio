@@ -228,8 +228,8 @@ void Mixer::FillBuffer()
 				for (uint32_t i = 0; i < length; i++) {
 					volume = voice->Volume.GetNext();
 					voice->Panning.CalculateNext();
-					mixL[i] += voice->GetReSample(sampleIndex, 0) * volume * voice->Panning.volL;
-					mixR[i] += voice->GetReSample(sampleIndex, 1) * volume * voice->Panning.volR;
+					mixL[i] += voice->GetSample(sampleIndex, 0) * volume * voice->Panning.volL;
+					mixR[i] += voice->GetSample(sampleIndex, 1) * volume * voice->Panning.volR;
 					sampleIndex += pitch;
 				}
 				voice->AdvancePlayhead(uint32_t(length * pitch));

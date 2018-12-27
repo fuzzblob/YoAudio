@@ -43,6 +43,7 @@ The audio data can be at and arbitrary sample rate.
 Plan to support:
 
 - OGG vorbis
+- Opus
 - ADPCM
 - MP3
 - WAV 8bit (signed integer)
