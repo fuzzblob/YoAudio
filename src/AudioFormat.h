@@ -1,5 +1,6 @@
 #pragma once
 
+// TODO: use bitmask to set format type (allow checking of bit and sign)
 enum SampleFormat
 {
 	YOA_Format_Unknown = -1,
@@ -7,7 +8,9 @@ enum SampleFormat
 	YOA_Format_Sint8 = 8,
 	YOA_Format_Uint8 = 9,
 	YOA_Format_Sint16 = 16,
-	YOA_Format_Sint32 = 32
+	YOA_Format_Uint16 = 17,
+	YOA_Format_Sint32 = 32,
+	YOA_Format_Uint32 = 37,
 };
 
 // Here are some builtin types and their value ranges

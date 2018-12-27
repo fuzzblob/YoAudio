@@ -34,21 +34,22 @@ Once you wish to shut down the audio engine simply call `YOA_Quit(quitSDL)` pass
 
 ### Supported playback formats <a name="formats"></a>
 
-The audio data can be at any arbitrary sample rate. The audio mixer will resample the data if needed (currently implementation using linear interpolation).
+The audio data can be at any arbitrary sample rate. The audio mixer will resample the data if needed. The current implementation uses linear interpolation for resampling.
 
 - WAV  8bit (unsigned integer)
-- WAV  8bit (signed integer) (untested)
 - WAV 16bit (signed integer)
 - WAV 32bit (signed integer)
-- WAV 32bit (float)
+- WAV 32bit IEEE-754 (float)
+- WAV 16bit (unsigned integer)  (untested)
+- WAV 32bit (unsigned integer)  (untested)
+- WAV  8bit (signed integer)    (untested)
 
-Plan to support:
 
-- OGG vorbis
-- Opus
+Plan to support (in order of importance):
+
+- OGG Vorbis (encapsulated Opus)
 - ADPCM
 - MP3
-- WAV 8bit (signed integer)
 - WAV 24bit (signed integer)
 
 ### Example Code  <a name="code"></a>

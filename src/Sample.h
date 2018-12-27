@@ -20,13 +20,20 @@ struct Sample {
 		case YOA_Format_Float:
 			return ((float*)Buffer)[position];
 		case YOA_Format_Sint8:
+			// TODO: test this
 			return (float)((int8_t*)Buffer)[position] / 128.0f;
 		case YOA_Format_Uint8:
 			return (float)((uint8_t*)Buffer)[position] / 128.0f - 1.0f;
 		case YOA_Format_Sint16:
 			return (float)((int16_t*)Buffer)[position] / 32768.0f;
+		case YOA_Format_Uint16:
+			// TODO: test this
+			return (float)((int16_t*)Buffer)[position] / 32768.0f - 1.0f;
 		case YOA_Format_Sint32:
 			return (float)((int32_t*)Buffer)[position] / 2147483648.0f;
+		case YOA_Format_Uint32:
+			// TODO: test this
+			return (float)((int32_t*)Buffer)[position] / 2147483648.0f - 1.0f;
 		case YOA_Format_Unknown:
 		default:
 			return 0.0f;
