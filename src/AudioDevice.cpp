@@ -8,7 +8,7 @@ bool AudioDevice::IsPaused() const noexcept {
 void AudioDevice::SetPaused(const bool pause) {
 	if (mPaused == pause)
 		return;
-	YOA_INFO("audio engine state set to \"paused = {0}\"", pause);
+	YOA_TRACE("audio engine state set to \"paused = {0}\"", pause);
 	mPaused = pause;
 	SDL_PauseAudioDevice(DeviceID, pause ? 1 : 0);
 }
@@ -31,20 +31,15 @@ SampleFormat AudioDevice::ConvertFormat(const SDL_AudioSpec& spec) noexcept {
 	else {
 		switch (SDL_AUDIO_BITSIZE(spec.format)) {
 		case 8:
-			if (SDL_AUDIO_ISSIGNED(spec.format))
-				return YOA_Format_Sint8;
-			else
+			if (SDL_AUDIO_ISSIGNED(spec.format) == false)
 				return YOA_Format_Uint8;
+			return YOA_Format_Unknown;
 		case 16:
 			if (SDL_AUDIO_ISSIGNED(spec.format))
 				return YOA_Format_Sint16;
-			else
-				return YOA_Format_Uint16;
 		case 32:
 			if (SDL_AUDIO_ISSIGNED(spec.format))
 				return YOA_Format_Sint32;
-			else
-				return YOA_Format_Uint32;
 		default:
 			return YOA_Format_Unknown;
 		}

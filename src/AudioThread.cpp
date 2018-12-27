@@ -42,24 +42,22 @@ void AudioThread::Release(const bool quitSDL) noexcept
 
 void AudioThread::Run()
 {
-#if !SPDLOG_ENABLED
-	printf("YoAudio initializing. (logging disabled). version: %i %i\n\n", YOA_VERSION_MAJOR, YOA_VERSION_MINOR);
-#endif //SPDLOG_ENABLED
-
+#if LOGGING_ENABLED
 	// initialize logging
 	Log::Init();
-	YOA_INFO("YoAudio initializing. version: {0} {1}", YOA_VERSION_MAJOR, YOA_VERSION_MINOR);
+#endif
+	YOA_TRACE("YoAudio initializing. version: {0} {1}", YOA_VERSION_MAJOR, YOA_VERSION_MINOR);
 
 	if (SDL_WasInit(SDL_INIT_AUDIO) != 0)
 		YOA_WARN("Audio is already initialized.");
 	// initialize SDL audio
 	if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-		YOA_WARN("Failed to initilize SDL! {0}", SDL_GetError());
+		YOA_CRITICAL("Failed to initilize SDL! {0}", SDL_GetError());
 		return;
 	}
 	// check itialization went well
 	if (!(SDL_WasInit(SDL_INIT_AUDIO) & SDL_INIT_AUDIO)) {
-		YOA_ERROR("SDL_INIT_AUDIO not initialized");
+		YOA_CRITICAL("SDL_INIT_AUDIO not initialized");
 		return;
 	}
 
@@ -69,7 +67,7 @@ void AudioThread::Run()
 	mMixer = std::make_unique<Mixer>();
 	mMixer->Pause(false);
 
-	YOA_INFO("Thread started!");
+	YOA_TRACE("Thread started!");
 
 	// main thread loop
 	while (mQuit == false) 

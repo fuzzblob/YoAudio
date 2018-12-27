@@ -1,16 +1,14 @@
 #pragma once
 
 // TODO: use bitmask to set format type (allow checking of bit and sign)
-enum SampleFormat
+enum SampleFormat : unsigned char
 {
-	YOA_Format_Unknown = -1,
-	YOA_Format_Float = 0,
-	YOA_Format_Sint8 = 8,
-	YOA_Format_Uint8 = 9,
+	
+	YOA_Format_Unknown = 0,
+	YOA_Format_Uint8 = 8,
 	YOA_Format_Sint16 = 16,
-	YOA_Format_Uint16 = 17,
 	YOA_Format_Sint32 = 32,
-	YOA_Format_Uint32 = 37,
+	YOA_Format_Float = 128,
 };
 
 // Here are some builtin types and their value ranges

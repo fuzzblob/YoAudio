@@ -21,13 +21,13 @@ std::shared_ptr<Sample> ResourceManager::GetSound(const std::string & filename)
 	return mSounds[filename] = LoadSound(fullPath);
 }
 
-std::shared_ptr<Sample> ResourceManager::LoadSound(const std::string & filename)
+std::shared_ptr<Sample> ResourceManager::LoadSound(const std::string & filePath)
 {
 	std::shared_ptr<Sample> newSound = std::make_shared<Sample>();
 	SDL_AudioSpec spec;
 	uint32_t audioLength;
-	if (SDL_LoadWAV(filename.c_str(), &spec, &newSound->Buffer, &audioLength) == nullptr) {
-		YOA_ERROR("Failed to open wave file: {0}\nerror: {1}", filename, SDL_GetError());
+	if (SDL_LoadWAV(filePath.c_str(), &spec, &newSound->Buffer, &audioLength) == nullptr) {
+		YOA_ERROR("Failed to open wave file: {0}\nerror: {1}", filePath, SDL_GetError());
 		return nullptr;
 	}
 
@@ -39,7 +39,6 @@ std::shared_ptr<Sample> ResourceManager::LoadSound(const std::string & filename)
 	switch (newSound->Format)
 	{
 	case YOA_Format_Uint8:
-	case YOA_Format_Sint8:
 		bytesPerSample = 1;
 		break;
 	case YOA_Format_Sint16:
@@ -50,11 +49,11 @@ std::shared_ptr<Sample> ResourceManager::LoadSound(const std::string & filename)
 		bytesPerSample = 4;
 		break;
 	default:
-		YOA_ERROR("Unknown sample format! - {0} / {1}", filename, SDL_AUDIO_BITSIZE(spec.format));
+		YOA_ERROR("Unknown sample format! - {0} / {1}", filePath, SDL_AUDIO_BITSIZE(spec.format));
 		break;
 	}
 	newSound->Samples = (audioLength) / (bytesPerSample * newSound->Channels);
-	YOA_INFO("Loaded {0}: format {1} - {2}bit {3} kHz", filename, 
+	YOA_TRACE("Loaded sound at \n\t{0}\n\tYOA_FORMAT: {1} - sample data: {2}bit {3} kHz", filePath,
 		newSound->Format, (bytesPerSample * 8), newSound->Frequency);
 
 	return newSound;

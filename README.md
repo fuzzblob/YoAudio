@@ -40,10 +40,6 @@ The audio data can be at any arbitrary sample rate. The audio mixer will resampl
 - WAV 16bit (signed integer)
 - WAV 32bit (signed integer)
 - WAV 32bit IEEE-754 (float)
-- WAV 16bit (unsigned integer)  (untested)
-- WAV 32bit (unsigned integer)  (untested)
-- WAV  8bit (signed integer)    (untested)
-
 
 Plan to support (in order of importance):
 

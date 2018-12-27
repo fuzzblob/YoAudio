@@ -6,7 +6,7 @@
 #include "LinearSmooothValue.h"
 #include "StereoPanner.h"
 
-enum VoiceState
+enum VoiceState : unsigned char
 {
 	ToPlay = 1,
 	Playing = 2,

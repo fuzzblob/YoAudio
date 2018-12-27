@@ -11,7 +11,7 @@ public:
 
 	~ResourceManager();
 private:
-	std::shared_ptr<Sample> LoadSound(const std::string & filename);
+	std::shared_ptr<Sample> LoadSound(const std::string & filePath);
 	void FreeSound(std::shared_ptr<Sample> sound) noexcept;
 private:
 	std::string assetPath;

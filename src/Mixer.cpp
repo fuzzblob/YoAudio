@@ -299,13 +299,13 @@ inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
 		}
 		return;
 	}
-	case YOA_Format_Sint8:
+	case YOA_Format_Uint8:
 	{
 		int8_t* out8 = (int8_t*)stream;
 		for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)
 		{
-			out8[sampleIndex++] = static_cast<int8_t>(mixer->mixL[mix] * 127);
-			out8[sampleIndex++] = static_cast<int8_t>(mixer->mixR[mix] * 127);
+			out8[sampleIndex++] = static_cast<uint8_t>((mixer->mixL[mix] + 1.0f) * 127);
+			out8[sampleIndex++] = static_cast<uint8_t>((mixer->mixR[mix] + 1.0f) * 127);
 		}
 		return;
 	}

@@ -4,21 +4,17 @@
 
 #if LOGGING_ENABLED
 #include "spdlog/spdlog.h"
-#endif
 
 class Log
 {
 public:
 	static void Init();
-#if LOGGING_ENABLED
 	inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() noexcept { return mLogger; }
 private:
 	static std::shared_ptr<spdlog::logger> mLogger;
-#endif
 };
 
 // log macros
-#if LOGGING_ENABLED
 #define YOA_ASSERT(x, ...)\
 if (!(x))\
 {\

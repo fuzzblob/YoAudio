@@ -1,8 +1,6 @@
 #include "Log.h"
 
-#if LOGGING_ENABLED == false
-void Init() {}
-#else
+#if LOGGING_ENABLED
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 std::shared_ptr<spdlog::logger> Log::mLogger;
