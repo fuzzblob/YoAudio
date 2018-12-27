@@ -1,11 +1,9 @@
 #pragma once
 
-#include "DllImportExport.h"
-
 #include <chrono>
 #include <atomic>
 
-class YOA_API Timer
+class Timer
 {
 private:
 	double mTime = 0.0;
