@@ -140,7 +140,7 @@ void Editor::App()
 
 		static uint16_t musicLoop = 0u;
 		if (musicLoop == 0u && ImGui::Button("Play Music")) {
-			musicLoop = YOA_PlayWavFile("DasRied_loop_mono_8bit_02.wav", true, 1.0f * volume, 1.0f * pitch, 0.0f, panning);
+			musicLoop = YOA_PlayWavFile("DasRied_loop_mono_8bit.wav", true, 1.0f * volume, 1.0f * pitch, 0.0f, panning);
 		}
 		if (musicLoop != 0u) {
 			if (ImGui::Button("Stop Music"))
