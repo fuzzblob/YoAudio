@@ -103,8 +103,10 @@ FIND_LIBRARY( SDL2_LIBRARIES
 
 # Linux using "/usr/lib/i386-linux-gnu/cmake/SDL2/sdl2-config.cmake"
 # TODO: possible on Windows and Mac OS?
-find_package(SDL2 REQUIRED)
-string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
+if ( !SDL2_INCLUDE_DIRS OR !SDL2_LIBRARIES )
+	find_package(SDL2 REQUIRED)
+	string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
+endif ( !SDL2_INCLUDE_DIRS OR !SDL2_LIBRARIES )
 
 # Check if we found it!
 IF ( SDL2_INCLUDE_DIRS AND SDL2_LIBRARIES )
