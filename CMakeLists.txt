@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.5)
 # set project name
 project(YoAudio)
 # The version number.
@@ -18,7 +18,7 @@ if(MSVC)
   endif()
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   # Update if necessary
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -std=c++14")
 endif()
 
 # set CMAKE_BUILD_TYPE if empty
@@ -70,11 +70,11 @@ FIND_PATH( SDL2_INCLUDE_DIRS
 		SDL.h
 	PATHS
 		# TODO: find path recursively instead of per version number
-		dependencies/SDL2/
-		dependencies/SDL2/SDL2-2.0.9/
+		dependencies/SDL2/include/
+		# Mac OS (when using Homebrew)
         /usr/local/opt/sdl2/include/SDL2
-	PATH_SUFFIXES
-		include
+        # Linux (when using apt)
+        /usr/inculde/SDL2/
 	DOC
 		"The directory where SDL.h resides"
 )
@@ -86,9 +86,13 @@ FIND_LIBRARY( SDL2_LIBRARIES
 	PATHS
 		# TODO: find path recursively instead of per version number
 		dependencies/SDL2/
-		dependencies/SDL2/SDL2-2.0.9/
+		# Mac OS (when using Homebrew)
         /usr/local/opt/sdl2/lib
+        # Linux (when using apt)
+        /usr/bin/
+        /usr/share/
 	PATH_SUFFIXES
+        # TODO: detect architecture to link against
 		lib
 		lib/x86
 		lib64
@@ -97,13 +101,19 @@ FIND_LIBRARY( SDL2_LIBRARIES
 		"The SDL2 library"
 )
 
+# Linux using "/usr/lib/i386-linux-gnu/cmake/SDL2/sdl2-config.cmake"
+# TODO: possible on Windows and Mac OS?
+find_package(SDL2 REQUIRED)
+string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
+
 # Check if we found it!
 IF ( SDL2_INCLUDE_DIRS AND SDL2_LIBRARIES )
 	SET( SDL2_FOUND true )
 	MESSAGE(STATUS "Looking for SDL2 - found")
 ELSE ( SDL2_INCLUDE_DIRS AND SDL2_LIBRARIES  )
 	SET( SDL2_FOUND false )
-	MESSAGE(STATUS "Looking for SDL2 - not found")
+	MESSAGE(STATUS "Looking for SDL2 includes - ${SDL2_INCLUDE_DIRS}")
+	MESSAGE(STATUS "Looking for SDL2 library  - ${SDL2_LIBRARIES}")
 ENDIF ( SDL2_INCLUDE_DIRS AND SDL2_LIBRARIES )
 
 file(GLOB_RECURSE HDRS
@@ -135,7 +145,7 @@ add_definitions(-DBUILD_DLL)
 #set_target_properties( ${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY bin )
 
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ../lib )
-#set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ../lib )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ../lib )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin )
 
 add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDRS})

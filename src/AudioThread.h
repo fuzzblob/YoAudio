@@ -24,7 +24,7 @@ private:
 	static std::unique_ptr<AudioThread> sInstance;
 	static bool sInitialized;
 
-	std::atomic_bool mQuit = false;
-	std::atomic_bool mThreadRunning = true;
+	std::atomic_bool mQuit;
+	std::atomic_bool mThreadRunning;
 	std::thread mThread;
 };

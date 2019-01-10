@@ -8,7 +8,7 @@ class Timer
 private:
 	double mTime = 0.0;
 	double mDeltaTime = 0.0;
-	std::atomic<double> mRenderTime = 0.0;
+	std::atomic<double> mRenderTime;
 	std::chrono::high_resolution_clock::time_point mEpoch;
 public:
 	Timer() noexcept;

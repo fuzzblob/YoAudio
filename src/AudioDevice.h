@@ -19,7 +19,7 @@
 #define AUDIO_FORMAT AUDIO_S32SYS
 #else
 #error unsupported target bitdepth
-#endif;
+#endif
 
 class AudioDevice {
 public:

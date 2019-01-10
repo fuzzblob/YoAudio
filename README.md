@@ -134,13 +134,19 @@ if you want a quick and easy sandbox to test stuff in clone the [YoAudio Editor]
 
 ### Linux
 
-Please provide me with information on how to make this work properly. A pull request with a build script (calling *CMake*), as well as any changes required to *CMakeLists.txt* and source code would be much appreciated.
+- install SDL2:
+    - Arch: pacman -S sdl2
+    - Debian: apt-get install sdl2 or apt-get install libsdl2-2.0-0 or apt-get install libsdl2-dev
+    - Fedora: dnf install SDL2-devel
+    - Gentoo: emerge media-libs/libsdl2
+- create & run a build script targeting your tool chain or IDE (an example is provided for CodeLite IDE)
 
 ### Mac OS
 
-Same as Linux.
+Please provide me with information on how to make this work properly. A pull request with a build script (calling *CMake*), as well as any changes required to *CMakeLists.txt* and source code would be much appreciated.
 
-- you can install SDL via *homebrew*. *CMakeLists.txt* is setup to find it in the default install directory and **should** pick it up
+- install SDL via [homebrew](https://brew.sh/) (*CMakeLists.txt* is setup to find it in the default install directory)
+- run CMake (probably needs some additional tweaking to make it work)
 
 ## TODO <a name="todo"></a>
 

@@ -3,6 +3,8 @@
 #include "Log.h"
 #if AUDIO_THREAD_UPDATES == false
 #include <stdlib.h>
+#include <thread>         // std::this_thread::sleep_for
+#include <chrono>         // std::chrono::seconds
 #endif
 
 std::unique_ptr<AudioThread> AudioThread::sInstance = nullptr;
@@ -85,7 +87,8 @@ void AudioThread::Run()
 		mTimer->ResetDeltaTime();
 #else
 		// wait for 10 ms before checking if the thread should continue running
-		Sleep(10);
+		//Sleep(10);
+		std::this_thread::sleep_for (std::chrono::milliseconds(10));
 #endif
 	}
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <math.h>
 #include "LinearSmooothValue.h"
 
 struct StereoPanner {
