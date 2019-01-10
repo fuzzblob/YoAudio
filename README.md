@@ -7,8 +7,11 @@
 	- [Usage](#usage)
 	- [Supported Formats](#formats)
 	- [Example Code](#code)
-	- [Dependencies](#dependencies)
 - [Build Instructions](#build)
+	- [Dependencies](#dependencies)
+	- [Building on Windows](#windows)
+	- [Building on Linux](#linux)
+	- [Building on Mac OS](#macos)
 - [TODO](#todo)
 - [Acknowledgements](#acknowledge)
 
@@ -41,7 +44,7 @@ The audio data can be at any arbitrary sample rate. The audio mixer will resampl
 - WAV 32bit (signed integer)
 - WAV 32bit IEEE-754 (float)
 
-Plan to support (in order of importance):
+Planned future support (in order of importance):
 
 - OGG Vorbis (encapsulated Opus)
 - ADPCM
@@ -94,11 +97,15 @@ Plan to support (in order of importance):
 		YOA_Quit(true);
 	}
 
+## Build Instructions <a name="build"></a>
+
+if you want a quick and easy sandbox to test stuff in clone the [YoAudio Editor](https://github.com/fuzzblob/YoAudioEditor) repository into a folder adjacent to the YoAudio repository and build. It will find the YoAudio sources, and copy the built *YoAudio.dll* and *YoAudio.pdb* from the YoAudio repo so it can run.
+
 ### Dependencies <a name="dependencies"></a>
 
+- An installation of [CMake 3.5 or newer](https://cmake.org/)
 - Simple DirectMedia Layer [download SDL Development Libraries 2.0.x (stable)](http://libsdl.org/download-2.0.php)
 	- SDL2 is being used as the audio rendering backend (potentially others will be added later)
-  - extract (at least) the *include* & *lib* directories to `dependencies/SDL2`
 - **[submodule]** YoAudio is using [sdplog](https://github.com/gabime/spdlog) for printing to the console (not included in Release builds). It is an optional **git submodule**.
 
 **On Submodules:**
@@ -107,46 +114,45 @@ YoAudio uses a git feature called submoculed to tie in other git repositories as
 
 To clone the repository with submodules paste the following command in your terminal
 
-> git clone --recurse-submodules -j8 https://github.com/fuzzblob/YoAudio.git
+> git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git
 
 Alternatively use a git client that supports git submodules like [Tortoise Git](https://tortoisegit.org/) or [SourceTree](https://www.sourcetreeapp.com/).
 
 - [git documentation](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
 - [how to clone submodules](https://stackoverflow.com/questions/3796927/how-to-git-clone-including-submodules))
 
-## Build Instructions <a name="build"></a>
-
-### Windows
+### Building on Windows <a name="windows"></a>
 
 At the moment the build process has only ever been tested on Windows with Microsoft Visual Studio 2017 Community Edition. Follow these steps to generate a Visual Studio project:
 
-- clone the repository: `git clone --recurse-submodules -j8 https://github.com/fuzzblob/YoAudio.git`
-- download the **SDL2** development libraries and add them to the `dependencies/` folder
-- on Windows simply execute `m.bat` (assuming [**cmake**](https://cmake.org/) installed)
-	- if not using VisualStudio 2017 you will have to set a different build target in `m.bat` and possibly also tweak *CMakeLists.txt*
-- Open the solution at `build/YoAudio.snl`
-- build (by hitting `ctrl + shift + b`)
-- the output will be built to `bin/Debug` or `bin/Release`
-	- YoAudio.dll for runtime
-	- YoAudio.pdb for debug symbols
+- clone the repository: `git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git`
+- download the [SDL2](http://libsdl.org/download-2.0.php) Development Libraries 2.0.x (stable) and extract the `include` and `lib` folders to `dependencies/SDL2`
+- create & run a build script targeting your tool chain or IDE (an example is provided for Visual Studio 2017 `build_Windows_VisualStudio2017.bat`)
+- build
+- the output will be built to `/bin/DEBUG`
+	- YoAudio.dll (runtime)
+	- YoAudio.pbd (debug symbols))
 
-if you want a quick and easy sandbox to test stuff in clone the [YoAudio Editor](https://github.com/fuzzblob/YoAudioEditor) repository into a folder adjacent to the YoAudio repository and build. It will find the YoAudio sources, and copy the built *YoAudio.dll* and *YoAudio.pdb* (debug symbols) so it can run.
-
-### Linux
+### Building on Linux <a name="linux"></a>
 
 - install SDL2:
     - Arch: pacman -S sdl2
     - Debian: apt-get install sdl2 or apt-get install libsdl2-2.0-0 or apt-get install libsdl2-dev
     - Fedora: dnf install SDL2-devel
     - Gentoo: emerge media-libs/libsdl2
-- create & run a build script targeting your tool chain or IDE (an example is provided for CodeLite IDE)
+- clone the repository: `git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git`
+- create & run a build script targeting your tool chain or IDE (an example is provided for CodeLite IDE `build_Linux_CodeLite.sh`)
+- build
+- the output will be built to `/lib/` as **libYoAudio.so**
 
-### Mac OS
-
-Please provide me with information on how to make this work properly. A pull request with a build script (calling *CMake*), as well as any changes required to *CMakeLists.txt* and source code would be much appreciated.
+### Building on Mac OS <a name="macos"></a>
 
 - install SDL via [homebrew](https://brew.sh/) (*CMakeLists.txt* is setup to find it in the default install directory)
-- run CMake (probably needs some additional tweaking to make it work)
+- clone the repository: `git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git`
+- run CMake
+- build
+
+As I don't have a Mac OS build environment I can not provide detailed instructions on how to build YoAudio for that platform. A pull request with a build script, as well as any changes required to *CMakeLists.txt* and source code would be much appreciated.
 
 ## TODO <a name="todo"></a>
 
