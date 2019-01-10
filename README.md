@@ -179,7 +179,15 @@ These are things that should be explored to move forward. In rough order of impo
 - AudioListener
 	- 3D math
 	- vector based amplitude panning
+- improve CMake process
+  - use find_package() on all platforms by providing "FindSDL2.cmake" in CMAKE_MODULE_PATH
+  - Could not find a package configuration file provided by "SDL2" with any of the following names:
+    - SDL2Config.cmake
+    - sdl2-config.cmake
+  - Add the installation prefix of "SDL2" to CMAKE_PREFIX_PATH or set "SDL2_DIR" to a directory containing one of the above files.
 
 ## Acknowledgements<a name="acknowledge"></a>
 
-The initial development was heavily inspired by this [Simple SDL2 Audio example](https://github.com/jakebesworth/Simple-SDL2-Audio).
+The initial development was inspired by this [Simple SDL2 Audio example](https://github.com/jakebesworth/Simple-SDL2-Audio) but the direction of the software has since diverged from this very simple approach to playing audio.
+
+A huge thank you to [Jeremy Tammik](https://github.com/jeremytammik) for helping me setup some basics, specifically CMake.
