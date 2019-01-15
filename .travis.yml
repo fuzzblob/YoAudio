@@ -2,6 +2,13 @@ dist: trusty
 sudo: false
 language: cpp
 
+addons:
+        sources:
+                ubuntu-toolchain-r-test
+        apt:
+                g++-5
+                libsdl2-dev
+
 script:
-        cmake .
-        cmake --build . -- -j2
+        CXX=/usr/bin/g++-5 CC=/usr/bin/gcc-5
+        build_Linux_Make.sh
