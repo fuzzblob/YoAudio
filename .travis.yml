@@ -6,7 +6,7 @@ addons:
   sources:
     - ubuntu-toolchain-r-test
   apt:
-    - g++-5
+    - g++-7
     - libsdl2-dev
 
 script:
@@ -14,3 +14,35 @@ script:
   - cd build
   - cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ../
   - cmake --build . --target YoAudio --config Debug
+
+
+language: cpp
+
+matrix:
+  include:
+    - name: "gcc 7 Debug"
+      os: linux
+      sudo: false
+       env: CXX_EXE=/usr/bin/g++-7 CC_EXE=/usr/bin/gcc-7 GCOV=/usr/bin/gcov-7 CMAKE_OPTS="-DCMAKE_BUILD_TYPE:STRING=Debug"
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+            - libsdl2-dev
+script:
+  - $CXX_EXE --version
+  - which cmake
+  - cmake --version
+  - export CXX=$CXX_EXE
+  - export CC=$CC_EXE
+  - echo $CXX
+  - echo $CMAKE_OPTS
+  - $CXX --version
+  - mkdir build
+  - cd build
+  - cmake  $CMAKE_OPTS ..
+  - VERBOSE=1 cmake --build . -- -j2
+
+
