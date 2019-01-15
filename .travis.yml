@@ -1,21 +1,3 @@
-dist: trusty
-sudo: false
-language: cpp
-
-addons:
-  sources:
-    - ubuntu-toolchain-r-test
-  apt:
-    - g++-7
-    - libsdl2-dev
-
-script:
-  - mkdir build
-  - cd build
-  - cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ../
-  - cmake --build . --target YoAudio --config Debug
-
-
 language: cpp
 
 matrix:
