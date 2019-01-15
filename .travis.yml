@@ -10,4 +10,9 @@ addons:
                 libsdl2-dev
 
 script:
-        build_Linux_Make.sh
+        rm -rf build
+        mkdir build -p
+        cd build
+        cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ../
+        cmake --build . --target YoAudio --config Debug
+
