@@ -10,5 +10,4 @@ addons:
                 libsdl2-dev
 
 script:
-        CXX=/usr/bin/g++-5 CC=/usr/bin/gcc-5
         build_Linux_Make.sh
