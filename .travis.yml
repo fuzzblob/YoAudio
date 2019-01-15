@@ -4,15 +4,15 @@ language: cpp
 
 addons:
         sources:
-                ubuntu-toolchain-r-test
+                - ubuntu-toolchain-r-test
         apt:
-                g++-5
-                libsdl2-dev
+                - g++-5
+                - libsdl2-dev
 
 script:
-        rm -rf build
-        mkdir build -p
-        cd build
-        cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ../
-        cmake --build . --target YoAudio --config Debug
+        - rm -rf build
+        - mkdir build -p
+        - cd build
+        - cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ../
+        - cmake --build . --target YoAudio --config Debug
 
