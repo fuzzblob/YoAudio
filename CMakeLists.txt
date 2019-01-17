@@ -65,41 +65,41 @@ ENDIF ( LOGGING_ENABLED )
 #
 
 # SDL2 include headers
-FIND_PATH( SDL2_INCLUDE_DIRS
-	NAMES
-		SDL.h
-	PATHS
-		# TODO: find path recursively instead of per version number
-		dependencies/SDL2/include/
-		# Mac OS (when using Homebrew)
-        /usr/local/opt/sdl2/include/SDL2
-        # Linux (when using apt)
-        /usr/inculde/SDL2/
-	DOC
-		"The directory where SDL.h resides"
-)
+#FIND_PATH( SDL2_INCLUDE_DIRS
+#	NAMES
+#		SDL.h
+#	PATHS
+#		# TODO: find path recursively instead of per version number
+#		dependencies/SDL2/include/
+#		# Mac OS (when using Homebrew)
+#       /usr/local/opt/sdl2/include/SDL2
+#	# Linux (when using apt)
+#	/usr/inculde/SDL2/
+#	DOC
+#		"The directory where SDL.h resides"
+#)
 
 # SDL2 development library
-FIND_LIBRARY( SDL2_LIBRARIES
-	NAMES
-		SDL2 SDL2main
-	PATHS
-		# TODO: find path recursively instead of per version number
-		dependencies/SDL2/
-		# Mac OS (when using Homebrew)
-        /usr/local/opt/sdl2/lib
-        # Linux (when using apt)
-        /usr/bin/
-        /usr/share/
-	PATH_SUFFIXES
-        # TODO: detect architecture to link against
-		lib
-		lib/x86
-		lib64
-		lib/x64
-	DOC
-		"The SDL2 library"
-)
+#FIND_LIBRARY( SDL2_LIBRARIES
+#	NAMES
+#		SDL2 SDL2main
+#	PATHS
+#		# TODO: find path recursively instead of per version number
+#		dependencies/SDL2/
+#		# Mac OS (when using Homebrew)
+#	/usr/local/opt/sdl2/lib
+#	# Linux (when using apt)
+#	/usr/bin/
+#	/usr/share/
+#	PATH_SUFFIXES
+#	# TODO: detect architecture to link against
+#		lib
+#		lib/x86
+#		lib64
+#		lib/x64
+#	DOC
+#		"The SDL2 library"
+#)
 
 set(SDL2_BUILDING_LIBRARY "true")
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/dependencies)
@@ -108,20 +108,18 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/dependencies)
 # TODO: possible on Windows and Mac OS?
 # if ( SDL2_INCLUDE_DIRS STREQUAL "SDL2_INCLUDE_DIRS-NOTFOUND" )
 	find_package(SDL2 REQUIRED)
-	string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
-        MESSAGE(STATUS "${SDL_INCLUDE_DIR}")
-	set(SDL_INCLUDE_DIRS ${SDL2_INCLUDE_DIR})
+	#string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
 # endif ( SDL2_INCLUDE_DIRS STREQUAL "SDL2_INCLUDE_DIRS-NOTFOUND" )
 
 # Check if we found it!
-IF ( SDL2_INCLUDE_DIRS AND SDL2_LIBRARIES )
+IF ( SDL2_INCLUDE_DIR AND SDL2_LIBRARY )
 	SET( SDL2_FOUND true )
 	MESSAGE(STATUS "Looking for SDL2 - found")
-ELSE ( SDL2_INCLUDE_DIRS AND SDL2_LIBRARIES  )
+ELSE ( SDL2_INCLUDE_DIR AND SDL2_LIBRARY  )
 	SET( SDL2_FOUND false )
-	MESSAGE(STATUS "Looking for SDL2 includes - ${SDL2_INCLUDE_DIRS}")
-	MESSAGE(STATUS "Looking for SDL2 library  - ${SDL2_LIBRARIES}")
-ENDIF ( SDL2_INCLUDE_DIRS AND SDL2_LIBRARIES )
+	MESSAGE(STATUS "Looking for SDL2 includes - ${SDL2_INCLUDE_DIR}")
+	MESSAGE(STATUS "Looking for SDL2 library  - ${SDL2_LIBRARY}")
+ENDIF ( SDL2_INCLUDE_DIR AND SDL2_LIBRARY )
 
 file(GLOB_RECURSE HDRS
 	include/*.h
@@ -136,7 +134,7 @@ file(GLOB_RECURSE SRCS
 
 include_directories(
 	include
-	${SDL2_INCLUDE_DIRS}
+	${SDL2_INCLUDE_DIR}
 )
 
 # configure a header file to pass some of the CMake settings
@@ -157,7 +155,7 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin )
 
 add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDRS})
 
-target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY})
 
 #set(CMAKE_LIBRARY_OUTPUT_DIRECTORY lib)
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
