@@ -101,7 +101,7 @@ FIND_LIBRARY( SDL2_LIBRARIES
 		"The SDL2 library"
 )
 
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/dependencies)
 
 # Linux using "/usr/lib/i386-linux-gnu/cmake/SDL2/sdl2-config.cmake"
 # TODO: possible on Windows and Mac OS?
