@@ -64,52 +64,10 @@ ENDIF ( LOGGING_ENABLED )
 # Set up SDL2 dependency stuff
 #
 
-# SDL2 include headers
-#FIND_PATH( SDL2_INCLUDE_DIRS
-#	NAMES
-#		SDL.h
-#	PATHS
-#		# TODO: find path recursively instead of per version number
-#		dependencies/SDL2/include/
-#		# Mac OS (when using Homebrew)
-#       /usr/local/opt/sdl2/include/SDL2
-#	# Linux (when using apt)
-#	/usr/inculde/SDL2/
-#	DOC
-#		"The directory where SDL.h resides"
-#)
-
-# SDL2 development library
-#FIND_LIBRARY( SDL2_LIBRARIES
-#	NAMES
-#		SDL2 SDL2main
-#	PATHS
-#		# TODO: find path recursively instead of per version number
-#		dependencies/SDL2/
-#		# Mac OS (when using Homebrew)
-#	/usr/local/opt/sdl2/lib
-#	# Linux (when using apt)
-#	/usr/bin/
-#	/usr/share/
-#	PATH_SUFFIXES
-#	# TODO: detect architecture to link against
-#		lib
-#		lib/x86
-#		lib64
-#		lib/x64
-#	DOC
-#		"The SDL2 library"
-#)
-
-set(SDL2_BUILDING_LIBRARY "true")
+#set(SDL2_BUILDING_LIBRARY "true")
+set(SDL2_CUSTOM_SEARCH_PATH "dependencies/SDL2/")
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/dependencies)
-
-# Linux using "/usr/lib/i386-linux-gnu/cmake/SDL2/sdl2-config.cmake"
-# TODO: possible on Windows and Mac OS?
-# if ( SDL2_INCLUDE_DIRS STREQUAL "SDL2_INCLUDE_DIRS-NOTFOUND" )
-	find_package(SDL2 REQUIRED)
-	#string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
-# endif ( SDL2_INCLUDE_DIRS STREQUAL "SDL2_INCLUDE_DIRS-NOTFOUND" )
+find_package(SDL2 REQUIRED)
 
 # Check if we found it!
 IF ( SDL2_INCLUDE_DIR AND SDL2_LIBRARY )
