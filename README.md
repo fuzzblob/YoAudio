@@ -1,6 +1,6 @@
 ![image: fox with headphones](misc/fox_small.png)
 
-# YoAudio
+# YoAudio [![Build Status](https://travis-ci.org/fuzzblob/YoAudio.svg?branch=master)](https://travis-ci.org/fuzzblob/YoAudio)
 
 - [About](#about)
 - [Overview](#overview)
