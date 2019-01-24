@@ -1,6 +1,7 @@
 ![image: fox with headphones](misc/fox_small.png)
 
-# YoAudio [![Build Status](https://travis-ci.org/fuzzblob/YoAudio.svg?branch=master)](https://travis-ci.org/fuzzblob/YoAudio)
+# YoAudio
+[![Build Status](https://travis-ci.org/fuzzblob/YoAudio.svg?branch=master)](https://travis-ci.org/fuzzblob/YoAudio)  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 - [About](#about)
 - [Overview](#overview)
