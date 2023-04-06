@@ -9,7 +9,16 @@ std::shared_ptr<Sample> ResourceManager::GetSound(const std::string & filename)
 	if (assetPath.size() == 0) {
 		auto sdl_path = SDL_GetBasePath();
 		assetPath = std::string(sdl_path);
+
+		// TODO: change slash dependent on platform
+#if YOA_PLATFORM == YOA_UNIX || YOA_PLATFORM == YOA_MAC
 		assetPath.append("assets/");
+#elif YOA_PLATFORM == YOA_WINDOWS
+		assetPath.append("assets\\");
+#else
+#error audio backend for this platform currently not implemented
+#endif
+
 		SDL_free(sdl_path);
 	}
 	// return if file is loaded
