@@ -105,7 +105,7 @@ if you want a quick and easy sandbox to test stuff in clone the [YoAudio Editor]
 ### Dependencies <a name="dependencies"></a>
 
 - An installation of [CMake 3.5 or newer](https://cmake.org/)
-- Simple DirectMedia Layer [download SDL Development Libraries 2.0.x (stable)](http://libsdl.org/download-2.0.php)
+- Simple DirectMedia Layer [download SDL Development Libraries 2.0.x (stable)](https://github.com/libsdl-org/SDL/releases)
 	- SDL2 is being used as the audio rendering backend (potentially others will be added later)
 - **[submodule]** YoAudio is using [sdplog](https://github.com/gabime/spdlog) for printing to the console (not included in Release builds). It is an optional **git submodule**.
 
