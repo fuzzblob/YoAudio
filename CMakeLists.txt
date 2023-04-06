@@ -39,7 +39,7 @@ FIND_LIBRARY( SDL2_LIBRARIES
 	PATHS
 		${SDL2_SEARCH_PATHS}
 	PATH_SUFFIXES
-		lib/x86
+		lib/x64
 	DOC
 		"The SDL2 library"
 )
@@ -51,7 +51,7 @@ FIND_PATH( SDL2_BINARIES
 	PATHS
 		${SDL2_SEARCH_PATHS}
 	PATH_SUFFIXES
-		lib/x86
+		lib/x64
 	DOC
 		"The SDL2 binary"
 )
