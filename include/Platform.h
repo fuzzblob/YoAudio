@@ -14,9 +14,17 @@
 #elif defined( __APPLE__ )
 #define YOA_PLATFORM YOA_MAC
 // TODO: implement CoreAudio
-#else
+#elif defined( __linux__ ) // linux
 // unix OSes should use SDL - https://www.libsdl.org/
-#define YOA_PLATFORM YOA_SDL
+#define YOA_PLATFORM YOA_UNIX
+#elif defined( __unix__ ) // all unices not caught above
+// unix OSes should use SDL - https://www.libsdl.org/
+#define YOA_PLATFORM YOA_UNIX
+#elif defined(_POSIX_VERSION) // POSIX
+// unix OSes should use SDL - https://www.libsdl.org/
+#define YOA_PLATFORM YOA_UNIX
+#else
+#error Platform detection error!
 #endif
 
 // switching audio rendering backends
