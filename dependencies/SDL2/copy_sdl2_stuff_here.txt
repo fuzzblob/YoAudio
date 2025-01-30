@@ -1,0 +1,2 @@
+for windows, drop your SDL2 .dll files in this folder
+for linux install the devl libraries (e.g. 'apt install libsdl2-dev' on debian)

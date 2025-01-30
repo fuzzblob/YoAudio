@@ -111,7 +111,7 @@ if you want a quick and easy sandbox to test stuff in clone the [YoAudio Editor]
 
 **On Submodules:**
 
-YoAudio uses a git feature called submoculed to tie in other git repositories as libraries. If you don't want to or can't use them, you will have to make the dependencies work by hand (adding files to `dependencies/` and possibly editing *CMakeLists.txt*). This can be finicky as the *CMake* scripts require specific folder locations- 
+YoAudio uses a git feature called submoculed to tie in other git repositories as libraries. If you don't want to or can't use them, you will have to make the dependencies work by hand (adding files to `dependencies/` and possibly editing *CMakeLists.txt*). This can be finicky as the *CMake* scripts require specific folder locations-
 
 To clone the repository with submodules paste the following command in your terminal
 
@@ -127,7 +127,8 @@ Alternatively use a git client that supports git submodules like [Tortoise Git](
 At the moment the build process has only ever been tested on Windows with Microsoft Visual Studio 2017 Community Edition. Follow these steps to generate a Visual Studio project:
 
 - clone the repository: `git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git`
-- download the [SDL2](http://libsdl.org/download-2.0.php) Development Libraries 2.0.x (stable) and extract the `include` and `lib` folders to `dependencies/SDL2`
+- download the [SDL2](https://github.com/libsdl-org/SDL/releases/tag/release-2.30.11) Development Libraries zip file labeled VC and extract the `include` and `lib` folders to `./dependencies/SDL2`
+- install CMAKE
 - create & run a build script targeting your tool chain or IDE (an example is provided for Visual Studio 2017 `build_Windows_VisualStudio2017.bat`)
 - build
 - the output will be built to `/bin/DEBUG`
@@ -136,15 +137,17 @@ At the moment the build process has only ever been tested on Windows with Micros
 
 ### Building on Linux <a name="linux"></a>
 
+- install build essetials (e.g. on Debian run '''apt install build-essential''' bringing in libc-dev, gcc, g++, make)
 - install SDL2:
     - Arch: pacman -S sdl2
     - Debian: apt-get install sdl2 or apt-get install libsdl2-2.0-0 or apt-get install libsdl2-dev
     - Fedora: dnf install SDL2-devel
     - Gentoo: emerge media-libs/libsdl2
 - clone the repository: `git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git`
+- install CMAKE
 - create & run a build script targeting your tool chain or IDE (an example is provided for CodeLite IDE `build_Linux_CodeLite.sh`)
 - build
-- the output will be built to `/lib/` as **libYoAudio.so**
+- the output will be built to `./lib/` as **libYoAudio.so**
 
 ### Building on Mac OS <a name="macos"></a>
 
