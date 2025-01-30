@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <map>
+#include <string>
 
 #include "Sample.h"
 
