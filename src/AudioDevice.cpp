@@ -33,13 +33,15 @@ SampleFormat AudioDevice::ConvertFormat(const SDL_AudioSpec& spec) noexcept {
 		case 8:
 			if (SDL_AUDIO_ISSIGNED(spec.format) == false)
 				return YOA_Format_Uint8;
-			return YOA_Format_Unknown;
+			[[fallthrough]];
 		case 16:
 			if (SDL_AUDIO_ISSIGNED(spec.format))
 				return YOA_Format_Sint16;
+			[[fallthrough]];
 		case 32:
 			if (SDL_AUDIO_ISSIGNED(spec.format))
 				return YOA_Format_Sint32;
+			[[fallthrough]];
 		default:
 			return YOA_Format_Unknown;
 		}

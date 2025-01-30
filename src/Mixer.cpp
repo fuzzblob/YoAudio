@@ -6,6 +6,7 @@
 #include "AudioThread.h"
 #include "AudioFormat.h"
 #include "Log.h"
+#include "Utility.h"
 
 Mixer::Mixer() noexcept
 {
@@ -202,7 +203,7 @@ void Mixer::FillBuffer()
 			if (voice->IsLooping == false) {
 				// if not looping, will we run out of samples?
 				const uint32_t samplesRemaining = uint32_t(voice->GetSamplesRemaining() / pitch);
-				if (samplesRemaining >= 0 && samplesRemaining < length)
+				if (samplesRemaining > 0 && samplesRemaining < length)
 					length = samplesRemaining;
 			}
 			if (voice->State == Stopping) {
@@ -282,6 +283,7 @@ void Mixer::FillBuffer()
 
 inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
 {
+    UNUSED(len);
 	Mixer* mixer = (Mixer*)userdata;
 	// render to mixing buffer
 	mixer->FillBuffer();
