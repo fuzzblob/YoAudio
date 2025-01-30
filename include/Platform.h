@@ -42,6 +42,7 @@
 #include <SDL.h>
 #else
 #undef YOA_RENDERER
+#error SDL rendering set but SDL not found!
 #endif
 #else
 #error audio backend for this platform currently not implemented
