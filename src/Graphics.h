@@ -1,22 +1,29 @@
 #ifndef _GRAPHICS_H
 #define _GRAPHICS_H
 
-#include <SDL.h>
+#include "SDLopenGL.h"
 #include <stdio.h>
 #include <string>
+#include <memory>
 
 class Graphics
 {
 private:
-	SDL_Window* mWindow;
-	SDL_GLContext mGlContext;
+	std::unique_ptr<SDLopenGL> mImplementation;
 public:
-	const int ScreenWidth = 1280;
-	const int ScreenHeight = 720;
+	SDL_Window* GetWindow() noexcept {
+		return mImplementation->GetWindow(); 
+	};
+	Graphics() noexcept
+	{
+		mImplementation = std::make_unique<SDLopenGL>();
+	};
+	~Graphics() { mImplementation = nullptr; };
 
-	SDL_Window* GetWindow() noexcept;
-	Graphics() noexcept;
-	~Graphics();
+	void StartFrame() { mImplementation->StartFrame(); };
+	void EndFrame() { mImplementation->EndFrame(); };
+	bool ProcessEvent(SDL_Event* event)
+	{ return mImplementation->ProcessEvent(event); };
 };
 
 #endif // !_GRAPHICS_H

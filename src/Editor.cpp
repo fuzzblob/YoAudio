@@ -1,7 +1,7 @@
 #include "Editor.h"
 #include "InputManager.h"
 #include "GUI.h"
-#include "imgui\imgui.h"
+#include "imgui.h"
 
 #include "YoAudio.h"
 
@@ -66,7 +66,7 @@ void Editor::App()
 		ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f);
 		const bool volChanged = ImGui::Button("Update Volume");
 
-		ImGui::InputFloat("Pitch", &pitch, 0.01f, 0.1f, 2);
+		ImGui::InputFloat("Pitch", &pitch, 0.01f, 0.1f);
 		if (pitch > 4.0f)
 			pitch = 4.0f;
 		if (pitch < 0.01f)

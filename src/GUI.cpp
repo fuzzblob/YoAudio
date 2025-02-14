@@ -1,48 +1,5 @@
 #include "GUI.h"
-#include "imgui\GL\imgui_impl_sdl_gl3.h"
-#include "imgui\GL\gl3w.h"
-
-Gui::Gui() noexcept 
-{
-	mGraphics = std::make_unique<Graphics>();
-	mWindow = mGraphics->GetWindow();
-}
-
-Gui::~Gui()
-{
-	mGraphics = nullptr;
-	mWindow = nullptr;
-}
-
-void Gui::StartFrame()
-{
-	ImGui_ImplSdlGL3_NewFrame(mWindow);
-}
-
-void Gui::EndFrame()
-{
-	// Rendering
-	
-	glViewport
-	(
-		0, 
-		0, 
-		int(ImGui::GetIO().DisplaySize.x),
-		int(ImGui::GetIO().DisplaySize.y)
-	);
-	
-	glClearColor
-	(
-		clear_color.x, 
-		clear_color.y, 
-		clear_color.z, 
-		clear_color.w
-	);
-	
-	glClear(GL_COLOR_BUFFER_BIT);
-	ImGui::Render();
-	SDL_GL_SwapWindow(mWindow);
-}
+#include "imgui_impl_sdl2.h"
 
 void Gui::DemoFrame()
 {
@@ -66,9 +23,4 @@ void Gui::DemoFrame()
 	}
 
 	EndFrame();
-}
-
-bool Gui::ProcessEvent(SDL_Event * event)
-{
-	return ImGui_ImplSdlGL3_ProcessEvent(event);
 }

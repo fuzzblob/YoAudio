@@ -4,7 +4,7 @@
 #include <memory>
 #include <SDL.h>
 #include "Graphics.h"
-#include "imgui\imgui.h"
+#include "imgui.h"
 
 class Gui
 {
@@ -13,14 +13,24 @@ private:
 	std::unique_ptr<Graphics> mGraphics;
 	SDL_Window* mWindow;
 public:
-	Gui() noexcept;
-	~Gui();
+	Gui() noexcept
+	{
+		mGraphics = std::make_unique<Graphics>();
+		mWindow = mGraphics->GetWindow();
+	};
+	~Gui()
+	{
+		mGraphics = nullptr;
+		mWindow = nullptr;
+	};
 
-	void StartFrame();
-	void EndFrame();
 	void DemoFrame();
-
-	bool ProcessEvent(SDL_Event* event);
+	bool ProcessEvent(SDL_Event* event)
+	{
+		return mGraphics->ProcessEvent(event);
+	};
+	void StartFrame() { mGraphics->StartFrame(); };
+	void EndFrame() { mGraphics->EndFrame(); };
 };
 
 #endif // !_GUI_H
