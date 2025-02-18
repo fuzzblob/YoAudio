@@ -1,3 +1,6 @@
 [submodule "engine/dependencies/spdlog"]
 	path = engine/dependencies/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "editor"]
+	path = editor
+	url = git@github.com:fuzzblob/YoAudioEditor.git
