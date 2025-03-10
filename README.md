@@ -126,11 +126,12 @@ Alternatively use a git client that supports git submodules like [Tortoise Git](
 
 At the moment the build process has only ever been tested on Windows with Microsoft Visual Studio 2017 Community Edition. Follow these steps to generate a Visual Studio project:
 
+- install Visual Studio (17 2022 recommended) including MSVC compiler and Windows SDK
 - clone the repository: `git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git`
-- download the [SDL2](https://github.com/libsdl-org/SDL/releases/tag/release-2.30.11) Development Libraries zip file labeled VC and extract the `include` and `lib` folders to `./dependencies/SDL2`
-- install CMAKE
+- download the [SDL2 Development Libraries](https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip) (zip file labeled **"SDL2-devel-2.XX.X-VC"**) and extract the `include` and `lib` folders to `./dependencies/SDL2`
+- install [CMAKE](https://cmake.org/download/) (Version 3.5 or newer)
 - create & run a build script targeting your tool chain or IDE (an example is provided for Visual Studio 2017 `build_Windows_VisualStudio2017.bat`)
-- build
+- open the created solution / project file ("YoAudio.sln") from the "build" folder and build the code (`Ctrl + Shift + B`)
 - the output will be built to `/bin/DEBUG`
 	- YoAudio.dll (runtime)
 	- YoAudio.pbd (debug symbols))

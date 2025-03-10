@@ -1,2 +1,5 @@
 for windows, drop your SDL2 .dll files in this folder
+it's also possible to extract cmake, docs, include and lib folders etc here.
+just don't extract the full SDL2.X folder containing these.
+
 for linux install the devl libraries (e.g. 'apt install libsdl2-dev' on debian)
