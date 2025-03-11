@@ -1,13 +1,15 @@
 #pragma once
 
 #include "YoaConfig.h"
+#include <cassert>
 
-#define YOA_ASSERT(x, ...) if (!(x)) { YOA_CRITICAL("Assertion Failed! \n", __VA_ARGS__); } // no backslash
-/*
-#if YOA_PLATFORM == YOA_WINDOWS
-__debugbreak(); \
-#endif
-*/
+#define YOA_ASSERT(x, ...) assert(x);
+//#define YOA_ASSERT(x, ...) if (!(x)) { YOA_CRITICAL("Assertion Failed! \n", __VA_ARGS__); } // no backslash
+//#if YOA_PLATFORM == YOA_WINDOWS
+//__debugbreak(); \
+//#endif
+
+
 
 #if LOGGING_ENABLED
 #include "spdlog/spdlog.h"
@@ -28,6 +30,7 @@ private:
 #define YOA_ERROR(...)			::Log::GetCoreLogger()->error(__VA_ARGS__)
 #define YOA_CRITICAL(...)	    ::Log::GetCoreLogger()->critical(__VA_ARGS__)
 #else
+#include <stdio.h>
 // logging disabled (maybe the sdplog library was not found?)
 // only errors and critical messages will be printed (and only the first argument :P)
 #define YOA_TRACE(...)
