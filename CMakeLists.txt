@@ -46,18 +46,14 @@ IF ( LOGGING_ENABLED )
 	set( SPDLOG_INCLUDE_DIRS engine/dependencies/spdlog/include )
 	# Check if we found it!
 	IF ( SPDLOG_INCLUDE_DIRS )
-		SET( LOGGING_ENABLED true )
+		SET (SPDLOG_FOUND true)
 		MESSAGE(STATUS "Looking for sdpLog - found")
-		include_directories(
-			include
-			${SPDLOG_INCLUDE_DIRS}
-		)
 	ELSE ( SPDLOG_INCLUDE_DIRS )
-		SET( LOGGING_ENABLED false )
+		SET (SPDLOG_FOUND false)
 		MESSAGE(STATUS "Looking for sdpLog - not found")
 	ENDIF ( SPDLOG_INCLUDE_DIRS )
 ELSE ( LOGGING_ENABLED )
-	SET( LOGGING_ENABLED false )
+	SET (SPDLOG_FOUND false)
 	MESSAGE(STATUS "disabled sdpLog")
 ENDIF ( LOGGING_ENABLED )
 
@@ -96,6 +92,11 @@ include_directories(
 	engine/include
 	${SDL2_INCLUDE_DIR}
 )
+if ( SPDLOG_FOUND )
+	include_directories(
+		${SPDLOG_INCLUDE_DIRS}
+	)
+endif ( SPDLOG_FOUND )
 
 # configure a header file to pass some of the CMake settings
 # to the source code

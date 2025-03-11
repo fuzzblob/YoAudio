@@ -7,6 +7,7 @@
 // version number set through CMake prejoect build process
 #define YOA_VERSION_MAJOR @YOA_VERSION_MAJOR@
 #define YOA_VERSION_MINOR @YOA_VERSION_MINOR@
+#define YOA_VERSION_PATCH @YOA_VERSION_PATCH@
 
 // toggle certain features of YoAudio
 #define SDL2_FOUND @SDL2_FOUND@
@@ -15,7 +16,12 @@
 #endif
 
 #ifdef _DEBUG
-#define LOGGING_ENABLED @LOGGING_ENABLED@
+#define SPDLOG_FOUND @SPDLOG_FOUND@
+#if SPDLOG_FOUND
+#define LOGGING_ENABLED true
+#else
+#define LOGGING_ENABLED false
+#endif
 #else
 #define LOGGING_ENABLED false
 #endif
