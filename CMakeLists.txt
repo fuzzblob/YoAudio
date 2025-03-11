@@ -96,7 +96,7 @@ file(GLOB_RECURSE SRCS
 )
 
 include_directories(
-	engine/include
+	${PROJECT_SOURCE_DIR}/engine/include
 	${SDL2_INCLUDE_DIR}
 )
 if ( SPDLOG_FOUND )
@@ -124,11 +124,7 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin )
 add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDRS})
 
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY})
-	
-#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY bin)
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 
 if (MSVC)
     set_property(DIRECTORY ${PROJ_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-endif(MSVC)
-
+endif (MSVC)
