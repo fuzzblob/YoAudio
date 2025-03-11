@@ -3,6 +3,7 @@
 #include "YoaConfig.h"
 #include "Platform.h"
 #include "AudioFormat.h"
+#include <string>
 
 // 0                                    No changes
 // SDL_AUDIO_ALLOW_FREQUENCY_CHANGE     frequency changes (e.g. AUDIO_FREQUENCY = 48000, but allow files to play at 44.100)
@@ -47,4 +48,5 @@ private:
 	// is the audio device paused
 	bool mPaused = true;
 	SDL_AudioDeviceID DeviceID;
+	std::string DeviceName;
 };
