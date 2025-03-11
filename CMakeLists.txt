@@ -8,9 +8,16 @@ set (YOA_VERSION_PATCH 0)
 
 message(STATUS "Now building the project for ${PROJECT_NAME} version ${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSION_PATCH}")
 
+# specify UTF8 support
+set(CMAKE_CXX_FLAGS "/utf-8")
+set(CMAKE_C_FLAGS "/utf-8")
+
 # set CMAKE_BUILD_TYPE if empty
 # for differentiation between debug and release builds.
 if(MSVC)
+  add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
   # Force to always compile with W4
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
