@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5...3.31)
 # The version number.
 set (YOA_VERSION_MAJOR 0)
-set (YOA_VERSION_MINOR 0)
+set (YOA_VERSION_MINOR 1)
 set (YOA_VERSION_PATCH 0)
 project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSION_PATCH}" DESCRIPTION "YoAudio Meta project")
 
