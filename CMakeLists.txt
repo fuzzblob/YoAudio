@@ -1,6 +1,5 @@
 # set project name
-project(YoAudio_Editor)
-message(STATUS "Now building the project for ${PROJECT_NAME} version ${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSION_PATCH}")
+project("YoAudio-Editor" VERSION ${PROJECT_VERSION})
 
 message(STATUS "###################################################################################################################")
 message(STATUS "")
