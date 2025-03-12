@@ -2,125 +2,26 @@
 project(YoAudio_Editor)
 message(STATUS "Now building the project for ${PROJECT_NAME} version ${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSION_PATCH}")
 
-#
-# Set up YoAudio dependency stuff
-#
-set(YOA_SEARCH_PATHS ../engine/)
-
-# YOA include
-FIND_PATH( YOA_INCLUDE_DIR
-	NAMES
-		YoAudio.h
-	PATHS
-		${YOA_SEARCH_PATHS}
-	PATH_SUFFIXES
-		include
-	DOC
-		"The directory where YoAudio.h resides"
-)
-
-# YOA binaries
-if(MSVC)
-    FIND_PATH( YOA_LIBRARIES
-	    NAMES
-		    YoAudio.dll
-	    PATHS
-		    ${YOA_SEARCH_PATHS} ..
-	    PATH_SUFFIXES
-		    bin/Debug
-			bin/Release
-			bin
-	    DOC
-		    "The YoAudio.dll file"
-    )
-elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    FIND_PATH( YOA_LIBRARIES
-	    NAMES
-            libYoAudio.so
-	    PATHS
-		    ${YOA_SEARCH_PATHS}..
-	    PATH_SUFFIXES
-		    bin
-	    DOC
-		    "The libYoAudio.so file"
-    )
-endif()
-
-# Check if we found it!
-IF ( YOA_INCLUDE_DIR AND YOA_LIBRARIES )
-	SET( YOA_FOUND TRUE )
-	MESSAGE(STATUS "Looking for YoAudio - found")
-ELSE ( YOA_INCLUDE_DIR AND YOA_LIBRARIES )
-	SET( YOA_FOUND FALSE )
-	MESSAGE(STATUS "Looking for YoAudio - not found" )
-	MESSAGE(STATUS "Looking for YoAudio (includes) at path: " ${} )
-	MESSAGE(STATUS "Looking for YoAudio (library) at path: " ${YOA_LIBRARIES} )
-ENDIF ( YOA_INCLUDE_DIR AND YOA_LIBRARIES )
-
-IF( YOA_FOUND )
-	message("-- Linking YoAudio lib")
-	if(MSVC)
-		add_library(YoAudio_lib ${YOA_LIBRARIES}/YoAudio.dll)
-	else()
-		add_library(YoAudio_lib ${YOA_LIBRARIES}/libYoAudio.so)
-	endif()
-	set_target_properties(YoAudio_lib PROPERTIES LINKER_LANGUAGE C)
-ENDIF()
+message(STATUS "###################################################################################################################")
+message(STATUS "")
+message(STATUS "Now building the project for ${PROJECT_NAME} version ${PROJECT_VERSION}")
+message(STATUS "")
+message(STATUS "###################################################################################################################")
 
 #
-# Set up imgui dependency stuff
+# handle dependencies
 #
-set(GUI_SEARCH_PATHS dependencies )
+include(dependencies/YoAudio.cmake)
+include(dependencies/imgui.cmake)
+# find OpenGL for rendering pixels to the screen
+find_package(OpenGL REQUIRED)
 
-# imgui include
-FIND_PATH( GUI_INCLUDE_DIRS
-	NAMES
-    	imgui.h
-	PATHS
-		${GUI_SEARCH_PATHS}
-    PATH_SUFFIXES
-		imgui
-	DOC
-		"The directory where imgui.h resides"
-)
-
-# Check if we found it!
-IF ( GUI_INCLUDE_DIRS )
-	SET( GUI_FOUND TRUE )
-	MESSAGE(STATUS "Looking for imgui.h - found")
-ELSE ( GUI_INCLUDE_DIRS )
-	SET( GUI_FOUND FALSE )
-	MESSAGE(STATUS "Looking for imgui.h in ${GUI_SEARCH_PATHS} - not found")
-ENDIF ( GUI_INCLUDE_DIRS )
-
-# gui impl include
-FIND_PATH( GUIIMPL_INCLUDE_DIRS
-	NAMES
-        imgui_impl_sdl2.h   
-	PATHS
-		${GUI_SEARCH_PATHS}
-	PATH_SUFFIXES
-		imgui/backends
-	DOC
-		"The directory where imgui_impl_sdl2.h resides"
-)
-
-# Check if we found it!
-IF ( GUIIMPL_INCLUDE_DIRS )
-	SET( GUI_FOUND TRUE )
-	MESSAGE(STATUS "Looking for imgui_impl_sdl2.h - found")
-ELSE ( GUIIMPL_INCLUDE_DIRS )
-	SET( GUI_FOUND FALSE )
-	MESSAGE(STATUS "Looking for imgui_impl_sdl2.h - not found")
-ENDIF ( GUIIMPL_INCLUDE_DIRS )
- 
 #
 # input files for this project
 #
 file(GLOB_RECURSE HDRS
 	src/*.h
 	src/*.hpp
-    dependencies/imgui/*.h
 )
 
 file(GLOB_RECURSE SRCS
@@ -133,17 +34,43 @@ include_directories(
 	${SDL2_INCLUDE_DIR}
 	${YOA_INCLUDE_DIR}
     ${GUI_INCLUDE_DIRS}
+    # ${GUI_INCLUDE_DIRS}/backends
     ${GUIIMPL_INCLUDE_DIRS}
 )
 
-add_executable(${PROJECT_NAME} ${SRCS} ${HDRS})
+add_executable(${PROJECT_NAME} ${SRCS} ${HDRS} ${IMGUI_SOURCES})
+#target_include_directories(${PROJECT_NAME} PRIVATE  ${GUI_INCLUDE_DIRS} ${GUIIMPL_INCLUDE_DIRS})  # Include the IMGUI headers
+target_link_libraries(${PROJECT_NAME} OpenGL::GL ${SDL2_LIBRARY} )
 
-target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY} ${YoAudio_lib})
+
+# The modern CMake version that doesn't add the -I and -L flags to every compiler invocation would be to use imported libraries:
+# add_library("YoAudio-Engine" SHARED IMPORTED) # or STATIC instead of SHARED
+if(MSVC)
+	#link_directories( ${YOA_LIB})
+	set_target_properties("YoAudio-Engine" PROPERTIES
+	  IMPORTED_LOCATION "${YOA_LIB}/YoAudio-Engine.lib"
+	  INTERFACE_INCLUDE_DIRECTORIES "${YOA_INCLUDE_DIR}"
+	)
+else()
+	#link_directories(${YOA_SO})
+	set_target_properties("YoAudio-Engine" PROPERTIES
+	  IMPORTED_LOCATION "${YOA_SO}/YoAudio-Engine.so"
+	  INTERFACE_INCLUDE_DIRECTORIES "${YOA_INCLUDE_DIR}"
+	)
+endif()
+target_link_libraries(${PROJECT_NAME} "YoAudio-Engine") # also adds the required include path
+# If setting the INTERFACE_INCLUDE_DIRECTORIES doesn't add the path, older versions of CMake also allow you to use target_include_directories(bar PUBLIC /path/to/include). However, this no longer works with CMake 3.6 or newer.
+
+# The simplest way of doing this would be to add
+# include_directories(${YOA_INCLUDE_DIR})
+
+# add_executable(${PROJECT_NAME} ${FOO_SRCS})
+# target_link_libraries(${PROJECT_NAME} bar) # libbar.so is found in ${CMAKE_SOURCE_DIR}/lib
+
+
 
 if(MSVC)
-	if(NOT BUILD_LIBRARY)
-		set_property(DIRECTORY ${PROJ_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-	endif()
+	target_compile_definitions(${PROJECT_NAME} PRIVATE BUILD_DLL=false)
 	
     # add_custom_command(
         # TARGET ${PROJECT_NAME}
@@ -153,12 +80,12 @@ if(MSVC)
     # add_custom_command(
         # TARGET ${PROJECT_NAME}
         # PRE_BUILD
-        # COMMAND ${CMAKE_COMMAND} -E copy_if_different "${YOA_LIBRARIES}/YoAudio.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+        # COMMAND ${CMAKE_COMMAND} -E copy_if_different "${YOA_BINARIES}/YoAudio.dll" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
     # add_custom_command(
         # TARGET ${PROJECT_NAME}
         # PRE_BUILD
-        # COMMAND ${CMAKE_COMMAND} -E copy_if_different "${YOA_LIBRARIES}/YoAudio.pdb" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+        # COMMAND ${CMAKE_COMMAND} -E copy_if_different "${YOA_BINARIES}/YoAudio.pdb" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
     # add_custom_command(
 	    # TARGET ${PROJECT_NAME}
@@ -171,3 +98,5 @@ elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 #	    PRE_BUILD
 #        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets )
 endif()
+
+MESSAGE("YoAudio Editor CMakeLists.txt end")
