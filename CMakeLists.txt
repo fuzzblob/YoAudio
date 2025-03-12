@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.5...3.31)
-# set project name
-project(YoAudio)
 # The version number.
 set (YOA_VERSION_MAJOR 0)
 set (YOA_VERSION_MINOR 0)
 set (YOA_VERSION_PATCH 0)
+project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSION_PATCH}" DESCRIPTION "YoAudio Meta project")
+
 
 ##########################
 #
@@ -17,7 +17,11 @@ option(BUILD_EDITOR "Enable building editor" ON)
 # should we allow logging?
 option (LOGGING_ENABLED "enable logging" ON) 
 
-message(STATUS "Now building the project for ${PROJECT_NAME} version ${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSION_PATCH}")
+message(STATUS "###################################################################################################################")
+message(STATUS "")
+message(STATUS "Now building the project for ${PROJECT_NAME} version ${PROJECT_VERSION}")
+message(STATUS "")
+message(STATUS "###################################################################################################################")
 
 ##########################
 #
@@ -83,9 +87,14 @@ ELSE ( SDL2_INCLUDE_DIR AND SDL2_LIBRARY  )
 	MESSAGE(STATUS "Looking for SDL2 library at path: ${SDL2_LIBRARY}")
 ENDIF ( SDL2_INCLUDE_DIR AND SDL2_LIBRARY )
 
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJ_SOURCE_DIR}/bin )
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJ_SOURCE_DIR}/bin )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJ_SOURCE_DIR}/bin )
+
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin )
+
+# set_target_properties( ${YOA_LIB_NAME} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin )
+# set_target_properties( ${YOA_LIB_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin )
+# set_target_properties( ${YOA_LIB_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin )
 
 if(BUILD_LIBRARY)
     add_subdirectory(engine)
@@ -93,3 +102,5 @@ endif()
 if(BUILD_EDITOR)
     add_subdirectory(editor)
 endif()
+
+MESSAGE("YoAudio CMakeLists.txt end")
