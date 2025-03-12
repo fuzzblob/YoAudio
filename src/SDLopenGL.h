@@ -34,7 +34,9 @@ private:
 public:
 	SDLopenGL() noexcept;
 	~SDLopenGL();
-	SDL_Window* GetWindow() noexcept;
+	SDL_Window* GetWindow() noexcept {
+		return mWindow;
+	};
 
 	void StartFrame() { ImGui_ImplSDL2_NewFrame(); };
 	void EndFrame() {
