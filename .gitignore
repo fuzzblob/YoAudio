@@ -12,10 +12,14 @@ CTestTestfile.cmake
 
 # YoAudio
 
-/bin/*
-/lib/*
+engine/bin/*
+engine/lib/*
 /build/*
 Win32/
+
+# YoAudio Editor
+
+editor/bin/*
 
 # Visual Studio
 

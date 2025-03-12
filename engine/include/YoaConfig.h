@@ -16,7 +16,7 @@
 #endif
 
 #ifdef _DEBUG
-#define SPDLOG_FOUND true
+#define SPDLOG_FOUND false
 #if SPDLOG_FOUND
 #define LOGGING_ENABLED true
 #else
