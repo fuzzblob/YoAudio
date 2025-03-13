@@ -1,3 +1,6 @@
 [submodule "engine/dependencies/spdlog"]
 	path = engine/dependencies/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "editor/dependencies/imgui"]
+	path = editor/dependencies/imgui
+	url = https://github.com/ocornut/imgui
