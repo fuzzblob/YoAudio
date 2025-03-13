@@ -71,22 +71,18 @@ IF ( YOA_DLL OR YOA_LIB)
 	message("-- Linking YoAudio lib")
 	MESSAGE(STATUS "YoAudio DLL: ${YOA_DLL}")
 	MESSAGE(STATUS "YoAudio LIB: ${YOA_LIB}")
-	# add_library(YOA_LIBRARY 
-		# ${YOA_DLL}/YoAudio-Engine.dll 
-		# ${YOA_LIB}/YoAudio-Engine.lib
-	# )
 	link_directories(${YOA_LIB})
 	set_target_properties(${YOA_LIBRARY} PROPERTIES LINKER_LANGUAGE C)
-	# add_library(YOA_LIBRARY ${YOA_INCLUDE_DIR}/YoAudio.h ${YOA_LIB}/YoAudio-Engine.lib ${YOA_DLL}/YoAudio-Engine.dll)
 ELSEIF( YOA_SO )
 	message("-- Linking YoAudio lib")
 	MESSAGE(STATUS "YoAudio SO: ${YOA_SO}" )
-	# add_library(YOA_LIBRARY ${YOA_SO}/libYoAudio.so)
 	link_directories(${YOA_SO})
 ELSE ()
 	MESSAGE(STATUS "Looking for YoAudio binaries - not found" )
 ENDIF()
-
+#
+# print status
+#
 IF( YOA_FOUND )
 	message(STATUS "YoAudio Engine configured")
 ELSE()
