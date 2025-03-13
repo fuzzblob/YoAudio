@@ -3,8 +3,6 @@
 
 void Gui::DemoFrame()
 {
-	StartFrame();
-
 	// 1. Show a simple window.
 	// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
 	{
@@ -21,6 +19,4 @@ void Gui::DemoFrame()
 		bool show = true;
 		ImGui::ShowDemoWindow(&show);
 	}
-
-	EndFrame();
 }

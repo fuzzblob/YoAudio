@@ -11,10 +11,10 @@
 // - Introduction, links and more at the top of imgui.cpp
 
 #include "imgui.h"
-#include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
-#include <stdio.h>
+#include "imgui_impl_sdl2.h"
 #include <SDL.h>
+#include <stdio.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
 #else
@@ -38,7 +38,18 @@ public:
 		return mWindow;
 	};
 
-	void StartFrame() { ImGui_ImplSDL2_NewFrame(); };
+	void StartFrame(const SDL_Event* event) {
+		//ImGui_ImplSDL2_NewFrame();
+		// (Where your code calls SDL_PollEvent())
+		ImGui_ImplSDL2_ProcessEvent(event); // Forward your event to backend
+
+		// (After event loop)
+		// Start the Dear ImGui frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
+		ImGui::ShowDemoWindow(); // Show demo window! :)
+	};
 	void EndFrame() {
 		// Rendering
 		glViewport
@@ -66,6 +77,13 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
 		ImGui::Render();
 		SDL_GL_SwapWindow(mWindow);
+
+
+		// Rendering
+		// (Your code clears your framebuffer, renders your other stuff etc.)
+		//ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		// (Your code calls SDL_GL_SwapWindow() etc.)
 	};
 
 	bool ProcessEvent(SDL_Event* event) { return ImGui_ImplSDL2_ProcessEvent(event); };

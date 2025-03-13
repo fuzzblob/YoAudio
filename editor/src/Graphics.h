@@ -16,11 +16,19 @@ public:
 	};
 	Graphics() noexcept
 	{
+		// Setup Dear ImGui context
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
+
 		mImplementation = std::make_unique<SDLopenGL>();
 	};
 	~Graphics() { mImplementation = nullptr; };
 
-	void StartFrame() { mImplementation->StartFrame(); };
+	void StartFrame(const SDL_Event* event) { mImplementation->StartFrame(event); };
 	void EndFrame() { mImplementation->EndFrame(); };
 	bool ProcessEvent(SDL_Event* event)
 	{ return mImplementation->ProcessEvent(event); };

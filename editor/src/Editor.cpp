@@ -36,7 +36,7 @@ void Editor::Run()
 		
 		inputManager->Update();
 		// begin GUI
-		ui->StartFrame();
+		ui->StartFrame(&mEvents);
 		// main GUI
 		App();
 		// end GUI
@@ -54,7 +54,7 @@ void Editor::App()
 	bool bTrue = true;
 	{
 		//ImGui::Begin("Sound Caster", &bTrue);
-		//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
 		static float panning = 0.0f;
 		static float volume = 1.0f;
