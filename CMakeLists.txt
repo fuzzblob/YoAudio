@@ -13,7 +13,10 @@ project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSI
 ##########################
 
 option(BUILD_LIBRARY "Enable building library" ON)
+# option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 option(BUILD_EDITOR "Enable building editor" ON)
+option(STARTUP_IN_EDITOR "Startup in Editor Project" ON)
+
 # should we allow logging?
 option (LOGGING_ENABLED "enable logging" ON) 
 
@@ -87,20 +90,39 @@ ELSE ( SDL2_INCLUDE_DIR AND SDL2_LIBRARY  )
 	MESSAGE(STATUS "Looking for SDL2 library at path: ${SDL2_LIBRARY}")
 ENDIF ( SDL2_INCLUDE_DIR AND SDL2_LIBRARY )
 
-
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin )
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin )
 
-# set_target_properties( ${YOA_LIB_NAME} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin )
-# set_target_properties( ${YOA_LIB_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin )
-# set_target_properties( ${YOA_LIB_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin )
-
 if(BUILD_LIBRARY)
     add_subdirectory(engine)
+	set(STARTUP_PROJECT ${EGINE_NAME})
 endif()
+
 if(BUILD_EDITOR)
     add_subdirectory(editor)
+	if (${STARTUP_IN_EDITOR})
+		if(${EDITOR_NAME} STREQUAL "")
+			MESSAGE (STATUS "EDITOR_NAME seems unset. cant set startup project to Editor.")
+		else()
+			MESSAGE (STATUS "setting editor project (${EDITOR_NAME})...")
+			set(STARTUP_PROJECT ${EDITOR_NAME})
+		endif()
+	endif()
+endif()
+
+if(MSVC)
+	if(NOT ${STARTUP_PROJECT} STREQUAL "")
+		set(STARTUP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+		MESSAGE(STATUS "setting ${STARTUP_PROJECT} as startup project (${STARTUP_DIR})")
+		set_property(DIRECTORY ${STARTUP_DIR} PROPERTY VS_STARTUP_PROJECT ${STARTUP_PROJECT})
+		# set_property(DIRECTORY ${PROJ_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+		# set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+	else()
+		MESSAGE(STATUS "STARTUP_PROJECT (${STARTUP_PROJECT}) variable not set!")
+		MESSAGE(STATUS "( ${EDITOR_NAME} / ${ENGINE_NAME} )")
+		MESSAGE(STATUS "( ${PROJ_SOURCE_DIR} / ${CMAKE_CURRENT_SOURCE_DIR} )")
+	endif()
 endif()
 
 MESSAGE("YoAudio CMakeLists.txt end")

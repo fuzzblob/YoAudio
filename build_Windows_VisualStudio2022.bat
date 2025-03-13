@@ -8,6 +8,8 @@ rem call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\
 rem clear or make build directory 
 if exist build rmdir /S /Q build
 mkdir build
+rem clear or make bin directory 
+if exist bin rmdir /S /Q bin
 cd build
 
 set VS150COMNTOOLS = "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\"
