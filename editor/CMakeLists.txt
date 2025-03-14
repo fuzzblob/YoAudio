@@ -42,6 +42,7 @@ include_directories(
 # setup the executable
 #
 add_executable(${PROJECT_NAME} ${SRCS} ${HDRS} ${IMGUI_SOURCES})
+# set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD ${CXX_STANDARD})
 #
 # link extermal libraries
 #
@@ -49,13 +50,13 @@ target_link_libraries(${PROJECT_NAME} OpenGL::GL ${SDL2_LIBRARY} )
 # YoAudio platform specifics
 if(MSVC)
 	#link_directories( ${YOA_LIB})
-	set_target_properties("YoAudio-Engine" PROPERTIES
+	set_target_properties(${PROJECT_NAME} PROPERTIES
 	  IMPORTED_LOCATION "${YOA_LIB}/YoAudio-Engine.lib"
 	  INTERFACE_INCLUDE_DIRECTORIES "${YOA_INCLUDE_DIR}"
 	)
 else()
 	#link_directories(${YOA_SO})
-	set_target_properties("YoAudio-Engine" PROPERTIES
+	set_target_properties(${PROJECT_NAME} PROPERTIES
 	  IMPORTED_LOCATION "${YOA_SO}/YoAudio-Engine.so"
 	  INTERFACE_INCLUDE_DIRECTORIES "${YOA_INCLUDE_DIR}"
 	)

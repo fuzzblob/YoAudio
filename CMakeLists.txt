@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8...3.31)
 # The version number.
 set (YOA_VERSION_MAJOR 0)
-set (YOA_VERSION_MINOR 1)
+set (YOA_VERSION_MINOR 2)
 set (YOA_VERSION_PATCH 0)
 project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSION_PATCH}" DESCRIPTION "YoAudio Meta project")
 
@@ -39,6 +39,10 @@ message(STATUS "################################################################
 #		Compiler
 #
 ##########################
+
+# set C++17 standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # specify UTF8 support
 set(CMAKE_CXX_FLAGS "/utf-8")
@@ -124,12 +128,12 @@ if(MSVC)
 		set(STARTUP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 		MESSAGE(STATUS "setting ${STARTUP_PROJECT} as startup project (${STARTUP_DIR})")
 		set_property(DIRECTORY ${STARTUP_DIR} PROPERTY VS_STARTUP_PROJECT ${STARTUP_PROJECT})
-		# set_property(DIRECTORY ${PROJ_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-		# set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 	else()
 		MESSAGE(STATUS "STARTUP_PROJECT (${STARTUP_PROJECT}) variable not set!")
-		MESSAGE(STATUS "( ${EDITOR_NAME} / ${ENGINE_NAME} )")
-		MESSAGE(STATUS "( ${PROJ_SOURCE_DIR} / ${CMAKE_CURRENT_SOURCE_DIR} )")
+		MESSAGE(STATUS "editor project name: ${EDITOR_NAME}")
+		MESSAGE(STATUS "engine project name: ${ENGINE_NAME}")
+		MESSAGE(STATUS "PROJ_SOURCE_DIR: ${PROJ_SOURCE_DIR}")
+		MESSAGE(STATUS "CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 	endif()
 endif()
 
