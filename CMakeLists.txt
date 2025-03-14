@@ -39,32 +39,26 @@ message(STATUS "################################################################
 #		Compiler
 #
 ##########################
-
 # set C++17 standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 # specify UTF8 support
-set(CMAKE_CXX_FLAGS "/utf-8")
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "/utf-8")
 set(CMAKE_C_FLAGS "/utf-8")
-
-# set CMAKE_BUILD_TYPE if empty
-# for differentiation between debug and release builds.
 if(MSVC)
-  add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
-  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
-
-  # Force to always compile with W4
-  if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-    string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-  else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
-  endif()
+	# Microsoft Visual Studio specifics
+	add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+	add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+	# Force to always compile with W4
+	if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+		string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	else()
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+	endif()
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  # Update if necessary
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -Wpedantic -Wnon-virtual-dtor -pedantic -g -std=c++20")
+	# Update if necessary
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -Wpedantic -Wnon-virtual-dtor -pedantic -g -std=c++17")
 endif()
-
 # set CMAKE_BUILD_TYPE if empty
 # for differentiation between debug and release builds.
 if ( CMAKE_BUILD_TYPE STREQUAL "" )
@@ -76,17 +70,11 @@ if ( CMAKE_BUILD_TYPE STREQUAL "" )
 		FORCE
 	)
 endif ( CMAKE_BUILD_TYPE STREQUAL "" )
-
 ##########################
 #
 #	Dependencies
 #
 ##########################
-
-#
-# Set up SDL2 dependency stuff
-#
-
 #set(SDL2_BUILDING_LIBRARY "true")
 set(SDL2_CUSTOM_SEARCH_PATH dependencies/SDL2/)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/dependencies)
@@ -117,7 +105,6 @@ if(BUILD_EDITOR)
 		if(${EDITOR_NAME} STREQUAL "")
 			message(STATUS "EDITOR_NAME seems unset. cant set startup project to Editor.")
 		else()
-			message(STATUS "setting editor project (${EDITOR_NAME})...")
 			set(STARTUP_PROJECT ${EDITOR_NAME})
 		endif()
 	endif()
@@ -126,7 +113,7 @@ endif()
 if(MSVC)
 	if(NOT ${STARTUP_PROJECT} STREQUAL "")
 		set(STARTUP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-		message(STATUS "setting ${STARTUP_PROJECT} as startup project (${STARTUP_DIR})")
+		message(STATUS "setting startup project to `${STARTUP_PROJECT}`")
 		set_property(DIRECTORY ${STARTUP_DIR} PROPERTY VS_STARTUP_PROJECT ${STARTUP_PROJECT})
 	else()
 		message(STATUS "STARTUP_PROJECT (${STARTUP_PROJECT}) variable not set!")
