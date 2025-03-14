@@ -2,7 +2,6 @@
 #define _GRAPHICS_H
 
 #include "SDLopenGL.h"
-#include <stdio.h>
 #include <string>
 #include <memory>
 

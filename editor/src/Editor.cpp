@@ -1,15 +1,15 @@
 #include "Editor.h"
 #include "EditorConfig.h"
 #include "InputManager.h"
-#include "GUI.h"
 #include <algorithm>
 
 #include <YoAudio.h>
 
 void Editor::Run()
 {
-	// Gui implicitly starts SDL for OpenGL rendering
-	std::unique_ptr<Gui> ui = std::make_unique<Gui>();
+	// Graphics implicitly starts SDL for OpenGL rendering
+	mGraphics = std::make_unique<Graphics>();
+	mWindow = mGraphics->GetWindow();
 	
 	// init Yo AudioEngine
 	if (YOA_Init() == false)
@@ -27,19 +27,20 @@ void Editor::Run()
 
 		while (SDL_PollEvent(&mEvents) != 0)
 		{
-			ui->ProcessEvent(&mEvents);
+			mGraphics->ProcessEvent(&mEvents);
 			if (mEvents.type == SDL_QUIT)
 				mQuit = true;
 		}
 		
 		inputManager->Update();
 		// begin GUI
-		ui->StartFrame();
+
+		mGraphics->StartFrame();
 		// main GUI
 		App();
 		//ImGui::ShowDemoWindow(); // Show demo window! :)
 		// end GUI
-		ui->EndFrame();
+		mGraphics->EndFrame();
 
 		uint64_t endTicks = SDL_GetTicks64();
 		constexpr uint64_t zero = 0;
@@ -49,6 +50,8 @@ void Editor::Run()
 		SDL_Delay(std::min(targetFrameLength, std::max(zero, delay)));
 	}
 
+	mGraphics = nullptr;
+	mWindow = nullptr;
 	// quit Yo audio system
 	YOA_Quit(false);
 }

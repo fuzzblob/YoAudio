@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <memory>
 #include "Editor.h"
 
 // have to override SDL defined main for some reson...
