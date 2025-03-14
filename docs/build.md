@@ -23,7 +23,9 @@
 	- **[submodule]** The YoAudio Editor uses [imgui](https://github.com/ocornut/imgui) for rendering immediate mode UI elements. It is required for the editor to compile and function as intended.
 	- For more information about the submodule workflow see below at [On git submodules](#submodules)
 
-> git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git
+```Shell
+git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git
+```
 
 ## Build Instructions <a name="build"></a>
 
@@ -71,11 +73,14 @@ As I don't have a Mac OS build environment I can not provide detailed instructio
 YoAudio uses a git feature called submodules to tie in other git repositories as dependencies. If you don't want to or can't use this feature, you will have to make the dependencies work by hand (adding files to `engine/dependencies/` and `editor/dependencies`, passing values to CMake, possibly editing *CMakeLists.txt*). This can be tricky as the *CMake* scripts require specific folder locations to detect the dependencies and set up the libraries properly for the compilation of code to function.
 To clone the repository with submodules paste the following command in your terminal
 
-> git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git
-
+```Shell
+git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git
+```
 If you accidentally cloned the repository without the `--recurse-submodules` option, you can fetch them after the fact with the following command:
 
-> git submodule update --init --recursive --remote
+```Shell
+git submodule update --init --recursive --remote
+```
 
 Sadly this will (probably) pull in the latest versions of the submodules, instead of the ones specified by the YoAudio repository, but it may well work.
 Alternatively use a git client that supports git submodules like [Tortoise Git](https://tortoisegit.org/) or [SourceTree](https://www.sourcetreeapp.com/).

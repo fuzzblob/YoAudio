@@ -27,7 +27,9 @@ The name Yo is based on the phonetic approximation of the korean word for fox (ì
 More detailed instructions on how to build the project can be found at [docs/build.md](docs/build.md).
 The short and sweet of it goes as follows:
 
-> git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git
+```Shell
+git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git
+```
 
 Use CMake to generate the project - then compile with a C++20 toolchain.
 
