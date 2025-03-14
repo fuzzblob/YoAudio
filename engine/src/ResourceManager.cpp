@@ -63,7 +63,7 @@ std::shared_ptr<Sample> ResourceManager::LoadSound(const std::string & filePath)
 	}
 	newSound->Samples = (audioLength) / (bytesPerSample * newSound->Channels);
 	YOA_TRACE("Loaded sound at \n\t{0}\n\tYOA_FORMAT: {1} - sample data: {2}bit {3} kHz", filePath,
-		newSound->Format, (bytesPerSample * 8), newSound->Frequency);
+		(unsigned char)(newSound->Format), (bytesPerSample * 8), newSound->Frequency);
 
 	return newSound;
 }
