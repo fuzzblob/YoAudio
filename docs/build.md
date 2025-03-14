@@ -18,10 +18,12 @@
 - SDL2 ([Simple DirectMedia Layer](https://www.libsdl.org/), [prebuilt downloads](https://github.com/libsdl-org/SDL/releases))
 	- SDL2 is being used as the audio rendering backend in the Engine, and for rendering graphics in the Editor.
 	- SDL3 has been released, but not tested yet.
-- clone the repository with submodules: > git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git
+- clone the repository with submodules:
 	- **[submodule]** The YoAudio Engine uses [sdplog](https://github.com/gabime/spdlog) for printing to the console (not included in Release builds). It is an optional **git submodule**.
 	- **[submodule]** The YoAudio Editor uses [imgui](https://github.com/ocornut/imgui) for rendering immediate mode UI elements. It is required for the editor to compile and function as intended.
 	- For more information about the submodule workflow see below at [On git submodules](#submodules)
+
+> git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git
 
 ## Build Instructions <a name="build"></a>
 
@@ -29,12 +31,12 @@
 
 At the moment the build process has only ever been tested on Windows with Microsoft Visual Studio 2017 Community Edition. Follow these steps to generate a Visual Studio project:
 
-- install Microsoft Visual Studio ([17 2022](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022) recommended)
+- install Microsoft Visual Studio (currently recommended [VS17 2022](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022))
 	- in the setup select the MSVC C++ compiler and Windows SDK
 - download the [SDL2 Development Libraries](https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip) (zip file labeled **"SDL2-devel-2.XX.X-VC"**)
 	- extract the `include` and `lib` folders to `./dependencies/SDL2/`
 - run CMake
-	- an example is provided for VS 17 2022 `build_Windows_VisualStudio2022.bat`
+	- an example is provided for VS 17 2022 [build_Windows_VisualStudio2022.bat](../build_Windows_VisualStudio2022.bat)
 - open the created solution file (e.g. `/build/YoAudio.sln`) and build the code (`Ctrl + Shift + B`)
 - the output will be built to `/bin/Debug`
 	- YoAudio-Engine.lib (linking symbols)
@@ -52,7 +54,7 @@ At the moment the build process has only ever been tested on Windows with Micros
     - Fedora: dnf install SDL2-devel
     - Gentoo: emerge media-libs/libsdl2
 - run cmake
-	- a build script targeting gcc is available as `build_Linux_Make.sh`
+	- a build script targeting gcc is available as [build_Linux_Make.sh](../build_Linux_Make.sh)
 - build
 - the output will be built to `/bin/` as **libYoAudio.so**
 
@@ -78,5 +80,5 @@ If you accidentally cloned the repository without the `--recurse-submodules` opt
 Sadly this will (probably) pull in the latest versions of the submodules, instead of the ones specified by the YoAudio repository, but it may well work.
 Alternatively use a git client that supports git submodules like [Tortoise Git](https://tortoisegit.org/) or [SourceTree](https://www.sourcetreeapp.com/).
 
-- [git documentation](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
+- [git submodule documentation](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
 - [how to clone submodules](https://stackoverflow.com/questions/3796927/how-to-git-clone-including-submodules))
