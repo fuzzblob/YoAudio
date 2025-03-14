@@ -37,7 +37,7 @@ include_directories(
 	include
 )
 # configure a header file to pass some of the CMake settings to the source code
-configure_file (include/YoaConfig.h.in include/YoaConfig.h @ONLY)
+# configure_file (include/YoaConfig.h.in include/YoaConfig.h @ONLY)
 configure_file (
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/YoaConfig.h.in"
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/YoaConfig.h" )
