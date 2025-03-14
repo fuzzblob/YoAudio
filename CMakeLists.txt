@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5...3.31)
+cmake_minimum_required(VERSION 3.8...3.31)
 # The version number.
 set (YOA_VERSION_MAJOR 0)
 set (YOA_VERSION_MINOR 1)
