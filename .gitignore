@@ -31,7 +31,10 @@ engine/include/YoaConfig.h
 # YoAudio-Editor
 
 editor/bin/*
+editor/src/EditorConfig.h
 
 # Dependencies
 
+dependencies/SDL2/
 dependencies/SDL2/*
+dependencies/SDL2/include/
