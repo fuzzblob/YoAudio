@@ -9,13 +9,20 @@ message(STATUS "Now building the project for ${PROJECT_NAME} version ${PROJECT_V
 message(STATUS "")
 message(STATUS "###################################################################################################################")
 
-# pull in logging library if it was pulled in properly
-include(dependencies/spdlog.cmake)
+#
+# Set up spdlog dependency stuff
+#
+if(LOGGING_ENABLED)
+	set(SPDLOG_ROOT  ${PROJECT_SOURCE_DIR}/dependencies/spdlog)
+	find_package(Spdlog REQUIRED)
+else()
+	set(SPDLOG_FOUND false)
+	message(STATUS "logging is disabled. not looking for sdpLog library.")
+endif()
 
 #
 # setup code
 #
-
 file(GLOB_RECURSE HDRS
 	include/*.h
 	include/*.hpp
@@ -29,9 +36,11 @@ file(GLOB_RECURSE SRCS
 include_directories(
 	include
 )
-# configure a header file to pass some of the CMake settings
-# to the source code
-configure_file ("include/YoaConfig.h.in" "include/YoaConfig.h")
+# configure a header file to pass some of the CMake settings to the source code
+configure_file (include/YoaConfig.h.in include/YoaConfig.h @ONLY)
+configure_file (
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/YoaConfig.h.in"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/YoaConfig.h" )
 
 #
 # include detected dependencies
@@ -41,12 +50,13 @@ IF ( SDL2_INCLUDE_DIR AND SDL2_LIBRARY )
 		${SDL2_INCLUDE_DIR}
 	)
 ENDIF ( SDL2_INCLUDE_DIR AND SDL2_LIBRARY )
-IF ( SPDLOG_FOUND )
-	MESSAGE(STATUS "spdlog found: ${SPDLOG_FOUND}	/${SPDLOG_INCLUDE_DIRS}")
-	include_directories(
-		${SPDLOG_INCLUDE_DIRS}
-	)
-ENDIF ( SPDLOG_FOUND )
+
+if(SPDLOG_FOUND)
+	message(STATUS "spdlog found: ${SPDLOG_FOUND}	/${SPDLOG_INCLUDE_DIR}")
+	include_directories(${SPDLOG_INCLUDE_DIR})
+else()
+	message(STATUS "spdlog not found!!!")
+endif()
 
 #
 # setup output binary
@@ -54,7 +64,7 @@ ENDIF ( SPDLOG_FOUND )
 add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDRS})
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE C)
 # link SDL2
-target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY})
+
 
 if (MSVC)
 	# this expresses the YOA_API macro to express DLL export
@@ -62,4 +72,4 @@ if (MSVC)
 	set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif(MSVC)
 
-MESSAGE("YoAudio Engine CMakeLists.txt end")
+message("YoAudio Engine CMakeLists.txt end")

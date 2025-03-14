@@ -4,36 +4,39 @@
 // 			Don't change this file by hand (except for testing during development)
 //			Change YoaConfig.h.in instead please.
 
-// version number set through CMake prejoect build process
-#define YOA_VERSION_MAJOR @YOA_VERSION_MAJOR@
-#define YOA_VERSION_MINOR @YOA_VERSION_MINOR@
-#define YOA_VERSION_PATCH @YOA_VERSION_PATCH@
+// version number set through CMake project build process
+#define PROJECT_VERSION			@PROJECT_VERSION@
+#define YOA_VERSION_MAJOR		@YOA_VERSION_MAJOR@
+#define YOA_VERSION_MINOR		@YOA_VERSION_MINOR@
+#define YOA_VERSION_PATCH		@YOA_VERSION_PATCH@
 
 // toggle certain features of YoAudio
-#define SDL2_FOUND @SDL2_FOUND@
+#cmakedefine SDL2_FOUND				@SDL2_FOUND@
 #if SDL2_FOUND
 #define FORCE_SDL @FORCE_SDL@
+#else
+#pragma error "can't find SDL2 dependency!"
 #endif
 
 #ifdef _DEBUG
-#define SPDLOG_FOUND @SPDLOG_FOUND@
+#cmakedefine SPDLOG_FOUND			@SPDLOG_FOUND@
 #if SPDLOG_FOUND
-#define LOGGING_ENABLED true
+#define LOGGING_ENABLED			@LOGGING_ENABLED@
 #else
-#define LOGGING_ENABLED false
+#define LOGGING_ENABLED 		false
 #endif
 #else
-#define LOGGING_ENABLED false
+#define LOGGING_ENABLED 		false
 #endif
 
-#define AUDIO_THREAD_UPDATES false
+#define AUDIO_THREAD_UPDATES	@AUDIO_THREAD_UPDATES@
 // calls to YoManager::Update() per second
-#define FRAME_RATE			60
+#define TICK_RATE				@TICK_RATE@
 // set to 0 for no limit on playing voices
-#define MAX_VOICES 			0
+#define MAX_VOICES 				@MAX_VOICES@
 
 // audio device configuration
-#define TARGET_SAMPLERATE	48000
-#define TARGET_CHANNELS		2
-#define TARGET_BUFFER		4096
-#define TARGET_BITDEPTH		16
+#cmakedefine TARGET_SAMPLERATE		@TARGET_SAMPLERATE@
+#cmakedefine TARGET_CHANNELS			@TARGET_CHANNELS@
+#cmakedefine TARGET_BUFFER			@TARGET_BUFFER@
+#cmakedefine TARGET_BITDEPTH			@TARGET_BITDEPTH@

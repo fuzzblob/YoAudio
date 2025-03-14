@@ -15,10 +15,18 @@ project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSI
 option(BUILD_LIBRARY "Enable building library" ON)
 # option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 option(BUILD_EDITOR "Enable building editor" ON)
+#option (FRAME_RATE "Editor rendering frame rate" 60)
 option(STARTUP_IN_EDITOR "Startup in Editor Project" ON)
 
 # should we allow logging?
-option (LOGGING_ENABLED "enable logging" ON) 
+set (LOGGING_ENABLED true)			# "enable logging"
+set (AUDIO_THREAD_UPDATES false)	# "enable audio thread updates"
+set (TICK_RATE 60)					# "audio thread tick rate"
+set (MAX_VOICES 0)					# "Maximum audio voices (unlimited when below 1)"
+set (TARGET_SAMPLERATE 48000)		# "default audio output sample rate"
+set (TARGET_CHANNELS 2)				# "default audio output channel count"
+set (TARGET_BUFFER 4096)			# "default audio output buffer length"
+set (TARGET_BITDEPTH 16)			# "default audio output bit depth"
 
 message(STATUS "###################################################################################################################")
 message(STATUS "")
