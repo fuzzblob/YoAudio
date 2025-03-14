@@ -80,7 +80,7 @@ AudioDevice::AudioDevice(void* userData, void(*callback)(void* userdata, uint8_t
 	DeviceName = GetDeviceName();
 
 	YOA_INFO("Opened AudioDevice \"{0}\" ID: {1}\n\t{2} sample rate, {5}bit, {3} channels, buffer size {4}",
-		DeviceName, DeviceID, Frequency, Channels, Samples, Format);
+		DeviceName, DeviceID, Frequency, Channels, Samples, (unsigned char)(Format));
 }
 AudioDevice::~AudioDevice() {
 	SetPaused(true);
