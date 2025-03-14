@@ -28,7 +28,11 @@ public:
 	};
 	~Graphics() { mImplementation = nullptr; };
 
-	void StartFrame(const SDL_Event* event) { mImplementation->StartFrame(event); };
+	bool ProcessEvent(const SDL_Event* event) 
+	{
+		return mImplementation->ProcessEvent(event);
+	};
+	void StartFrame() { mImplementation->StartFrame(); };
 	void EndFrame() { mImplementation->EndFrame(); };
 	bool ProcessEvent(SDL_Event* event)
 	{ return mImplementation->ProcessEvent(event); };

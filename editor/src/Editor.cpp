@@ -36,8 +36,9 @@ void Editor::Run()
 		
 		inputManager->Update();
 		// begin GUI
-		ui->StartFrame(&mEvents);
+		ui->StartFrame();
 		// main GUI
+		//ImGui::ShowDemoWindow(); // Show demo window! :)
 		App();
 		// end GUI
 		ui->EndFrame();

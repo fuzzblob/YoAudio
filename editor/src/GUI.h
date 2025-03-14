@@ -29,7 +29,7 @@ public:
 	{
 		return mGraphics->ProcessEvent(event);
 	};
-	void StartFrame(const SDL_Event* event) { mGraphics->StartFrame(event); };
+	void StartFrame() { mGraphics->StartFrame(); };
 	void EndFrame() { mGraphics->EndFrame(); };
 };
 
