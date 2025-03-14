@@ -12,7 +12,7 @@ bool AudioThread::sInitialized = false;
 
 AudioThread* AudioThread::GetInstance(const bool creatIfNull)
 {
-	if (sInstance == nullptr) {
+	if (!sInstance) {
 		if (!creatIfNull)
 			return nullptr;
 		sInstance = std::make_unique<AudioThread>();
@@ -23,7 +23,7 @@ AudioThread* AudioThread::GetInstance(const bool creatIfNull)
 
 void AudioThread::Release(const bool quitSDL) noexcept
 {
-	if (sInstance == nullptr)
+	if (!sInstance)
 		return;
 	// stop audio engine
 	sInstance->mMixer = nullptr;
@@ -98,7 +98,7 @@ void AudioThread::Update() noexcept
 {
 	//YOA_INFO("Current DeltaTime: {0}", mTimer->DeltaTime());
 
-	if (mMixer == nullptr || mMixer->IsPaused())
+	if (!mMixer || mMixer->IsPaused())
 		return;
 
 	// interpolate values

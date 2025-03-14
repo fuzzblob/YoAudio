@@ -5,7 +5,7 @@
 
 bool YOA_Init(void)
 {
-	return (AudioThread::GetInstance(true) != nullptr);
+	return bool(AudioThread::GetInstance(true));
 }
 
 void YOA_Quit(const bool quitSDL)
@@ -16,7 +16,7 @@ void YOA_Quit(const bool quitSDL)
 int YOA_PlayWavFile(const char * filename, const bool loop, const float volume, const float pitch, const float fadeIn, const float pan)
 {
 	const AudioThread* inst = AudioThread::GetInstance();
-	if (inst != nullptr) {
+	if (inst) {
 		return inst->mMixer->PlayWavFile(std::string(filename), loop, volume, pitch, fadeIn, pan);
 	}
 	return 0u;
@@ -25,7 +25,7 @@ int YOA_PlayWavFile(const char * filename, const bool loop, const float volume, 
 bool YOA_StopVoice(const int id, const float fadeOut)
 {
 	const AudioThread* inst = AudioThread::GetInstance();
-	if (inst != nullptr) {
+	if (inst) {
 		return inst->mMixer->StopVoice(uint16_t(id), fadeOut);
 	}
 	return false;
@@ -34,7 +34,7 @@ bool YOA_StopVoice(const int id, const float fadeOut)
 void YOA_API YOA_SetVoiceVolume(const int id, const float newVolume)
 {
 	const AudioThread* inst = AudioThread::GetInstance();
-	if (inst != nullptr) {
+	if (inst) {
 		inst->mMixer->SetVoiceVolume(id, newVolume);
 	}
 }
@@ -42,7 +42,7 @@ void YOA_API YOA_SetVoiceVolume(const int id, const float newVolume)
 void YOA_API YOA_SetVoicePan(const int id, const float newPan)
 {
 	const AudioThread* inst = AudioThread::GetInstance();
-	if (inst != nullptr) {
+	if (inst) {
 		inst->mMixer->SetVoicePan(id, newPan);
 	}
 }
@@ -50,7 +50,7 @@ void YOA_API YOA_SetVoicePan(const int id, const float newPan)
 void YOA_Pause(void)
 {
 	const AudioThread* inst = AudioThread::GetInstance();
-	if (inst != nullptr) {
+	if (inst) {
 		inst->mMixer->Pause(true);
 	}
 }
@@ -58,7 +58,7 @@ void YOA_Pause(void)
 void YOA_Resume(void)
 {
 	const AudioThread* inst = AudioThread::GetInstance();
-	if (inst != nullptr) {
+	if (inst) {
 		inst->mMixer->Pause(false);
 	}
 }

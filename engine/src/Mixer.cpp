@@ -37,7 +37,7 @@ Mixer::~Mixer()
 
 void Mixer::Pause(const bool pause) noexcept
 {
-	if (mDevice == nullptr)
+	if (!mDevice)
 	{
 		YOA_ERROR("No Device present!");
 		return;
@@ -54,19 +54,19 @@ bool Mixer::IsPaused() noexcept
 uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const float volume, 
 	const float pitch, const float fadeIn, const float pan)
 {
-	if (mDevice == nullptr) {
+	if (!mDevice) {
 		YOA_CRITICAL("Can't play audio. No Device present!");
 		return 0;
 	}
 	// load sound
 	std::shared_ptr<Sample> sound = mResources->GetSound(filename);
-	if (sound == nullptr) {
+	if (!sound) {
 		YOA_CRITICAL("Can't play audio. Could not load sound at path: {0}", filename);
 		return 0;
 	}
 	// get voice
 	std::shared_ptr<Voice> voice = GetVoiceAvailable();
-	if (voice == nullptr) {
+	if (!voice) {
 		YOA_ERROR("Can't play audio. Could not aquire a Voice!");
 		return 0;
 	}
@@ -103,7 +103,7 @@ uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const
 bool Mixer::StopVoice(const uint16_t id, float fadeOut)
 {
 	auto voice = GetVoiceActive(id);
-	if (voice == nullptr)
+	if (!voice)
 		return false;
 	fadeOut = std::max(0.01f, fadeOut);
 	voice->Volume.SetValue(0.0f);
@@ -119,7 +119,7 @@ bool Mixer::StopVoice(const uint16_t id, float fadeOut)
 void Mixer::SetVoiceVolume(const uint16_t id, const float value, const float fade)
 {
 	auto voice = GetVoiceActive(id);
-	if (voice == nullptr)
+	if (!voice)
 		return;
 	voice->Volume.SetValue(std::max(0.0f, std::min(1.0f, value)));
 	voice->Volume.SetFadeLength(static_cast<int>(fade * mDevice->Frequency));
@@ -128,7 +128,7 @@ void Mixer::SetVoiceVolume(const uint16_t id, const float value, const float fad
 void Mixer::SetVoicePan(const uint16_t id, const float value)
 {
 	auto voice = GetVoiceActive(id);
-	if (voice == nullptr)
+	if (!voice)
 		return;
 	voice->Panning.Set(std::max(-1.0f, std::min(1.0f, value)));
 }
@@ -160,7 +160,7 @@ std::shared_ptr<Voice> Mixer::GetVoiceAvailable()
 
 std::shared_ptr<Voice> Mixer::GetVoiceActive(const uint16_t id)
 {
-	if (mDevice == nullptr) {
+	if (!mDevice) {
 		YOA_CRITICAL("Voice stopping failed! no Device present!");
 		return nullptr;
 	}
