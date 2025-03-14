@@ -45,11 +45,11 @@ configure_file (
 #
 # include detected dependencies
 #
-IF ( SDL2_INCLUDE_DIR AND SDL2_LIBRARY )
+if(SDL2_INCLUDE_DIR)
 	include_directories(
 		${SDL2_INCLUDE_DIR}
 	)
-ENDIF ( SDL2_INCLUDE_DIR AND SDL2_LIBRARY )
+endif()
 
 if(SPDLOG_FOUND)
 	message(STATUS "spdlog found: ${SPDLOG_FOUND}	/${SPDLOG_INCLUDE_DIR}")
@@ -64,7 +64,9 @@ endif()
 add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDRS})
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE C)
 # link SDL2
-
+if(SDL2_LIBRARY)
+	target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY})
+endif()
 
 if (MSVC)
 	# this expresses the YOA_API macro to express DLL export
