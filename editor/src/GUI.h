@@ -4,7 +4,7 @@
 #include <memory>
 #include <SDL.h>
 #include "Graphics.h"
-#include "imgui.h"
+#include <imgui.h>
 
 class Gui
 {

@@ -1,9 +1,10 @@
 #include "Editor.h"
+#include "EditorConfig.h"
 #include "InputManager.h"
 #include "GUI.h"
-#include "imgui.h"
+#include <algorithm>
 
-#include "YoAudio.h"
+#include <YoAudio.h>
 
 void Editor::Run()
 {
@@ -38,8 +39,8 @@ void Editor::Run()
 		// begin GUI
 		ui->StartFrame();
 		// main GUI
-		//ImGui::ShowDemoWindow(); // Show demo window! :)
 		App();
+		//ImGui::ShowDemoWindow(); // Show demo window! :)
 		// end GUI
 		ui->EndFrame();
 	}

@@ -11,7 +11,7 @@
 
 #if LOGGING_ENABLED
 #if SPDLOG_FOUND
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
 class Log
 {

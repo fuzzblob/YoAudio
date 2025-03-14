@@ -4,20 +4,20 @@ set (YOA_VERSION_MAJOR 0)
 set (YOA_VERSION_MINOR 2)
 set (YOA_VERSION_PATCH 0)
 project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSION_PATCH}" DESCRIPTION "YoAudio Meta project")
-
-
 ##########################
 #
 #		Options
 #
 ##########################
-
-option(BUILD_LIBRARY "Enable building library" ON)
+# Meta Project
+option(Warnings_As_Errors "Treat compiler warnings as errors" ON)
 # option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+# Editor:
 option(BUILD_EDITOR "Enable building editor" ON)
-#option (FRAME_RATE "Editor rendering frame rate" 60)
 option(STARTUP_IN_EDITOR "Startup in Editor Project" ON)
-
+set(EDITOR_FRAME_RATE 60)			# "Editor rendering frame rate"
+# Engine:
+option(BUILD_LIBRARY "Enable building library" ON)
 # should we allow logging?
 set (LOGGING_ENABLED true)			# "enable logging"
 set (AUDIO_THREAD_UPDATES false)	# "enable audio thread updates"
@@ -27,24 +27,24 @@ set (TARGET_SAMPLERATE 48000)		# "default audio output sample rate"
 set (TARGET_CHANNELS 2)				# "default audio output channel count"
 set (TARGET_BUFFER 4096)			# "default audio output buffer length"
 set (TARGET_BITDEPTH 16)			# "default audio output bit depth"
-
+# beging project setup
 message(STATUS "###################################################################################################################")
 message(STATUS "")
 message(STATUS "Now building the project for ${PROJECT_NAME} version ${PROJECT_VERSION}")
 message(STATUS "")
 message(STATUS "###################################################################################################################")
-
 ##########################
 #
 #		Compiler
 #
 ##########################
 # set C++17 standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # specify UTF8 support
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "/utf-8")
 set(CMAKE_C_FLAGS "/utf-8")
+# For more warning options see: https://github.com/cpp-best-practices/cppbestpractices/blob/master/02-Use_the_Tools_Available.md
 if(MSVC)
 	# Microsoft Visual Studio specifics
 	add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
@@ -53,11 +53,22 @@ if(MSVC)
 	if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
 		string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 	else()
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /permissive-")
 	endif()
+	# /Wall is possible thanks to VS2022 enabling to exclude external headers from it
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /permissive- /w14640 /Wall /external:anglebrackets /external:W0")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w14242 /w14254 /w14263 /w14265 /w14287 /we4289 /w14296 /w14311 /w14545")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w14546 /w14547 /w14549 /w14555 /w14619 /w14640 /w14826 /w14905 /w14906 /w14928")
+	# if(Warnings_As_Errors)
+		# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+	# endif()
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+	# Compiler warnings
 	# Update if necessary
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -Wpedantic -Wnon-virtual-dtor -pedantic -g -std=c++17")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wnon-virtual-dtor -pedantic -g -std=c++20")
+	if(Warnings_As_Errors)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+	endif() 
 endif()
 # set CMAKE_BUILD_TYPE if empty
 # for differentiation between debug and release builds.

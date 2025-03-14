@@ -15,7 +15,10 @@ include(../dependencies/YoAudio.cmake)
 include(../dependencies/imgui.cmake)
 # find OpenGL for rendering pixels to the screen
 find_package(OpenGL REQUIRED)
-
+# configure editor config header
+configure_file (
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/EditorConfig.h.in"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/EditorConfig.h" )
 #
 # input files for this project
 #
@@ -34,15 +37,11 @@ include_directories(
 	${SDL2_INCLUDE_DIR}
 	${YOA_INCLUDE_DIR}
     ${GUI_INCLUDE_DIRS}
-    # ${GUI_INCLUDE_DIRS}/backends
-    ${GUIIMPL_INCLUDE_DIRS}
-	)
-
+    ${GUIIMPL_INCLUDE_DIRS})
 #
 # setup the executable
 #
 add_executable(${PROJECT_NAME} ${SRCS} ${HDRS} ${IMGUI_SOURCES})
-# set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD ${CXX_STANDARD})
 #
 # link extermal libraries
 #
