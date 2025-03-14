@@ -38,6 +38,7 @@ Timer::Timer() noexcept
 	mEpoch = std::chrono::high_resolution_clock::now();
 	mTime = 0.0;
 	mDeltaTime = 0.0f;
+	mRenderTime.store(0.0);
 }
 
 Timer::~Timer() noexcept { }
