@@ -26,7 +26,7 @@ private:
 #define YOA_TRACE(...)			//::Log::GetCoreLogger()->trace(__VA_ARGS__)
 #define YOA_INFO(...)			//::Log::GetCoreLogger()->info(__VA_ARGS__)
 #define YOA_WARN(...)			::Log::GetCoreLogger()->warn(__VA_ARGS__)
-#define YOA_ERROR(...)			//::Log::GetCoreLogger()->error(__VA_ARGS__)
+#define YOA_ERROR(...)			::Log::GetCoreLogger()->error(__VA_ARGS__)
 #define YOA_CRITICAL(...)	    ::Log::GetCoreLogger()->critical(__VA_ARGS__)
 #else
 #include <stdio.h>

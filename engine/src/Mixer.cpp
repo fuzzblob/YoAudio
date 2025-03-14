@@ -332,7 +332,8 @@ inline void Mixer::AudioCallback(void * userdata, uint8_t * stream, int len)
 		return;
 	}
 	default:
-		YOA_ERROR("Unsupported output format: {0}", mixer->mDevice->Format);
+		const auto format = (unsigned char)(mixer->mDevice->Format);
+		YOA_ERROR("Unsupported output format: {0}", format);
 		return;
 	}
 }
