@@ -74,4 +74,5 @@ if (MSVC)
 	set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif(MSVC)
 
-message("YoAudio Engine CMakeLists.txt end")
+message(STATUS "YoAudio Engine CMakeLists.txt end")
+message(STATUS " ")

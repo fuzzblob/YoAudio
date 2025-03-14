@@ -74,9 +74,8 @@ if(MSVC)
 		NAMES SDL2.dll
 		PATHS ${SDL2_DLL_SEARCH_PATH}
 		PATH_SUFFIXES lib/x64
-		DOC "The SDL2.dll file location"
-		)
-	MESSAGE(STATUS "SDL2.dll path detected is: " ${SDL_DLL_PATH} )
+		DOC "The SDL2.dll file location")
+	message(STATUS "SDL2.dll path detected is: " ${SDL_DLL_PATH} )
 	# copy SDL.dll to Runtime directory so the editor can run properly
 	IF ( SDL_DLL_PATH )
 		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -84,7 +83,7 @@ if(MSVC)
 			COMMAND_EXPAND_LISTS
 			)
 	ELSE ( )
-		MESSAGE(STATUS "could not locate SDL2.dll path in ${SDL2_DLL_SEARCH_PATH}" )
+		message(STATUS "could not locate SDL2.dll path in ${SDL2_DLL_SEARCH_PATH}" )
 	ENDIF ( )
 	#
 	# there should be a better way to make this ditributable 
@@ -119,11 +118,12 @@ if(MSVC)
 	    # PRE_BUILD
         # COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets )
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    MESSAGE("TODO: contemplate copying assets to buid directory if needed?")
+    message(STATUS "TODO: contemplate copying assets to buid directory if needed?")
 	# add_custom_command(
 		# TARGET ${PROJECT_NAME}
 	    # PRE_BUILD
 		# COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets )
 endif()
 
-MESSAGE("YoAudio Editor CMakeLists.txt end")
+message(STATUS "YoAudio Editor CMakeLists.txt end")
+message(STATUS " ")
