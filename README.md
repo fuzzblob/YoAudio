@@ -35,4 +35,6 @@ Use CMake to generate the project - then compile with a C++20 toolchain.
 
 The initial development was inspired by this [Simple SDL2 Audio example](https://github.com/jakebesworth/Simple-SDL2-Audio) but the direction of the software has since diverged from this very simple approach to playing audio.
 
+Part of the idea to build this project came from watching the [Youtube Series](https://www.youtube.com/playlist?list=PLEETnX-uPtBVpZvp-R2daNfy9k3-L-Q3u) centered on building an [Audio Engine by thebennybox](https://github.com/BennyQBD/AudioTutorial).
+
 A huge thank you to [Jeremy Tammik](https://github.com/jeremytammik) for helping me setup some basics, specifically CMake.
