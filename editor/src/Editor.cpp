@@ -8,12 +8,9 @@
 
 void Editor::Run()
 {
-	// UI implicitly starts SDL for OpenGL rendering
+	// Gui implicitly starts SDL for OpenGL rendering
 	std::unique_ptr<Gui> ui = std::make_unique<Gui>();
-	std::unique_ptr<InputManager> inputManager = std::make_unique<InputManager>();
-	SDL_Event mEvents;
-	float deltaTime = 0.0f;
-
+	
 	// init Yo AudioEngine
 	if (YOA_Init() == false)
 	{
@@ -21,19 +18,19 @@ void Editor::Run()
 		mQuit = true;
 	}
 
+	std::unique_ptr<InputManager> inputManager = std::make_unique<InputManager>();
+	SDL_Event mEvents;
+	const static uint64_t targetFrameLength = 1000 / EDITOR_FRAME_RATE;
 	while (mQuit == false)
 	{
-		uint32_t startTicks = SDL_GetTicks();
-		double deltaTime = 0.0;
+		uint64_t startTicks = SDL_GetTicks64();
+
 		while (SDL_PollEvent(&mEvents) != 0)
 		{
 			ui->ProcessEvent(&mEvents);
 			if (mEvents.type == SDL_QUIT)
 				mQuit = true;
 		}
-
-		const static uint32_t targetFrameLength = 1000 / 30;
-		SDL_Delay(targetFrameLength);
 		
 		inputManager->Update();
 		// begin GUI
@@ -43,6 +40,13 @@ void Editor::Run()
 		//ImGui::ShowDemoWindow(); // Show demo window! :)
 		// end GUI
 		ui->EndFrame();
+
+		uint64_t endTicks = SDL_GetTicks64();
+		constexpr uint64_t zero = 0;
+		// inverse of length of rendering application
+		uint64_t delay = targetFrameLength - (endTicks - startTicks);
+		// minimum 0, maximum target length
+		SDL_Delay(std::min(targetFrameLength, std::max(zero, delay)));
 	}
 
 	// quit Yo audio system
