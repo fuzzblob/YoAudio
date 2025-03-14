@@ -1,7 +1,7 @@
 #
 # Set up YoAudio dependency stuff
 #
-set(YOA_SEARCH_PATHS ../ ../engine/)
+set(YOA_SEARCH_PATHS ../ ../engine/ ./engine/)
 
 #
 # include headers

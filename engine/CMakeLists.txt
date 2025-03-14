@@ -13,7 +13,7 @@ message(STATUS "################################################################
 # Set up spdlog dependency stuff
 #
 if(LOGGING_ENABLED)
-	set(SPDLOG_ROOT  ${PROJECT_SOURCE_DIR}/dependencies/spdlog)
+	set(SPDLOG_ROOT  ${PROJECT_SOURCE_DIR}/../dependencies/spdlog)
 	find_package(Spdlog REQUIRED)
 else()
 	set(SPDLOG_FOUND false)

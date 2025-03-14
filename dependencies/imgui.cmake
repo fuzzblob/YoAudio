@@ -1,7 +1,7 @@
 #
 # Set up imgui dependency stuff
 #
-set(GUI_SEARCH_PATHS dependencies )
+set(GUI_SEARCH_PATHS dependencies/ ../dependencies/)
 # imgui include
 FIND_PATH( GUI_INCLUDE_DIRS
 	NAMES

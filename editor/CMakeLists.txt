@@ -11,8 +11,8 @@ message(STATUS "################################################################
 #
 # handle dependencies
 #
-include(dependencies/YoAudio.cmake)
-include(dependencies/imgui.cmake)
+include(../dependencies/YoAudio.cmake)
+include(../dependencies/imgui.cmake)
 # find OpenGL for rendering pixels to the screen
 find_package(OpenGL REQUIRED)
 
@@ -68,7 +68,7 @@ if(MSVC)
 	# when referencing YoAudio.h the DLL macros should expand to import, not export
 	target_compile_definitions(${PROJECT_NAME} PRIVATE BUILD_DLL=false)
 	# search for SDL2.dll
-	set(SDL2_DLL_SEARCH_PATH ../engine/dependencies/SDL2/)
+	set(SDL2_DLL_SEARCH_PATH ../dependencies/SDL2/)
 	FIND_PATH( SDL_DLL_PATH
 		NAMES SDL2.dll
 		PATHS ${SDL2_DLL_SEARCH_PATH}
