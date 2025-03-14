@@ -78,45 +78,18 @@ if(MSVC)
 	message(STATUS "SDL2.dll path detected is: " ${SDL_DLL_PATH} )
 	# copy SDL.dll to Runtime directory so the editor can run properly
 	IF ( SDL_DLL_PATH )
-		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy ${SDL_DLL_PATH}/SDL2.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>
-			COMMAND_EXPAND_LISTS
-			)
+			COMMAND_EXPAND_LISTS)
 	ELSE ( )
 		message(STATUS "could not locate SDL2.dll path in ${SDL2_DLL_SEARCH_PATH}" )
 	ENDIF ( )
-	#
-	# there should be a better way to make this ditributable 
-	#
-	
-	# install(FILES $<TARGET_RUNTIME_DLLS:${EDITOR_NAME}> TYPE BIN)
-	# add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-		# COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}>
-		# COMMAND_EXPAND_LISTS
-		# )
-		# add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD
-        # COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SDL2_LIBRARY}/SDL2.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}) # TODO: Debug, Release etc
-	# install(TARGETS ${PROJECT_NAME}
-		# RUNTIME ARCHIVE LIBRARY RUNTIME FRAMEWORK BUNDLE PUBLIC_HEADER RESOURCE)
-	# install(TARGETS ${SDL2}
-		# RUNTIME ARCHIVE LIBRARY RUNTIME FRAMEWORK BUNDLE PUBLIC_HEADER RESOURCE)	
-	# install(TARGETS ${PROJECT_NAME}
-		# COMPONENT ${PROJECT_NAME}
-		# RUNTIME_DEPENDENCIES
-		# PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
-		# POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
-		# DIRECTORIES $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-	# install(
-		# DIRECTORY "${SDL_DLL_PATH}"
-		# TYPE BIN
-		# FILES_MATCHING REGEX "[^\\\\/.]\\.[dD][lL][lL]$"
-	# )
-
-    MESSAGE("TODO: contemplate copying assets to buid directory if needed?")
-    # add_custom_command(
-	    # TARGET ${PROJECT_NAME}
-	    # PRE_BUILD
-        # COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets )
+	# copy assets folder to build directory to enable easy playback
+	set(ASSETS_DIR ${CMAKE_CURRENT_LIST_DIR}/assets/)
+    message(STATUS "custom command to copy `${ASSETS_DIR}` to buid directory pre-build.")
+	add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${ASSETS_DIR} $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets/)
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     message(STATUS "TODO: contemplate copying assets to buid directory if needed?")
 	# add_custom_command(
