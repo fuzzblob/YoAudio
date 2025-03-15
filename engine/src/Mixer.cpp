@@ -55,7 +55,7 @@ namespace YoaEngine
 	}
 
 	uint32_t Mixer::PlayWavFile(const std::string& filename, const bool loop, const float volume,
-		const float pitch, const float fadeIn, const float pan)
+		const float pitch, const float fadeIn, const float pan, const bool startPaused)
 	{
 		if (!mDevice) {
 			YOA_CRITICAL("Can't play audio. No Device present!");
@@ -94,12 +94,18 @@ namespace YoaEngine
 		}
 
 		// add voice to playing voices vector
-		voice->State = ToPlay;
-		mDevice->Lock();
-		this->mPlayingAudio.push_back(voice);
-		mDevice->Unlock();
+		if (!startPaused)
+		{
+			voice->State = ToPlay;
+			mDevice->Lock();
+			this->mPlayingAudio.push_back(voice);
+			mDevice->Unlock();
 
-		YOA_INFO("Playing audio: {0} with voiceID: {1}", filename.c_str(), voice->ID);
+			YOA_INFO("Playing audio: {0} with voiceID: {1}", filename.c_str(), voice->ID);
+		}
+		else {
+			YOA_INFO("Readied audio: {0} with voiceID: {1}, but kept it paused.", filename.c_str(), voice->ID);
+		}
 		return voice->ID;
 	}
 
@@ -345,7 +351,14 @@ namespace YoaEngine
 		default:
 			const auto format = (unsigned char)(mixer->mDevice->Format);
 			YOA_ERROR("Unsupported output format: {0}", format);
+			int32_t* out32 = (int32_t*)stream;
+			// zero output / fill with silence
+			for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)
+			{
+				out32[sampleIndex++] = 0;
+				out32[sampleIndex++] = 0;
+			}
 			return;
 		}
 	}
-}
+};
