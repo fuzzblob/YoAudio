@@ -23,9 +23,8 @@ namespace YoaEngine
 		void Run();
 		void Update() noexcept;
 	private:
-
-		std::unique_ptr<AudioThread> sInstance = nullptr;
-		bool sInitialized = false;
+		static std::unique_ptr<AudioThread> sInstance;
+		static bool sInitialized;
 
 		std::atomic_bool mQuit;
 		std::atomic_bool mThreadRunning;

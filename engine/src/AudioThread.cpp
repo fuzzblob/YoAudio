@@ -9,6 +9,9 @@
 
 namespace YoaEngine
 {
+	std::unique_ptr<AudioThread> AudioThread::sInstance = nullptr;
+	bool AudioThread::sInitialized = false;
+
 	AudioThread* AudioThread::GetInstance(const bool creatIfNull)
 	{
 		if (!sInstance) {
@@ -109,6 +112,7 @@ namespace YoaEngine
 
 		mQuit = false;
 		mThreadRunning = true;
+		sInitialized = true;
 		mThread = std::thread([this]() { this->Run(); });
 	}
 
@@ -117,5 +121,6 @@ namespace YoaEngine
 		mQuit = true;
 		// wait for thread to finish
 		mThread.join();
+		AudioThread::sInitialized = false;
 	}
 }
