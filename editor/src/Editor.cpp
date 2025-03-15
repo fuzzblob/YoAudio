@@ -1,11 +1,10 @@
 #include "Editor.h"
-#include "EditorConfig.h"
 #include "InputManager.h"
 #include <algorithm>
 
 #include <YoAudio.h>
 
-void Editor::Run()
+int Editor::Run()
 {
 	// Graphics implicitly starts SDL for OpenGL rendering
 	mGraphics = std::make_unique<Graphics>();
@@ -15,45 +14,49 @@ void Editor::Run()
 	if (YOA_Init() == false)
 	{
 		printf("Yo Audio initialization error! Shutting town\n");
-		mQuit = true;
+		Shutdown();
+		return 1;
 	}
-
-	std::unique_ptr<InputManager> inputManager = std::make_unique<InputManager>();
-	SDL_Event mEvents;
-	const static uint64_t targetFrameLength = 1000 / EDITOR_FRAME_RATE;
-	while (mQuit == false)
+	else
 	{
-		uint64_t startTicks = SDL_GetTicks64();
-
-		while (SDL_PollEvent(&mEvents) != 0)
+		std::unique_ptr<InputManager> inputManager = std::make_unique<InputManager>();
+		SDL_Event mEvents;
+		while (mQuit == false)
 		{
-			mGraphics->ProcessEvent(&mEvents);
-			if (mEvents.type == SDL_QUIT)
-				mQuit = true;
+			uint64_t startTicks = SDL_GetTicks64();
+			while (SDL_PollEvent(&mEvents) != 0) {
+				mGraphics->ProcessEvent(&mEvents);
+				if (mEvents.type == SDL_QUIT)
+					mQuit = true;
+			}
+			inputManager->Update();
+			// begin GUI
+			mGraphics->StartFrame();
+			// main GUI
+			App();
+			// Show ImGui demo window! :)
+			//ImGui::ShowDemoWindow();
+			// end GUI
+			mGraphics->EndFrame();
+			// calculate time needed to reach target framerate (minimum 0u)
+			// (compared to elapsed time since beginning of frame)
+			uint64_t delay = std::max((uint64_t)(0u), mTargetFrameLength - (SDL_GetTicks64() - startTicks));
+			// maximum target length (if frame took no time at all)
+			SDL_Delay(std::min(mTargetFrameLength, delay));
 		}
-		
-		inputManager->Update();
-		// begin GUI
-
-		mGraphics->StartFrame();
-		// main GUI
-		App();
-		//ImGui::ShowDemoWindow(); // Show demo window! :)
-		// end GUI
-		mGraphics->EndFrame();
-
-		uint64_t endTicks = SDL_GetTicks64();
-		constexpr uint64_t zero = 0;
-		// inverse of length of rendering application
-		uint64_t delay = targetFrameLength - (endTicks - startTicks);
-		// minimum 0, maximum target length
-		SDL_Delay(std::min(targetFrameLength, std::max(zero, delay)));
 	}
-
-	mGraphics = nullptr;
-	mWindow = nullptr;
+	// set 
+	Shutdown();
 	// quit Yo audio system
 	YOA_Quit(false);
+	return 0;
+}
+
+void Editor::Shutdown()
+{
+	mQuit = true;
+	mGraphics = nullptr;
+	mWindow = nullptr;
 }
 
 void Editor::App()

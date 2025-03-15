@@ -5,8 +5,5 @@
 int main(void)
 {
 	std::unique_ptr<Editor> editor = std::make_unique<Editor>();
-
-	editor->Run();
-
-	return 0;
+	return editor->Run();
 }
