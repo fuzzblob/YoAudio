@@ -1,6 +1,6 @@
 #include "InputManager.h"
 
-bool InputManager::KeyDown(SDL_Scancode scanCode)
+bool InputManager::KeyDown(SDL_Scancode scanCode) const
 {
 	return mKeyboardStates[scanCode];
 }

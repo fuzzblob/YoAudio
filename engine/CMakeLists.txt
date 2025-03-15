@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5...3.31)
 # set project name
-project("YoAudio-Engine" VERSION ${PROJECT_VERSION})
+project("YOA_Engine" VERSION ${PROJECT_VERSION})
 SET(ENGINE_NAME ${PROJECT_NAME} CACHE INTERNAL "Name of ${PROJECT_NAME} project")
 
 message(STATUS "###################################################################################################################")

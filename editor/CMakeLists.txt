@@ -1,5 +1,5 @@
 # set project name
-project("YoAudio-Editor" VERSION ${PROJECT_VERSION})
+project("YOA_Editor" VERSION ${PROJECT_VERSION})
 SET(EDITOR_NAME ${PROJECT_NAME} CACHE INTERNAL "Name of ${PROJECT_NAME} project")
 
 message(STATUS "###################################################################################################################")
