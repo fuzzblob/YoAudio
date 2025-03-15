@@ -60,9 +60,9 @@ void Editor::App()
 {
 	Menu();
 
-	bool bTrue = true;
+	static bool bTrue = true;
 	{
-		//ImGui::Begin("Sound Caster", &bTrue);
+		ImGui::Begin("Sound Caster", &bTrue);
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
 		static float panning = 0.0f;
@@ -188,6 +188,8 @@ void Editor::App()
 
 		if (ImGui::Button("Stop All Playback"))
 			YOA_Stop(0.0f);
+		// end the sound caster window
+		ImGui::End();
 	}
 }
 
