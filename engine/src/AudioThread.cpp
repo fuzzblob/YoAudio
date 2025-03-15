@@ -82,7 +82,7 @@ void AudioThread::Update() noexcept
 
 AudioThread::AudioThread()
 {
-#if LOGGING_ENABLED
+#if LOGGING_ENABLED && SPDLOG_FOUND
 	// initialize logging
 	Log::Init();
 #endif
