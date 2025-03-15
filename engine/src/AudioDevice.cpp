@@ -13,10 +13,10 @@ void AudioDevice::SetPaused(const bool pause) {
 	SDL_PauseAudioDevice(DeviceID, pause ? 1 : 0);
 }
 
-void AudioDevice::Lock() noexcept {
+void AudioDevice::Lock() const noexcept {
 	SDL_LockAudioDevice(DeviceID);
 }
-void AudioDevice::Unlock() noexcept {
+void AudioDevice::Unlock() const noexcept {
 	SDL_UnlockAudioDevice(DeviceID);
 }
 

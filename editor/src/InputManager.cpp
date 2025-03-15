@@ -12,7 +12,7 @@ void InputManager::Update()
 
 InputManager::InputManager()
 {
-	Uint8* mKeyboardStates = nullptr;
+	mKeyboardStates = nullptr;
 }
 
 InputManager::~InputManager()

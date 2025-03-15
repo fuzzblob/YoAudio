@@ -29,8 +29,8 @@
 class SDLopenGL
 {
 private:
-	SDL_Window* mWindow;
-	SDL_GLContext mGlContext;
+	SDL_Window* mWindow = nullptr;
+	SDL_GLContext mGlContext = nullptr;
 public:
 	SDLopenGL() noexcept;
 	~SDLopenGL();

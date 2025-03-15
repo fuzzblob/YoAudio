@@ -29,8 +29,8 @@ public:
 	bool IsPaused() const noexcept;
 	void SetPaused(const bool pause);
 
-	void Lock() noexcept;
-	void Unlock() noexcept;
+	void Lock() const noexcept;
+	void Unlock() const noexcept;
 
 	const char* GetDeviceName() const noexcept;
 	AudioDevice(void* userData, void(*callback)(void* userdata, uint8_t* stream, int len));
