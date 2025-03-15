@@ -116,7 +116,7 @@ bool Mixer::StopVoice(const uint16_t id, float fadeOut)
 	return true;
 }
 
-void Mixer::SetVoiceVolume(const uint16_t id, const float value, const float fade)
+void Mixer::SetVoiceVolume(const uint32_t id, const float value, const float fade)
 {
 	auto voice = GetVoiceActive(id);
 	if (!voice)
@@ -125,7 +125,7 @@ void Mixer::SetVoiceVolume(const uint16_t id, const float value, const float fad
 	voice->Volume.SetFadeLength(static_cast<int>(fade * mDevice->Frequency));
 }
 
-void Mixer::SetVoicePan(const uint16_t id, const float value)
+void Mixer::SetVoicePan(const uint32_t id, const float value)
 {
 	auto voice = GetVoiceActive(id);
 	if (!voice)
@@ -158,7 +158,7 @@ std::shared_ptr<Voice> Mixer::GetVoiceAvailable()
 	return newVoice;
 }
 
-std::shared_ptr<Voice> Mixer::GetVoiceActive(const uint16_t id)
+std::shared_ptr<Voice> Mixer::GetVoiceActive(const uint32_t id)
 {
 	if (!mDevice) {
 		YOA_CRITICAL("Voice stopping failed! no Device present!");

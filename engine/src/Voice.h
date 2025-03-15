@@ -22,11 +22,11 @@ public:
 	uint32_t GetSamplesRemaining() const noexcept;
 	float GetSample(float position, const uint8_t channel = 0);
 
-	Voice(uint16_t id) : ID(id) { }
+	Voice(uint32_t id) : ID(id) { }
 private:
 	float LoadSample(uint32_t position, const uint8_t channel = 0);
 public:
-	const uint16_t ID;
+	const uint32_t ID;
 	VoiceState State = Stopped;
 	std::shared_ptr<Sample> Sound;
 	LinearSmooothValue Volume;

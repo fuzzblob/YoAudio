@@ -81,7 +81,7 @@ void Editor::App()
 		if (pitch < 0.01f)
 			pitch = 0.01f;
 
-		static uint16_t ambLoop_01 = 0u;
+		static uint32_t ambLoop_01 = 0u;
 		if (ambLoop_01 == 0u && ImGui::Button("Play Ambience 01")) {
 			ambLoop_01 = YOA_PlayWavFile("ambience_01.wav", true, 1.0f * volume, 1.0f * pitch, 12.0f, panning);
 		}
@@ -103,7 +103,7 @@ void Editor::App()
 			}
 		}
 
-		static uint16_t ambLoop_02 = 0u;
+		static uint32_t ambLoop_02 = 0u;
 		if (ambLoop_02 == 0u && ImGui::Button("Play Ambience 02")) {
 			ambLoop_02 = YOA_PlayWavFile("ambience_02.wav", true, 1.0f * volume, 1.0f * pitch, 5.0f, panning);
 		}
@@ -125,7 +125,7 @@ void Editor::App()
 			}
 		}
 
-		static uint16_t engineLoop = 0u;
+		static uint32_t engineLoop = 0u;
 		if (engineLoop == 0u && ImGui::Button("Play Engine")) {
 			engineLoop = YOA_PlayWavFile("engine.wav", true, 1.0f * volume, 1.0f * pitch, 5.0f, panning);
 		}
@@ -147,7 +147,7 @@ void Editor::App()
 			}
 		}
 
-		static uint16_t musicLoop = 0u;
+		static uint32_t musicLoop = 0u;
 		if (musicLoop == 0u && ImGui::Button("Play Music")) {
 			musicLoop = YOA_PlayWavFile("DasRied_loop_mono_8bit.wav", true, 1.0f * volume, 1.0f * pitch, 0.0f, panning);
 		}
