@@ -51,7 +51,7 @@ bool Mixer::IsPaused() noexcept
 	return mDevice->IsPaused();
 }
 
-uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const float volume, 
+uint32_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const float volume,
 	const float pitch, const float fadeIn, const float pan)
 {
 	if (!mDevice) {
@@ -100,7 +100,7 @@ uint16_t Mixer::PlayWavFile(const std::string & filename, const bool loop, const
 	return voice->ID;
 }
 
-bool Mixer::StopVoice(const uint16_t id, float fadeOut)
+bool Mixer::StopVoice(const uint32_t id, float fadeOut)
 {
 	auto voice = GetVoiceActive(id);
 	if (!voice)
