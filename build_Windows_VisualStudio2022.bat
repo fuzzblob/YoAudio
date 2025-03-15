@@ -14,7 +14,7 @@ cd build
 
 set VS150COMNTOOLS = "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\"
 rem run CMake
-rem change the target project type if not using VisualStudio (append Win64 to build 64bit binaries)
+rem change the target project type if not using VisualStudio
 %CM% -G "Visual Studio 17 2022" -A x64 -Wdev ../
 
 cd ..
