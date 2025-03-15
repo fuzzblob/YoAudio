@@ -10,6 +10,7 @@ project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSI
 #
 ##########################
 # Meta Project
+option(Code_Analysis "do code analysis in MS VS" ON)
 option(Warnings_As_Errors "Treat compiler warnings as errors" ON)
 # option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 # Editor:

@@ -83,6 +83,12 @@ if(MSVC)
 	ELSE ( )
 		message(STATUS "could not locate SDL2.dll path in ${SDL2_DLL_SEARCH_PATH}" )
 	ENDIF ( )
+	if(${Code_Analysis})
+		# do code analysis
+		set_target_properties(${PROJECT_NAME} PROPERTIES
+			VS_GLOBAL_RunCodeAnalysis true
+			VS_GLOBAL_EnableMicrosoftCodeAnalysis true)
+	endif()
 	# copy assets folder to build directory to enable easy playback
 	set(ASSETS_DIR ${CMAKE_CURRENT_LIST_DIR}/assets/)
     message(STATUS "custom command to copy `${ASSETS_DIR}` to buid directory pre-build.")

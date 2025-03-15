@@ -72,6 +72,12 @@ if (MSVC)
 	# this expresses the YOA_API macro to express DLL export
 	target_compile_definitions(${PROJECT_NAME} PRIVATE BUILD_DLL=true)
 	set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+	if(${Code_Analysis})
+		# do code analysis
+		set_target_properties(${PROJECT_NAME} PROPERTIES
+			VS_GLOBAL_RunCodeAnalysis true
+			VS_GLOBAL_EnableMicrosoftCodeAnalysis true)
+	endif()
 endif(MSVC)
 
 message(STATUS "YoAudio Engine CMakeLists.txt end")
