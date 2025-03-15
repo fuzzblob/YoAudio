@@ -1,7 +1,7 @@
 #include "Log.h"
 
 #if LOGGING_ENABLED && SPDLOG_FOUND
-#include "spdlog/sinks/stdout_color_sinks.h"
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 std::shared_ptr<spdlog::logger> Log::mLogger;
 

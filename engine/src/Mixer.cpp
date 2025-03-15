@@ -14,7 +14,6 @@ namespace YoaEngine
 	{
 		// initialize audio device
 		mDevice = std::make_unique<AudioDevice>(this, AudioCallback);
-		//mDevice = std::unique_ptr<AudioDevice>(new AudioDevice(this, AudioCallback));
 		if (mDevice->Format == YOA_Format_Unknown) {
 			return;
 		}
@@ -28,7 +27,8 @@ namespace YoaEngine
 		// unpause audio device
 		mDevice->SetPaused(false);
 		// initialize other resources
-		mPlayingAudio.reserve(MAX_VOICES > 0 ? MAX_VOICES : 32);
+		constexpr int reserveAmt = (MAX_VOICES > 0) ? MAX_VOICES : 32;
+		mPlayingAudio.reserve(reserveAmt);
 		mResources = std::make_unique<ResourceManager>();
 	}
 
@@ -38,7 +38,7 @@ namespace YoaEngine
 		mResources = nullptr;
 	}
 
-	void Mixer::Pause(const bool pause) noexcept
+	void Mixer::Pause(const bool pause)
 	{
 		if (!mDevice)
 		{
@@ -161,7 +161,7 @@ namespace YoaEngine
 				return nullptr;
 			}
 #endif
-			newVoice = std::shared_ptr<Voice>(new Voice(++mVoiceCount));
+			newVoice = std::make_unique<Voice>(++mVoiceCount);
 		}
 
 		newVoice->Sound = nullptr;
@@ -213,7 +213,7 @@ namespace YoaEngine
 				uint32_t length = bufferSize;
 				if (voice->IsLooping == false) {
 					// if not looping, will we run out of samples?
-					const uint32_t samplesRemaining = uint32_t(voice->GetSamplesRemaining() / pitch);
+					const uint32_t samplesRemaining = static_cast<uint32_t>(voice->GetSamplesRemaining() / pitch);
 					if (samplesRemaining > 0 && samplesRemaining < length)
 						length = samplesRemaining;
 				}
@@ -230,9 +230,9 @@ namespace YoaEngine
 					float sample(0.0f);
 					for (uint32_t i = 0; i < length; i++) {
 						voice->Panning.CalculateNext();
-						sample = voice->GetSample(uint32_t(sampleIndex)) * voice->Volume.GetNext();
 						mixL[i] += sample * voice->Panning.volL;
 						mixR[i] += sample * voice->Panning.volR;
+						sample = voice->GetSample(static_cast<uint32_t>(sampleIndex)) * voice->Volume.GetNext();
 						sampleIndex += pitch;
 					}
 					voice->AdvancePlayhead(std::ceil(length * pitch));

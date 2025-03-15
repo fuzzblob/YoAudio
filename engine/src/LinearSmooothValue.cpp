@@ -5,7 +5,7 @@
 namespace YoaEngine
 {
 	LinearSmooothValue::LinearSmooothValue(float initial, double sampleRate, double rampLengthSeconds) noexcept
-		: currentValue(initial), currentTarget(initial), stepsToTarget((int)std::floor(rampLengthSeconds* sampleRate)),
+		: currentValue(initial), currentTarget(initial), stepsToTarget(static_cast<int>(std::floor(rampLengthSeconds* sampleRate))),
 		hasReacheTarget(false), countdown(0), stepSize(0)
 	{
 	}

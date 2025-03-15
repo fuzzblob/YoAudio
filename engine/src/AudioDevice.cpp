@@ -7,7 +7,7 @@ namespace YoaEngine
 	bool AudioDevice::IsPaused() const noexcept {
 		return mPaused;
 	}
-	void AudioDevice::SetPaused(const bool pause) noexcept {
+	void AudioDevice::SetPaused(const bool pause) {
 		if (mPaused == pause)
 			return;
 		YOA_TRACE("audio engine state set to \"paused = {0}\"", pause);

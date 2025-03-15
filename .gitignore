@@ -38,3 +38,4 @@ editor/src/EditorConfig.h
 dependencies/SDL2/
 dependencies/SDL2/*
 dependencies/SDL2/include/
+engine/include/EngineConfig.h

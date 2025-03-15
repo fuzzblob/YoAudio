@@ -11,7 +11,7 @@ project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSI
 ##########################
 # Meta Project
 set(FORCE_SDL true) # "force the use of SDL2 backend (no other options are implemented at the moment)"
-option(Code_Analysis "do code analysis in MS VS" ON)
+option(Code_Analysis "do code analysis in MS VS" OFF)
 option(Warnings_As_Errors "Treat compiler warnings as errors" ON)
 # option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 # Editor:
@@ -88,11 +88,14 @@ endif ( CMAKE_BUILD_TYPE STREQUAL "" )
 #	Dependencies
 #
 ##########################
-#set(SDL2_BUILDING_LIBRARY "true")
-set(SDL2_CUSTOM_SEARCH_PATH dependencies/SDL2/)
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/dependencies)
+# set(SDL2_BUILDING_LIBRARY false)
+set(SDL2_CUSTOM_SEARCH_PATH ${PROJECT_SOURCE_DIR}/dependencies/SDL2/)
+#set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/dependencies)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/dependencies ${SDL2_CUSTOM_SEARCH_PATH})
 message(STATUS "Looking for SDL2 (SDL2_CUSTOM_SEARCH_PATH = ${SDL2_CUSTOM_SEARCH_PATH})...")
 find_package(SDL2 REQUIRED)
+# target_link_libraries(${PROJECT_NAME} OpenGL::GL ${SDL2_LIBRARY} )
+
 
 # Check if we found it!
 IF ( SDL2_INCLUDE_DIR AND SDL2_LIBRARY )
