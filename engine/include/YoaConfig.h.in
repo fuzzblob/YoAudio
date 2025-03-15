@@ -4,36 +4,34 @@
 // 			Don't change this file by hand (except for testing during development)
 //			Change YoaConfig.h.in instead please.
 
-// version number set through CMake project build process
-#define PROJECT_VERSION			@PROJECT_VERSION@
-#define YOA_VERSION_MAJOR		@YOA_VERSION_MAJOR@
-#define YOA_VERSION_MINOR		@YOA_VERSION_MINOR@
-#define YOA_VERSION_PATCH		@YOA_VERSION_PATCH@
+#include <ostream>
+
+// project version set through CMake project build process
+constexpr const char* PROJECT_VERSION = "@PROJECT_VERSION@";
+constexpr uint16_t YOA_VERSION_MAJOR = @YOA_VERSION_MAJOR@u;
+constexpr uint16_t YOA_VERSION_MINOR = @YOA_VERSION_MINOR@u;
+constexpr uint16_t YOA_VERSION_PATCH = @YOA_VERSION_PATCH@u;
 
 // toggle certain features of YoAudio
-#cmakedefine SDL2_FOUND				@SDL2_FOUND@
+#define SDL2_FOUND @SDL2_FOUND@
 #if SDL2_FOUND
 #define FORCE_SDL @FORCE_SDL@
 #else
-#pragma error "can't find SDL2 dependency!"
+#error "can't find SDL2 dependency!"
 #endif
 
 #ifdef _DEBUG
-#cmakedefine SPDLOG_FOUND			@SPDLOG_FOUND@
-#if SPDLOG_FOUND
 #define LOGGING_ENABLED			@LOGGING_ENABLED@
-#else
-#define LOGGING_ENABLED 		false
+#if LOGGING_ENABLED
+#cmakedefine SPDLOG_FOUND			@SPDLOG_FOUND@
 #endif
-#else
-#define LOGGING_ENABLED 		false
 #endif
 
-#define AUDIO_THREAD_UPDATES	@AUDIO_THREAD_UPDATES@
+constexpr bool AUDIO_THREAD_UPDATES = @AUDIO_THREAD_UPDATES@;
 // calls to YoManager::Update() per second
-#define TICK_RATE				@TICK_RATE@
+constexpr uint16_t TICK_RATE = @TICK_RATE@u;
 // set to 0 for no limit on playing voices
-#define MAX_VOICES 				@MAX_VOICES@
+constexpr uint16_t MAX_VOICES = @MAX_VOICES@u;
 
 // audio device configuration
 #cmakedefine TARGET_SAMPLERATE		@TARGET_SAMPLERATE@

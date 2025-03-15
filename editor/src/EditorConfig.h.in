@@ -4,13 +4,21 @@
 // 			Don't change this file by hand (except for testing during development)
 //			Change YoaConfig.h.in instead please.
 
-#define EDITOR_FRAME_RATE			@EDITOR_FRAME_RATE@
+#include <ostream>
+
+// project version set through CMake project build process
+constexpr const char* PROJECT_VERSION = "@PROJECT_VERSION@";
+constexpr uint16_t YOA_VERSION_MAJOR = @YOA_VERSION_MAJOR@u;
+constexpr uint16_t YOA_VERSION_MINOR = @YOA_VERSION_MINOR@u;
+constexpr uint16_t YOA_VERSION_PATCH = @YOA_VERSION_PATCH@u;
+
+constexpr uint16_t EDITOR_FRAME_RATE = @EDITOR_FRAME_RATE@u;
 
 #cmakedefine SDL2_FOUND				@SDL2_FOUND@
 #if SDL2_FOUND
 #define FORCE_SDL @FORCE_SDL@
 #else
-#pragma error "can't find SDL2 dependency!"
+#error "can't find SDL2 dependency!"
 #endif
 
 #ifdef _DEBUG
