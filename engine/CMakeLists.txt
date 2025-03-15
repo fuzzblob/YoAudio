@@ -80,5 +80,5 @@ if (MSVC)
 	endif()
 endif(MSVC)
 
-message(STATUS "YoAudio Engine CMakeLists.txt end")
+message(STATUS "${PROJECT_NAME} CMakeLists.txt end")
 message(STATUS " ")
