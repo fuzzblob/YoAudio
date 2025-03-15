@@ -1,21 +1,24 @@
 #include "InputManager.h"
 
-bool InputManager::KeyDown(SDL_Scancode scanCode) const
+namespace YoaEditor
 {
-	return mKeyboardStates[scanCode];
-}
+	bool InputManager::KeyDown(SDL_Scancode scanCode) const
+	{
+		return mKeyboardStates[scanCode];
+	}
 
-void InputManager::Update()
-{
-	mKeyboardStates = SDL_GetKeyboardState(nullptr);
-}
+	void InputManager::Update()
+	{
+		mKeyboardStates = SDL_GetKeyboardState(nullptr);
+	}
 
-InputManager::InputManager()
-{
-	mKeyboardStates = nullptr;
-}
+	InputManager::InputManager()
+	{
+		mKeyboardStates = nullptr;
+	}
 
-InputManager::~InputManager()
-{
+	InputManager::~InputManager()
+	{
 
+	}
 }

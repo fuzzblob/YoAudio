@@ -4,6 +4,6 @@
 #undef main
 int main(void)
 {
-	std::unique_ptr<Editor> editor = std::make_unique<Editor>();
+	auto editor = std::make_unique<YoaEditor::Editor>();
 	return editor->Run();
 }

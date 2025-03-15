@@ -4,15 +4,17 @@
 
 #include <SDL.h>
 
-class InputManager
+namespace YoaEditor
 {
-private:
-	const Uint8* mKeyboardStates = nullptr;
-public:
-	bool KeyDown(SDL_Scancode scanCode) const;
-	void Update();
-	InputManager();
-	~InputManager();
-};
-
+	class InputManager
+	{
+	private:
+		const Uint8* mKeyboardStates = nullptr;
+	public:
+		bool KeyDown(SDL_Scancode scanCode) const;
+		void Update();
+		InputManager();
+		~InputManager();
+	};
+}
 #endif // !_INPUTMANAGER_H
