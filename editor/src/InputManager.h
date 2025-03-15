@@ -9,7 +9,7 @@ class InputManager
 private:
 	const Uint8* mKeyboardStates = nullptr;
 public:
-	bool KeyDown(SDL_Scancode scanCode);
+	bool KeyDown(SDL_Scancode scanCode) const;
 	void Update();
 	InputManager();
 	~InputManager();

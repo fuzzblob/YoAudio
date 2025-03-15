@@ -10,7 +10,7 @@
 
 class Mixer {
 public:
-	Mixer() noexcept;
+	Mixer();
 	~Mixer();
 
 	void Pause(const bool pause) noexcept;

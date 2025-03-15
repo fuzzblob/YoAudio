@@ -8,10 +8,11 @@
 #include "Log.h"
 #include "Utility.h"
 
-Mixer::Mixer() noexcept
+Mixer::Mixer()
 {
 	// initialize audio device
-	mDevice = std::unique_ptr<AudioDevice>(new AudioDevice(this, AudioCallback));
+	mDevice = std::make_unique<AudioDevice>(this, AudioCallback);
+	//mDevice = std::unique_ptr<AudioDevice>(new AudioDevice(this, AudioCallback));
 	if (mDevice->Format == YOA_Format_Unknown) {
 		return;
 	}

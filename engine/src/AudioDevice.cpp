@@ -5,7 +5,7 @@
 bool AudioDevice::IsPaused() const noexcept {
 	return mPaused;
 }
-void AudioDevice::SetPaused(const bool pause) {
+void AudioDevice::SetPaused(const bool pause) noexcept {
 	if (mPaused == pause)
 		return;
 	YOA_TRACE("audio engine state set to \"paused = {0}\"", pause);

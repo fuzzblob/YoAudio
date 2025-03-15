@@ -27,7 +27,7 @@ public:
 	static SampleFormat ConvertFormat(const SDL_AudioSpec& spec) noexcept;
 public:
 	bool IsPaused() const noexcept;
-	void SetPaused(const bool pause);
+	void SetPaused(const bool pause) noexcept;
 
 	void Lock() const noexcept;
 	void Unlock() const noexcept;
