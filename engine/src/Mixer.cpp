@@ -170,7 +170,7 @@ std::shared_ptr<Voice> Mixer::GetVoiceActive(const uint32_t id)
 	}
 
 	// loop throu sound channels removing stopped voices
-	for (auto voice : mPlayingAudio) {
+	for (auto& voice : mPlayingAudio) {
 		if (voice->ID != id)
 			continue;
 		return voice;
@@ -187,7 +187,7 @@ void Mixer::FillBuffer()
 	for (size_t i = 0; i < bufferSize; i++)
 		mixR[i] = 0.0f;
 
-	for (auto voice : mPlayingAudio)
+	for (auto& voice : mPlayingAudio)
 	{
 		if (voice->State == ToPlay)
 			voice->State = Playing;
@@ -253,7 +253,7 @@ void Mixer::FillBuffer()
 	for (int i = mPlayingAudio.size() - 1; i >= 0; i--) {
 		if (mPlayingAudio[i]->State != Stopped)
 			continue;
-		auto voice = mPlayingAudio[i];
+		auto& voice = mPlayingAudio[i];
 		voice->Volume.SetFadeLength(0);
 		voice->Volume.SetValue(1.0f);
 		voice->Volume.UpdateTarget();
