@@ -185,6 +185,9 @@ void Editor::App()
 		
 		if (ImGui::Button("Resume Playback"))
 			YOA_Resume();
+
+		if (ImGui::Button("Stop All Playback"))
+			YOA_Stop(0.0f);
 	}
 }
 

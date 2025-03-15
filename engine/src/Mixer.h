@@ -21,7 +21,7 @@ public:
 	bool StopVoice(const uint32_t id, const float fadeOut = 0.0f);
 	void SetVoiceVolume(const uint32_t id, const float value, const float fade = 0.01f);
 	void SetVoicePan(const uint32_t id, const float value);
-	// TODO: StopSound (useful for unloading also)
+	void StopSound(const float fade = 0.01f);
 private:
 	std::shared_ptr<Voice> GetVoiceAvailable();
 	std::shared_ptr<Voice> GetVoiceActive(const uint32_t id);

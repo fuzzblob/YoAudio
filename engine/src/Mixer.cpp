@@ -133,6 +133,14 @@ void Mixer::SetVoicePan(const uint32_t id, const float value)
 	voice->Panning.Set(std::max(-1.0f, std::min(1.0f, value)));
 }
 
+void Mixer::StopSound(const float fade)
+{
+	// loop throu sound channels removing stopped voices
+	for (auto& voice : mPlayingAudio) {
+		StopVoice(voice->ID, fade);
+	}
+}
+
 std::shared_ptr<Voice> Mixer::GetVoiceAvailable()
 {
 	std::shared_ptr<Voice> newVoice = nullptr;

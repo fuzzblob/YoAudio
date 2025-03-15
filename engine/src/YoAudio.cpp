@@ -62,3 +62,11 @@ void YOA_Resume(void)
 		inst->mMixer->Pause(false);
 	}
 }
+
+void YOA_Stop(const float fadeOut)
+{
+	const AudioThread* inst = AudioThread::GetInstance();
+	if (inst) {
+		inst->mMixer->StopSound(fadeOut);
+	}
+}

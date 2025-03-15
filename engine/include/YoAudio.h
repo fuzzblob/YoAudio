@@ -24,6 +24,8 @@ void YOA_API YOA_Pause(void);
 
 void YOA_API YOA_Resume(void);
 
+void YOA_API YOA_Stop(const float fadeOut);
+
 #ifdef __cplusplus
 }
 #endif
