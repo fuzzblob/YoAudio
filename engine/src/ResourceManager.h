@@ -6,15 +6,18 @@
 
 #include "Sample.h"
 
-class ResourceManager {
-public:
-	std::shared_ptr<Sample> GetSound(const std::string & filename);
+namespace YoaEngine
+{
+	class ResourceManager {
+	public:
+		std::shared_ptr<Sample> GetSound(const std::string& filename);
 
-	~ResourceManager();
-private:
-	std::shared_ptr<Sample> LoadSound(const std::string & filePath);
-	void FreeSound(std::shared_ptr<Sample> sound) noexcept;
-private:
-	std::string assetPath;
-	std::map<std::string, std::shared_ptr<Sample>> mSounds;
-};
+		~ResourceManager();
+	private:
+		std::shared_ptr<Sample> LoadSound(const std::string& filePath);
+		void FreeSound(std::shared_ptr<Sample> sound) noexcept;
+	private:
+		std::string assetPath;
+		std::map<std::string, std::shared_ptr<Sample>> mSounds;
+	};
+}

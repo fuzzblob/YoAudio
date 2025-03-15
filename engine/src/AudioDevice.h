@@ -22,31 +22,34 @@
 #error unsupported target bitdepth
 #endif
 
-class AudioDevice {
-public:
-	static SampleFormat ConvertFormat(const SDL_AudioSpec& spec) noexcept;
-public:
-	bool IsPaused() const noexcept;
-	void SetPaused(const bool pause) noexcept;
+namespace YoaEngine
+{
+	class AudioDevice {
+	public:
+		static SampleFormat ConvertFormat(const SDL_AudioSpec& spec) noexcept;
+	public:
+		bool IsPaused() const noexcept;
+		void SetPaused(const bool pause) noexcept;
 
-	void Lock() const noexcept;
-	void Unlock() const noexcept;
+		void Lock() const noexcept;
+		void Unlock() const noexcept;
 
-	const char* GetDeviceName() const noexcept;
-	AudioDevice(void* userData, void(*callback)(void* userdata, uint8_t* stream, int len));
-	~AudioDevice();
-public:
-	// audio callback buffer size (per channel)
-	uint32_t Samples = 0;
-	// audio callback sample rate
-	uint32_t Frequency = 0;
-	// audio callback bit depth
-	SampleFormat Format = YOA_Format_Unknown;
-	// audio callback channel count
-	uint8_t Channels = 0;
-private:
-	// is the audio device paused
-	bool mPaused = true;
-	SDL_AudioDeviceID DeviceID;
-	std::string DeviceName;
-};
+		const char* GetDeviceName() const noexcept;
+		AudioDevice(void* userData, void(*callback)(void* userdata, uint8_t* stream, int len));
+		~AudioDevice();
+	public:
+		// audio callback buffer size (per channel)
+		uint32_t Samples = 0;
+		// audio callback sample rate
+		uint32_t Frequency = 0;
+		// audio callback bit depth
+		SampleFormat Format = YOA_Format_Unknown;
+		// audio callback channel count
+		uint8_t Channels = 0;
+	private:
+		// is the audio device paused
+		bool mPaused = true;
+		SDL_AudioDeviceID DeviceID;
+		std::string DeviceName;
+	};
+}

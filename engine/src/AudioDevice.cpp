@@ -2,88 +2,91 @@
 
 #include "Log.h"
 
-bool AudioDevice::IsPaused() const noexcept {
-	return mPaused;
-}
-void AudioDevice::SetPaused(const bool pause) noexcept {
-	if (mPaused == pause)
-		return;
-	YOA_TRACE("audio engine state set to \"paused = {0}\"", pause);
-	mPaused = pause;
-	SDL_PauseAudioDevice(DeviceID, pause ? 1 : 0);
-}
-
-void AudioDevice::Lock() const noexcept {
-	SDL_LockAudioDevice(DeviceID);
-}
-void AudioDevice::Unlock() const noexcept {
-	SDL_UnlockAudioDevice(DeviceID);
-}
-
-const char* AudioDevice::GetDeviceName() const noexcept {
-	return SDL_GetCurrentAudioDriver();
-}
-
-SampleFormat AudioDevice::ConvertFormat(const SDL_AudioSpec& spec) noexcept {
-	if (SDL_AUDIO_ISFLOAT(spec.format)) {
-		return YOA_Format_Float;
+namespace YoaEngine
+{
+	bool AudioDevice::IsPaused() const noexcept {
+		return mPaused;
 	}
-	else {
-		switch (SDL_AUDIO_BITSIZE(spec.format)) {
-		case 8:
-			if (SDL_AUDIO_ISSIGNED(spec.format) == false)
-				return YOA_Format_Uint8;
-			[[fallthrough]];
-		case 16:
-			if (SDL_AUDIO_ISSIGNED(spec.format))
-				return YOA_Format_Sint16;
-			[[fallthrough]];
-		case 32:
-			if (SDL_AUDIO_ISSIGNED(spec.format))
-				return YOA_Format_Sint32;
-			[[fallthrough]];
-		default:
-			return YOA_Format_Unknown;
+	void AudioDevice::SetPaused(const bool pause) noexcept {
+		if (mPaused == pause)
+			return;
+		YOA_TRACE("audio engine state set to \"paused = {0}\"", pause);
+		mPaused = pause;
+		SDL_PauseAudioDevice(DeviceID, pause ? 1 : 0);
+	}
+
+	void AudioDevice::Lock() const noexcept {
+		SDL_LockAudioDevice(DeviceID);
+	}
+	void AudioDevice::Unlock() const noexcept {
+		SDL_UnlockAudioDevice(DeviceID);
+	}
+
+	const char* AudioDevice::GetDeviceName() const noexcept {
+		return SDL_GetCurrentAudioDriver();
+	}
+
+	SampleFormat AudioDevice::ConvertFormat(const SDL_AudioSpec& spec) noexcept {
+		if (SDL_AUDIO_ISFLOAT(spec.format)) {
+			return YOA_Format_Float;
+		}
+		else {
+			switch (SDL_AUDIO_BITSIZE(spec.format)) {
+			case 8:
+				if (SDL_AUDIO_ISSIGNED(spec.format) == false)
+					return YOA_Format_Uint8;
+				[[fallthrough]];
+			case 16:
+				if (SDL_AUDIO_ISSIGNED(spec.format))
+					return YOA_Format_Sint16;
+				[[fallthrough]];
+			case 32:
+				if (SDL_AUDIO_ISSIGNED(spec.format))
+					return YOA_Format_Sint32;
+				[[fallthrough]];
+			default:
+				return YOA_Format_Unknown;
+			}
 		}
 	}
-}
 
-AudioDevice::AudioDevice(void* userData, void(*callback)(void* userdata, uint8_t* stream, int len)) {
-	SDL_AudioSpec want;
-	SDL_memset(&want, 0, sizeof(want));
-	want.freq = TARGET_SAMPLERATE;
-	want.format = AUDIO_FORMAT;
-	want.channels = TARGET_CHANNELS;
-	want.samples = TARGET_BUFFER;
-	want.callback = callback;
-	want.userdata = userData;
-	SDL_AudioSpec get;
+	AudioDevice::AudioDevice(void* userData, void(*callback)(void* userdata, uint8_t* stream, int len)) {
+		SDL_AudioSpec want;
+		SDL_memset(&want, 0, sizeof(want));
+		want.freq = TARGET_SAMPLERATE;
+		want.format = AUDIO_FORMAT;
+		want.channels = TARGET_CHANNELS;
+		want.samples = TARGET_BUFFER;
+		want.callback = callback;
+		want.userdata = userData;
+		SDL_AudioSpec get;
 
-	DeviceID = SDL_OpenAudioDevice(nullptr, 0, &want, &get, ALLOWED_CHANGES);
-	if (DeviceID == 0) {
-		YOA_CRITICAL("Failed to open audio device: {0}", SDL_GetError());
-		return;
+		DeviceID = SDL_OpenAudioDevice(nullptr, 0, &want, &get, ALLOWED_CHANGES);
+		if (DeviceID == 0) {
+			YOA_CRITICAL("Failed to open audio device: {0}", SDL_GetError());
+			return;
+		}
+		else if (get.freq != TARGET_SAMPLERATE
+			|| get.format != AUDIO_FORMAT
+			|| get.channels != TARGET_CHANNELS
+			|| get.samples != TARGET_BUFFER)
+		{
+			YOA_ERROR("AudioDevice opened with different parameters than requested!");
+		}
+		SetPaused(true);
+
+		Samples = get.samples;
+		Channels = get.channels;
+		Frequency = get.freq;
+		Format = AudioDevice::ConvertFormat(get);
+		DeviceName = GetDeviceName();
+
+		YOA_INFO("Opened AudioDevice \"{0}\" ID: {1}\n\t{2} sample rate, {5}bit, {3} channels, buffer size {4}",
+			DeviceName, DeviceID, Frequency, Channels, Samples, (unsigned char)(Format));
 	}
-	else if (get.freq != TARGET_SAMPLERATE
-		|| get.format != AUDIO_FORMAT
-		|| get.channels != TARGET_CHANNELS
-		|| get.samples != TARGET_BUFFER)
-	{
-		YOA_ERROR("AudioDevice opened with different parameters than requested!");
+	AudioDevice::~AudioDevice() {
+		SetPaused(true);
+		// close SDL audio
+		SDL_CloseAudioDevice(DeviceID);
 	}
-	SetPaused(true);
-
-	Samples = get.samples;
-	Channels = get.channels;
-	Frequency = get.freq;
-	Format = AudioDevice::ConvertFormat(get);
-	DeviceName = GetDeviceName();
-
-	YOA_INFO("Opened AudioDevice \"{0}\" ID: {1}\n\t{2} sample rate, {5}bit, {3} channels, buffer size {4}",
-		DeviceName, DeviceID, Frequency, Channels, Samples, (unsigned char)(Format));
-}
-AudioDevice::~AudioDevice() {
-	SetPaused(true);
-	// close SDL audio
-	SDL_CloseAudioDevice(DeviceID);
 }
