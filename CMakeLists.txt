@@ -141,4 +141,10 @@ if(MSVC)
 endif()
 
 message(STATUS "YoAudio CMakeLists.txt end")
-message(STATUS " ")
+
+message(STATUS "")
+message(STATUS "###################################################################################################################")
+message(STATUS "")
+message(STATUS "				${PROJECT_NAME} configuration complete!")
+message(STATUS "")
+message(STATUS "###################################################################################################################")
