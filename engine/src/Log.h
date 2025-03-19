@@ -1,22 +1,6 @@
 #pragma once
 
 #include "YoaConfig.h"
-#include <cassert>
-
-#define YOA_ASSERT(x, ...) assert(x);
-//#define YOA_ASSERT(x, ...) \
-//{ \
-//	YOA_CRITICAL("Assertion Failed! \n", __VA_ARGS__); \
-//	assert(x); \
-//}; \
-//#if YOA_PLATFORM == YOA_WINDOWS \
-//	/* MSVC specific debug break */ \
-//	__debugbreak(); \
-//#else \
-//	/* POSIX portable debug break */ \
-//	raise(SIGTRAP); \
-//#endif \
-//};
 
 #if LOGGING_ENABLED
 #if SPDLOG_FOUND
