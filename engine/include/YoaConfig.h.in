@@ -4,6 +4,7 @@
 // 			Don't change this file by hand (except for testing during development)
 //			Change YoaConfig.h.in instead please.
 
+#include "AudioFormat.h"
 #include <ostream>
 
 constexpr const char* PROJECT_NAME = "@PROJECT_NAME@";
@@ -39,3 +40,4 @@ constexpr uint16_t MAX_VOICES = @MAX_VOICES@u;
 #cmakedefine TARGET_CHANNELS			@TARGET_CHANNELS@
 #cmakedefine TARGET_BUFFER			@TARGET_BUFFER@
 #cmakedefine TARGET_BITDEPTH			@TARGET_BITDEPTH@
+constexpr auto TargetRenderBitdepth = static_cast<SampleFormat>(@TARGET_BITDEPTH@);
