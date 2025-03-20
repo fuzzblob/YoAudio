@@ -26,7 +26,7 @@ namespace YoaEngine
 {
 	class AudioDevice {
 	public:
-		static SampleFormat ConvertFormat(const SDL_AudioSpec& spec) noexcept;
+		static SampleFormat GetYoaFormat(const SDL_AudioSpec& spec) noexcept;
 	public:
 		bool IsPaused() const noexcept;
 		void SetPaused(const bool pause);

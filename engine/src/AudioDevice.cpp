@@ -26,7 +26,7 @@ namespace YoaEngine
 		return SDL_GetCurrentAudioDriver();
 	}
 
-	SampleFormat AudioDevice::ConvertFormat(const SDL_AudioSpec& spec) noexcept {
+	SampleFormat AudioDevice::GetYoaFormat(const SDL_AudioSpec& spec) noexcept {
 		if (SDL_AUDIO_ISFLOAT(spec.format)) {
 			return YOA_Format_Float;
 		}
@@ -78,7 +78,7 @@ namespace YoaEngine
 		Samples = get.samples;
 		Channels = get.channels;
 		Frequency = get.freq;
-		Format = AudioDevice::ConvertFormat(get);
+		Format = AudioDevice::GetYoaFormat(get);
 		DeviceName = GetDeviceName();
 
 		YOA_INFO("Opened AudioDevice \"{0}\" ID: {1}\n\t{2} sample rate, {5}bit, {3} channels, buffer size {4}",
