@@ -42,6 +42,7 @@ include_directories(
 # setup the executable
 #
 add_executable(${PROJECT_NAME} ${SRCS} ${HDRS} ${IMGUI_SOURCES})
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 #
 # link extermal libraries
 #

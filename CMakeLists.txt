@@ -40,9 +40,11 @@ message(STATUS "################################################################
 #		Compiler
 #
 ##########################
-# set C++17 standard
+# set C++ standard
 set(CMAKE_CXX_STANDARD 20)
+#set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++20")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 # specify UTF8 support
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "/utf-8")
 set(CMAKE_C_FLAGS "/utf-8")
@@ -58,9 +60,8 @@ if(MSVC)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /permissive-")
 	endif()
 	# /Wall is possible thanks to VS2022 enabling to exclude external headers from it
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /permissive- /w14640 /Wall /external:anglebrackets /external:W0")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w14242 /w14254 /w14263 /w14265 /w14287 /we4289 /w14296 /w14311 /w14545")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w14546 /w14547 /w14549 /w14555 /w14619 /w14640 /w14826 /w14905 /w14906 /w14928")
+	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "/permissive- /w14640 /Wall /external:anglebrackets /external:W0 /std:c++20")
+	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "/w14242 /w14254 /w14263 /w14265 /w14287 /we4289 /w14296 /w14311 /w14545 /w14546 /w14547 /w14549 /w14555 /w14619 /w14640 /w14826 /w14905 /w14906 /w14928")
 	# if(Warnings_As_Errors)
 		# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
 	# endif()

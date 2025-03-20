@@ -62,6 +62,7 @@ endif()
 # setup output binary
 #
 add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDRS})
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE C)
 # link SDL2
 if(SDL2_LIBRARY)
