@@ -39,9 +39,7 @@ namespace YoaEngine
             // Calculate log base 2 of n
             const double logValue = std::log2(n);
             // check if log2 of n is iteger
-            double intPart = 0;
-            const double fractPart = std::modf(logValue, &intPart);
-            return (fractPart == 0.0);
+            return isInteger(logValue);
             // naive implementation checking the log2 is integer
             //return (logValue == static_cast<long>(logValue));
             // naive implementation, but costlier
@@ -49,5 +47,16 @@ namespace YoaEngine
             // and 2^(logn) = n
             //return pow(2, logValue) == n;
         }
+    }
+
+    template<
+        typename T, //real type
+        typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+    >
+    [[nodiscard]] inline constexpr bool isInteger(const T numer) noexcept
+    {
+        double intPart = 0;
+        const double fractPart = std::modf(numer, &intPart);
+        return (fractPart == 0.0);
     }
 }

@@ -1,33 +1,43 @@
 #include "Voice.h"
+#include "Utility.h"
+#include <cmath>
+#include <algorithm>
 
 namespace YoaEngine
 {
-	void Voice::AdvancePlayhead(const uint32_t samples) noexcept {
-		NextSample += samples;
+	void Voice::AdvancePlayhead(const float samples) noexcept {
 		if (IsLooping) {
-			NextSample %= Sound->Samples;
+			NextSample = std::fmod(NextSample + samples, Sound->Samples);
+		}
+		else {
+			NextSample += samples;
 		}
 	}
 
-	uint32_t Voice::GetSamplesRemaining() const noexcept {
-		return Sound->Samples - NextSample;
+	float Voice::GetSamplesRemaining() const noexcept {
+		return std::max(0.0f, (Sound->Samples - NextSample));
 	}
 
-	float Voice::GetSample(float position, const uint8_t channel) {
-		const float delta = (position - int(position));
-		if (delta == 0.0f)
-			return LoadSample(position, channel);
-		const uint32_t pos0 = NextSample + int(position);
-		const uint32_t pos1 = pos0 + 1;
-		const float s0 = LoadSample(pos0, channel);
-		const float s1 = LoadSample(pos1, channel);
-		return (delta * (s1 - s0)) + s0;
+	float Voice::GetSample(const float position, const uint8_t channel) {
+		float sample = NextSample + position;
+		double intPart = 0;
+		const double fractPart = std::modf(sample, &intPart);
+		if(fractPart == 0.0)
+		{
+			return LoadSample(sample, channel);
+		}
+		// linear interpolation between 2 samples
+		const float a = LoadSample(intPart, channel);
+		const float b = LoadSample(intPart + 1, channel);
+		return std::lerp(a, b, fractPart);
+		// naive lerp implemntation
+		// return a + (fractPart * (b - a));
 	}
 
 	float Voice::LoadSample(uint32_t position, const uint8_t channel) {
-		position += NextSample;
-		if (IsLooping)
-			position %= Sound->Samples;
-		return Sound->GetSample(position + channel);
+#ifdef _DEBUG
+		YOA_ASSERT(channel <= this->Sound->Channels);
+#endif
+		return Sound->GetSample((position % Sound->Samples) + channel);
 	}
 }

@@ -233,33 +233,34 @@ namespace YoaEngine
 				//YOA_ASSERT(voice->Sound->Channels <= 2);
 				float sampleIndex = 0.0f;
 				if (voice->Sound->Channels == 1) {
-					float sample(0.0f);
 					for (uint32_t i = 0; i < length; i++) {
+						const float volume = voice->Volume.GetNext();
+						const float sample = voice->GetSample(sampleIndex);
 						voice->Panning.CalculateNext();
-						mixL[i] += sample * voice->Panning.volL;
-						mixR[i] += sample * voice->Panning.volR;
-						sample = voice->GetSample(static_cast<uint32_t>(sampleIndex)) * voice->Volume.GetNext();
+						mixL[i] += sample * volume * voice->Panning.volL;
+						mixR[i] += sample * volume * voice->Panning.volR;
 						sampleIndex += pitch;
+						//voice->AdvancePlayhead(pitch);
 					}
-					voice->AdvancePlayhead(std::ceil(length * pitch));
+					voice->AdvancePlayhead(length * pitch);
 				}
 				else if (voice->Sound->Channels == 2) {
-					float volume;
 					for (uint32_t i = 0; i < length; i++) {
-						volume = voice->Volume.GetNext();
+						const float volume = voice->Volume.GetNext();
 						voice->Panning.CalculateNext();
 						mixL[i] += voice->GetSample(sampleIndex, 0) * volume * voice->Panning.volL;
 						mixR[i] += voice->GetSample(sampleIndex, 1) * volume * voice->Panning.volR;
 						sampleIndex += pitch;
+						//voice->AdvancePlayhead(pitch);
 					}
-					voice->AdvancePlayhead(std::ceil(length * pitch));
+					voice->AdvancePlayhead(length * pitch);
 				}
 
 				if (voice->State == Stopping && voice->Volume.HasReachedTarget()) {
 					voice->State = Stopped;
 				}
 				else if (voice->IsLooping == false
-					&& voice->GetSamplesRemaining() <= 0) {
+					&& voice->GetSamplesRemaining() <= 0.0f) {
 					// Non looping sound has no more mixable samples
 					voice->State = Stopped;
 				}

@@ -20,9 +20,9 @@ namespace YoaEngine
 	class Voice
 	{
 	public:
-		void AdvancePlayhead(const uint32_t samples) noexcept;
-		uint32_t GetSamplesRemaining() const noexcept;
-		float GetSample(float position, const uint8_t channel = 0);
+		void AdvancePlayhead(const float samples) noexcept;
+		float GetSamplesRemaining() const noexcept;
+		float GetSample(const float position, const uint8_t channel = 0);
 
 		Voice(uint32_t id) : ID(id) {}
 	private:
@@ -35,6 +35,6 @@ namespace YoaEngine
 		StereoPanner Panning;
 		bool IsLooping = false;
 		float Pitch = 1.0f;
-		uint32_t NextSample = 0;
+		float NextSample = 0;
 	};
 }
