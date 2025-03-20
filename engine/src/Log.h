@@ -15,11 +15,11 @@ private:
 };
 
 // log macros
-#define YOA_TRACE(...)			::Log::GetCoreLogger()->trace(__VA_ARGS__)
-#define YOA_INFO(...)			::Log::GetCoreLogger()->info(__VA_ARGS__)
-#define YOA_WARN(...)			::Log::GetCoreLogger()->warn(__VA_ARGS__)
-#define YOA_ERROR(...)			::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define YOA_CRITICAL(...)	    ::Log::GetCoreLogger()->critical(__VA_ARGS__)
+#define YOA_TRACE(...)			{ auto log = ::Log::GetCoreLogger(); if(log)log->trace(__VA_ARGS__); };
+#define YOA_INFO(...)			{ auto log = ::Log::GetCoreLogger(); if(log)log->info(__VA_ARGS__); };
+#define YOA_WARN(...)			{ auto log = ::Log::GetCoreLogger(); if(log)log->warn(__VA_ARGS__); };
+#define YOA_ERROR(...)			{ auto log = ::Log::GetCoreLogger(); if(log)log->error(__VA_ARGS__); };
+#define YOA_CRITICAL(...)	    { auto log = ::Log::GetCoreLogger(); if(log)log->critical(__VA_ARGS__); };
 #else
 #include <stdio.h>
 // sdplog library was not found
