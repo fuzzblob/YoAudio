@@ -22,7 +22,8 @@ namespace YoaEngine
 		float sample = NextSample + position;
 		double intPart = 0;
 		const double fractPart = std::modf(sample, &intPart);
-		if(fractPart == 0.0)
+		if (fractPart <  std::numeric_limits<double>::epsilon() &&
+			fractPart > -std::numeric_limits<double>::epsilon())
 		{
 			return LoadSample(sample, channel);
 		}

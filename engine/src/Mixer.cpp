@@ -344,8 +344,8 @@ namespace YoaEngine
 			int32_t* out32 = (int32_t*)stream;
 			for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)
 			{
-				out32[sampleIndex++] = static_cast<int32_t>(mixer->mixL[mix] * 2147483647);
-				out32[sampleIndex++] = static_cast<int32_t>(mixer->mixR[mix] * 2147483647);
+				out32[sampleIndex++] = static_cast<int32_t>(mixer->mixL[mix] * 2147483647.0f);
+				out32[sampleIndex++] = static_cast<int32_t>(mixer->mixR[mix] * 2147483647.0f);
 			}
 			return;
 		}
