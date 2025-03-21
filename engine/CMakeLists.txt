@@ -71,9 +71,9 @@ if(SDL2_LIBRARY)
 	target_link_libraries(${ENGINE_NAME} ${SDL2_LIBRARY})
 endif()
 
+target_compile_definitions(${ENGINE_NAME} PRIVATE BUILD_DLL=true)
 if (MSVC)
 	# this expresses the YOA_API macro to express DLL export
-	target_compile_definitions(${PROJECT_NAME} PRIVATE BUILD_DLL=true)
 	set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 	if(${Code_Analysis})
 		# do code analysis

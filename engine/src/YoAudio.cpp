@@ -31,7 +31,7 @@ bool YOA_StopVoice(const uint32_t id, const float fadeOut)
 	return false;
 }
 
-void YOA_API YOA_SetVoiceVolume(const uint32_t id, const float newVolume)
+void YOA_SetVoiceVolume(const uint32_t id, const float newVolume)
 {
 	const YoaEngine::AudioThread* inst = YoaEngine::AudioThread::GetInstance();
 	if (inst) {
@@ -39,7 +39,7 @@ void YOA_API YOA_SetVoiceVolume(const uint32_t id, const float newVolume)
 	}
 }
 
-void YOA_API YOA_SetVoicePan(const uint32_t id, const float newPan)
+void YOA_SetVoicePan(const uint32_t id, const float newPan)
 {
 	const YoaEngine::AudioThread* inst = YoaEngine::AudioThread::GetInstance();
 	if (inst) {

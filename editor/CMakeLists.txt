@@ -64,41 +64,35 @@ else()
 	)
 endif()
 target_link_libraries(${EDITOR_NAME} ${ENGINE_NAME} ${COMMON_NAME}) # also adds the required include path
+# when referencing YoAudio.h the DLL macros should expand to import, not export
+target_compile_definitions(${EDITOR_NAME} PRIVATE BUILD_DLL=false)
+# search for SDL2.dll
+set(SDL2_DLL_SEARCH_PATH ../dependencies/SDL2/)
+FIND_PATH( SDL_DLL_PATH
+	NAMES SDL2.dll
+	PATHS ${SDL2_DLL_SEARCH_PATH}
+	PATH_SUFFIXES lib/x64
+	DOC "The SDL2.dll file location")
+message(STATUS "SDL2.dll path detected is: " ${SDL_DLL_PATH} )
+# copy SDL.dll to Runtime directory so the editor can run properly
+IF ( SDL_DLL_PATH )
+	add_custom_command(TARGET ${EDITOR_NAME} PRE_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy ${SDL_DLL_PATH}/SDL2.dll $<TARGET_FILE_DIR:${EDITOR_NAME}>
+		COMMAND_EXPAND_LISTS)
+ELSE ( )
+	message(STATUS "could not locate SDL2.dll path in ${SDL2_DLL_SEARCH_PATH}" )
+ENDIF ( )
 #
 # Windows platform specific stuff
 #
 if(MSVC)
-	# when referencing YoAudio.h the DLL macros should expand to import, not export
-	target_compile_definitions(${PROJECT_NAME} PRIVATE BUILD_DLL=false)
-	# search for SDL2.dll
-	set(SDL2_DLL_SEARCH_PATH ../dependencies/SDL2/)
-	FIND_PATH( SDL_DLL_PATH
-		NAMES SDL2.dll
-		PATHS ${SDL2_DLL_SEARCH_PATH}
-		PATH_SUFFIXES lib/x64
-		DOC "The SDL2.dll file location")
-	message(STATUS "SDL2.dll path detected is: " ${SDL_DLL_PATH} )
-	# copy SDL.dll to Runtime directory so the editor can run properly
-	IF ( SDL_DLL_PATH )
-		add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy ${SDL_DLL_PATH}/SDL2.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>
-			COMMAND_EXPAND_LISTS)
-	ELSE ( )
-		message(STATUS "could not locate SDL2.dll path in ${SDL2_DLL_SEARCH_PATH}" )
-	ENDIF ( )
 	if(${Code_Analysis})
 		# do code analysis
 		set_target_properties(${EDITOR_NAME} PROPERTIES
 			VS_GLOBAL_RunCodeAnalysis true
 			VS_GLOBAL_EnableMicrosoftCodeAnalysis true)
 	endif()
-	# copy assets folder to build directory to enable easy playback
-	set(ASSETS_DIR ${CMAKE_CURRENT_LIST_DIR}/assets/)
-    message(STATUS "custom command to copy `${ASSETS_DIR}` to buid directory pre-build.")
-	add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory
-		${ASSETS_DIR} $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets/)
-elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_${lang}_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
     message(STATUS "TODO: contemplate copying assets to buid directory if needed?")
 	# add_custom_command(
 		# TARGET ${EDITOR_NAME}
@@ -106,7 +100,12 @@ elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 		# COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:${EDITOR_NAME}>/assets )
 endif()
 
-message(STATUS "${PROJECT_NAME} CMakeLists.txt end")
+# copy assets folder to build directory to enable easy playback
+set(ASSETS_DIR ${CMAKE_CURRENT_LIST_DIR}/assets/)
+message(STATUS "custom command to copy `${ASSETS_DIR}` to buid directory pre-build.")
+add_custom_command(TARGET ${EDITOR_NAME} PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+	${ASSETS_DIR} $<TARGET_FILE_DIR:${EDITOR_NAME}>/assets/)
 
 message(STATUS "########## ${ENGINE_NAME} CMakeLists.txt end ##########")
 message(STATUS " ")
