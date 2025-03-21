@@ -12,7 +12,7 @@ project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSI
 # Meta Project
 set(FORCE_SDL true) # "force the use of SDL2 backend (no other options are implemented at the moment)"
 option(Code_Analysis "do code analysis in MS VS" OFF)
-option(Warnings_As_Errors "Treat compiler warnings as errors" ON)
+option(Warnings_As_Errors "Treat compiler warnings as errors" OFF)
 # option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 # Editor:
 option(BUILD_EDITOR "Enable building editor" ON)
@@ -38,9 +38,46 @@ message(STATUS "################################################################
 
 ##########################
 #
-#		Compiler
+#	Analysis Tools
 #
 ##########################
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# cppcheck
+if(Code_Analysis)
+	find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
+	if (CMAKE_CXX_CPPCHECK)
+		message(STATUS "Setting cppcheck flags.")
+		# example cppcheck --enable=warning -Dfalse=0 --inconclusive --force --project=build_ninja/compile_commands.json --inline-suppr --suppressions-list=cppcheck-supressions.txt --xml --output-file=cppcheck-results.xml
+		# --enable=all, checks for everything cppcheck knows about
+		# -Dfalse=0, tell cppcheck that the boolean word 'false' equals the zero value
+		# --force, prevents toomanyconfig errors by forcing cppcheck to run to the end of nested config lists
+		# --project, specifices the json file created by MAKE_EXPORT_COMPILE_COMMANDS which outlines the code structure
+		# --inline-suppr, uses inline 'cppcheck-suppress' comments to suppress specific checks
+		# --suppressions-list, specifies this file, which suppresses check for certain file
+		list( APPEND CMAKE_CXX_CPPCHECK
+			"--enable=warning"
+			"-Dfalse=0"
+			"--inconclusive"
+			"--force"
+			# ignore slow input file
+			#"-i${CMAKE_SOURCE_DIR}/editor/src/InputManager.cpp"
+			#"--project=${CMAKE_SOURCE_DIR}/compile_commands.json"
+			"--inline-suppr"
+			"--suppressions-list=${CMAKE_SOURCE_DIR}/cppcheck-supressions.txt"
+			"--xml"
+			"--output-file=${CMAKE_SOURCE_DIR}/cppcheck-results.xml"
+			)
+	endif()
+	find_program(CMAKE_CXX_CLANGTIDY NAMES cland-tidy)
+	if(CMAKE_CXX_CLANGTIDY)
+		message(STATUS "Setting clang-tidy command.")
+		set(CMAKE_CXX_CLANG_TIDY
+			clang-tidy;
+			--config-file=.clang-tidy;
+			-format-style='file';
+			-header-filter=.; # -header-filter=${CMAKE_CURRENT_SOURCE_DIR};
+			-checks=*;
+			)
 	endif()
 endif()
 ##########################
