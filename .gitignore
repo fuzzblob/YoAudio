@@ -17,6 +17,8 @@ CTestTestfile.cmake
 # build outputs
 
 build/*
+build_MSVC/*
+buil_ninja/*
 bin/*
 
 # YoAudio-Engine
