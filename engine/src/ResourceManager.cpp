@@ -44,7 +44,7 @@ namespace YoaEngine
 
 		newSound->Channels = spec.channels;
 		newSound->Frequency = spec.freq;
-		newSound->Format = AudioDevice::ConvertFormat(spec);
+		newSound->Format = AudioDevice::GetYoaFormat(spec);
 
 		size_t bytesPerSample = 0;
 		switch (newSound->Format)

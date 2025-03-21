@@ -4,10 +4,12 @@ SET(EDITOR_NAME ${PROJECT_NAME} CACHE INTERNAL "Name of ${PROJECT_NAME} project"
 
 message(STATUS "###################################################################################################################")
 message(STATUS "")
-message(STATUS "Now building the project for ${PROJECT_NAME} version ${PROJECT_VERSION}")
+message(STATUS "Now building the project for ${EDITOR_NAME} version ${PROJECT_VERSION}")
 message(STATUS "")
 message(STATUS "###################################################################################################################")
 
+# set C++ standard
+include(../compiler.cmake)
 #
 # handle dependencies
 #
@@ -41,27 +43,27 @@ include_directories(
 #
 # setup the executable
 #
-add_executable(${PROJECT_NAME} ${SRCS} ${HDRS} ${IMGUI_SOURCES})
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
+add_executable(${EDITOR_NAME} ${SRCS} ${HDRS} ${IMGUI_SOURCES})
+target_compile_features(${EDITOR_NAME} PRIVATE cxx_std_20)
 #
 # link extermal libraries
 #
-target_link_libraries(${PROJECT_NAME} OpenGL::GL ${SDL2_LIBRARY} )
+target_link_libraries(${EDITOR_NAME} OpenGL::GL ${SDL2_LIBRARY} )
 # YoAudio platform specifics
 if(MSVC)
 	#link_directories( ${YOA_LIB})
-	set_target_properties(${PROJECT_NAME} PROPERTIES
+	set_target_properties(${EDITOR_NAME} PROPERTIES
 	  IMPORTED_LOCATION "${YOA_LIB}/${ENGINE_NAME}.lib"
 	  INTERFACE_INCLUDE_DIRECTORIES "${YOA_INCLUDE_DIR}"
 	)
 else()
 	#link_directories(${YOA_SO})
-	set_target_properties(${PROJECT_NAME} PROPERTIES
+	set_target_properties(${EDITOR_NAME} PROPERTIES
 	  IMPORTED_LOCATION "${YOA_SO}/${ENGINE_NAME}.so"
 	  INTERFACE_INCLUDE_DIRECTORIES "${YOA_INCLUDE_DIR}"
 	)
 endif()
-target_link_libraries(${PROJECT_NAME} ${ENGINE_NAME} ${COMMON_NAME}) # also adds the required include path
+target_link_libraries(${EDITOR_NAME} ${ENGINE_NAME} ${COMMON_NAME}) # also adds the required include path
 #
 # Windows platform specific stuff
 #
@@ -86,7 +88,7 @@ if(MSVC)
 	ENDIF ( )
 	if(${Code_Analysis})
 		# do code analysis
-		set_target_properties(${PROJECT_NAME} PROPERTIES
+		set_target_properties(${EDITOR_NAME} PROPERTIES
 			VS_GLOBAL_RunCodeAnalysis true
 			VS_GLOBAL_EnableMicrosoftCodeAnalysis true)
 	endif()
@@ -99,10 +101,12 @@ if(MSVC)
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     message(STATUS "TODO: contemplate copying assets to buid directory if needed?")
 	# add_custom_command(
-		# TARGET ${PROJECT_NAME}
+		# TARGET ${EDITOR_NAME}
 	    # PRE_BUILD
-		# COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets )
+		# COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:${EDITOR_NAME}>/assets )
 endif()
 
 message(STATUS "${PROJECT_NAME} CMakeLists.txt end")
+
+message(STATUS "########## ${ENGINE_NAME} CMakeLists.txt end ##########")
 message(STATUS " ")

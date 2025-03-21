@@ -5,10 +5,12 @@ SET(ENGINE_NAME ${PROJECT_NAME} CACHE INTERNAL "Name of ${PROJECT_NAME} project"
 
 message(STATUS "###################################################################################################################")
 message(STATUS "")
-message(STATUS "Now building the project for ${PROJECT_NAME} version ${PROJECT_VERSION}")
+message(STATUS "Now building the project for ${ENGINE_NAME} version ${PROJECT_VERSION}")
 message(STATUS "")
 message(STATUS "###################################################################################################################")
 
+# set C++ standard
+include(../compiler.cmake)
 #
 # Set up spdlog dependency stuff
 #
@@ -37,10 +39,10 @@ include_directories(
 	include
 )
 # configure a header file to pass some of the CMake settings to the source code
-# configure_file (include/YoaConfig.h.in include/YoaConfig.h @ONLY)
+# configure_file (include/EngineConfig.h.in include/EngineConfig.h @ONLY)
 configure_file (
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/YoaConfig.h.in"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/YoaConfig.h" )
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/EngineConfig.h.in"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/EngineConfig.h" )
 
 #
 # include detected dependencies
@@ -61,12 +63,12 @@ endif()
 #
 # setup output binary
 #
-add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDRS})
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
-set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE C)
+add_library(${ENGINE_NAME} SHARED ${SRCS} ${HDRS})
+target_compile_features(${ENGINE_NAME} PRIVATE cxx_std_20)
+set_target_properties(${ENGINE_NAME} PROPERTIES LINKER_LANGUAGE C)
 # link SDL2
 if(SDL2_LIBRARY)
-	target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY})
+	target_link_libraries(${ENGINE_NAME} ${SDL2_LIBRARY})
 endif()
 
 if (MSVC)
@@ -75,11 +77,11 @@ if (MSVC)
 	set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 	if(${Code_Analysis})
 		# do code analysis
-		set_target_properties(${PROJECT_NAME} PROPERTIES
+		set_target_properties(${ENGINE_NAME} PROPERTIES
 			VS_GLOBAL_RunCodeAnalysis true
 			VS_GLOBAL_EnableMicrosoftCodeAnalysis true)
 	endif()
 endif(MSVC)
 
-message(STATUS "${PROJECT_NAME} CMakeLists.txt end")
+message(STATUS "########## ${ENGINE_NAME} CMakeLists.txt end ##########")
 message(STATUS " ")
