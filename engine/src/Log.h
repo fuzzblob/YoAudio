@@ -1,6 +1,6 @@
 #pragma once
 
-#include "YoaConfig.h"
+#include "EngineConfig.h"
 
 #if LOGGING_ENABLED
 #if SPDLOG_FOUND

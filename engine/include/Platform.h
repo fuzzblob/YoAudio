@@ -1,6 +1,6 @@
 #pragma once
 
-#include "YoaConfig.h"
+#include "EngineConfig.h"
 
 // This is a blob for determining the platform
 //#define YOA_SDL			0
