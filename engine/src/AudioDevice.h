@@ -1,7 +1,7 @@
 #pragma once
 
-#include "EngineConfig.h"
-#include "Platform.h"
+#include "../include/EngineConfig.h"
+#include "../include/Platform.h"
 #include "AudioFormat.h"
 #include <string>
 

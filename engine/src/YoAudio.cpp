@@ -1,4 +1,4 @@
-#include "YoAudio.h"
+#include "../include/YoAudio.h"
 
 #include "AudioThread.h"
 #include <memory>

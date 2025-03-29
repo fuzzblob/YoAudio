@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EngineConfig.h"
+#include "../include/EngineConfig.h"
 
 #if LOGGING_ENABLED
 #if SPDLOG_FOUND

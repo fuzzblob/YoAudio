@@ -28,6 +28,17 @@ namespace YoaEngine
         typename T, //real type
         typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type
     >
+    [[nodiscard]] inline constexpr bool isInteger(const T numer) noexcept
+    {
+        double intPart = 0;
+        const double fractPart = std::modf(numer, &intPart);
+        return (fractPart == 0.0);
+    }
+
+    template<
+        typename T, //real type
+        typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+    >
     [[nodiscard]] inline constexpr bool isPowerofTwo(const T n) noexcept
     {
         if (n <= 0)
@@ -47,16 +58,5 @@ namespace YoaEngine
             // and 2^(logn) = n
             //return pow(2, logValue) == n;
         }
-    }
-
-    template<
-        typename T, //real type
-        typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type
-    >
-    [[nodiscard]] inline constexpr bool isInteger(const T numer) noexcept
-    {
-        double intPart = 0;
-        const double fractPart = std::modf(numer, &intPart);
-        return (fractPart == 0.0);
     }
 }

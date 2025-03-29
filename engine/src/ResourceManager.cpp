@@ -1,6 +1,6 @@
 #include "ResourceManager.h"
 
-#include "Platform.h"
+#include "../include/Platform.h"
 #include "Log.h"
 #include "AudioDevice.h"
 

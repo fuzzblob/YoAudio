@@ -4,8 +4,9 @@
 // 			Don't change this file by hand (except for testing during development)
 //			Change EditorConfig.h.in instead please.
 
-#include "AudioFormat.h"
+#include "../src/AudioFormat.h"
 #include <ostream>
+#include <cstdint>
 
 constexpr const char* PROJECT_NAME = "@PROJECT_NAME@";
 // project version set through CMake project build process
