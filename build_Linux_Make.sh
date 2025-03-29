@@ -8,4 +8,6 @@ cd build
 echo "\nmaking DEBUG unix makefiles:"
 cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ../
 echo "\nbuilding DEBUG build of YoAudio:"
-cmake --build . --target YoAudio --config Debug
+#cmake --build . --target YoAudio --config Debug
+make
+cd ..
