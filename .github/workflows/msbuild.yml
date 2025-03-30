@@ -38,30 +38,28 @@ jobs:
     #    version: 2-latest
     #    version-sdl-image: 2-latest
 
-    - name: download & extract SDL2 development libraries
+    - name: Download SDL2 development libraries
       run: Invoke-WebRequest https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip -OutFile C:\SDL2-dev-libs-win.zip
     
     - name: Extract SDL2 libraries
       #run: expand "C:\SDL2-dev-libs-win.zip" -F:* "D:\a\YoAudio\YoAudio\SDL2-unzipped"
       run: 7z x "C:\SDL2-dev-libs-win.zip" -oD:\a\YoAudio\YoAudio\SDL2-unzipped
       
-    - name: print dir
-      run: dir
-      
-    - name: copy SDL2 libraries
+    - name: Copy SDL2 libraries to ./dependencies/SDL2/
       run: xcopy /s /e D:\a\YoAudio\YoAudio\SDL2-unzipped\SDL2-2.32.2 dependencies\SDL2
       
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
 
-    - name: pull in git-submodules
+    - name: Pull git-submodules
       run: git submodule update --init --recursive --remote
 
-    - name: run CMake to setup project
+    - name: Run CMake to setup project
       run: cmake -G "Visual Studio 17 2022" -A x64 -Wdev .
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+      #run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+      run: $ cmake --build .
