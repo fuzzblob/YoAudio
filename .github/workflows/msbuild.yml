@@ -45,7 +45,7 @@ jobs:
       run: 7z x "C:\SDL2-dev-libs-win.zip" .
     
     - name: copy SDL2 libraries
-      run: xcopy /s /e SDL2-dev-libs-win dependencies\SDL2
+      run: xcopy /s /e SDL2*\ dependencies\SDL2\
       
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
