@@ -49,7 +49,7 @@ jobs:
       run: dir
       
     - name: copy SDL2 libraries
-      run: xcopy /s /e D:\a\YoAudio\YoAudio\SDL2-unzipped dependencies\SDL2
+      run: xcopy /s /e D:\a\YoAudio\YoAudio\SDL2-unzipped\SDL2-2.32.2 dependencies\SDL2
       
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
