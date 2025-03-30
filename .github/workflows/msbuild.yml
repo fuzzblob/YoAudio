@@ -44,6 +44,9 @@ jobs:
     - name: Extract SDL2 libraries
       run: 7z x "C:\SDL2-dev-libs-win.zip" .
     
+    - name: print dir
+      run: dir
+      
     - name: copy SDL2 libraries
       run: xcopy /s /e SDL2-devel-2.32.2-VC\ dependencies\SDL2\
       
