@@ -22,6 +22,11 @@ buil_ninja/*
 bin/*
 cppcheck-results.xml
 
+# work in progress files
+
+patches/*
+*.patch
+
 # YoAudio-Engine
 
 engine/bin/*
