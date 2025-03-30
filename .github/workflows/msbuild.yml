@@ -42,7 +42,8 @@ jobs:
       run: Invoke-WebRequest https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip -OutFile C:\SDL2-dev-libs-win.zip
     
     - name: Extract SDL2 libraries
-      run: 7z x "C:\SDL2-dev-libs-win.zip" .
+      run: expand “C:\SDL2-dev-libs-win.zip” -F:* .
+      # 7z x "C:\SDL2-dev-libs-win.zip" 
     
     - name: print dir
       run: dir
