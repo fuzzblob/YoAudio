@@ -23,11 +23,9 @@ constexpr uint16_t @PROJECT_NAME@_VERSION_PATCH = @YOA_VERSION_PATCH@u;
 #error "can't find SDL2 dependency!"
 #endif
 
-#ifdef _DEBUG
 #define LOGGING_ENABLED			@LOGGING_ENABLED@
 #if LOGGING_ENABLED
 #cmakedefine SPDLOG_FOUND			@SPDLOG_FOUND@
-#endif
 #endif
 
 constexpr bool AUDIO_THREAD_UPDATES = @AUDIO_THREAD_UPDATES@;
