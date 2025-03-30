@@ -42,10 +42,10 @@ jobs:
       run: git submodule update --init --recursive --remote
 
     - name: download & extract SDL2 development libraries
-      run: aria2 --dir="dependencies/SDL2/" --out="SDL2-dev-libs-win.zip" https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip
+      run: (new-object System.Net.WebClient).DownloadFile('https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip','C:\tmp\SDL2-dev-libs-win.zip')
     
     - name: Extract SDL2 libraries
-      run: 7z x SDL2-dev-libs-win.zip .
+      run: 7z x "C:\tmp\SDL2-dev-libs-win.zip" .
     
     - name: copy SDL2 libraries
       run: cp SDL2*/* dependencies/SDL2/
