@@ -1,7 +1,7 @@
 ![image: fox with headphones](docs/img/fox_small.png)
 
 # [YoAudio](https://github.com/fuzzblob/YoAudio)
-[![Build Status](https://travis-ci.org/fuzzblob/YoAudio.svg?branch=master)](https://travis-ci.org/fuzzblob/YoAudio)  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![MSBuild](https://github.com/fuzzblob/YoAudio/actions/workflows/msbuild.yml/badge.svg)](https://github.com/fuzzblob/YoAudio/actions/workflows/msbuild.yml) [![Linux](https://github.com/fuzzblob/YoAudio/actions/workflows/multi-cmake-linux-build.yml/badge.svg)](https://github.com/fuzzblob/YoAudio/actions/workflows/multi-cmake-linux-build.yml)
 
 - [About](#about)
 	- [Usage](docs/usage.md)
