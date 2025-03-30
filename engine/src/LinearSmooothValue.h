@@ -29,4 +29,4 @@ namespace YoaEngine
 		void UpdateTarget() noexcept;
 		float GetNext() noexcept;
 	};
-}
+}  // namespace YoaEngine

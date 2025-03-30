@@ -64,4 +64,4 @@ namespace YoaEngine
 		currentValue += stepSize;
 		return currentValue;
 	}
-}
+}  // namespace YoaEngine

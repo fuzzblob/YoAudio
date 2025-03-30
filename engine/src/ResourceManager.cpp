@@ -88,4 +88,4 @@ namespace YoaEngine
 		}
 		mSounds.clear();
 	}
-}
+}  // namespace YoaEngine

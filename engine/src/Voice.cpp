@@ -41,4 +41,4 @@ namespace YoaEngine
 #endif
 		return Sound->GetSample((position % Sound->Samples) + channel);
 	}
-}
+}  // namespace YoaEngine

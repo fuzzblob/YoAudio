@@ -44,4 +44,4 @@ namespace YoaEngine
 	}
 
 	Timer::~Timer() noexcept {}
-}
+}  // namespace YoaEngine

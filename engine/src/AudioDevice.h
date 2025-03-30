@@ -52,4 +52,4 @@ namespace YoaEngine
 		SDL_AudioDeviceID DeviceID;
 		std::string DeviceName;
 	};
-}
+}  // namespace YoaEngine

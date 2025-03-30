@@ -30,4 +30,4 @@ namespace YoaEngine
 		std::atomic_bool mThreadRunning;
 		std::thread mThread;
 	};
-};
+}  // namespace YoaEngine

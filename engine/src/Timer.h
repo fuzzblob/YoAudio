@@ -25,4 +25,4 @@ namespace YoaEngine
 		void AdvancemRenderTime(double change) noexcept;
 		double RenderTime() const noexcept;
 	};
-};
+}  // namespace YoaEngine

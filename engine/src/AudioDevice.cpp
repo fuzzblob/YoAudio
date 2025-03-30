@@ -89,4 +89,4 @@ namespace YoaEngine
 		// close SDL audio
 		SDL_CloseAudioDevice(DeviceID);
 	}
-}
+}  // namespace YoaEngine

@@ -1,9 +1,9 @@
 #pragma once
 
-// TODO: use bitmask to set format type (allow checking of bit and sign)
+// TODO(maris): use bitmask to set format type (allow checking of bit and sign)
 enum SampleFormat : unsigned char
 {
-	
+
 	YOA_Format_Unknown = 0,
 	YOA_Format_Uint8 = 8,
 	YOA_Format_Sint16 = 16,

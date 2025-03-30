@@ -37,4 +37,4 @@ namespace YoaEngine
 		float Pitch = 1.0f;
 		float NextSample = 0;
 	};
-}
+}  // namespace YoaEngine

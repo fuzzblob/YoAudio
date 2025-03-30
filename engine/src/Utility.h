@@ -3,7 +3,7 @@
 namespace YoaEngine
 {
     #define UNUSED(x) (void)(x)
-    
+
     #include <cassert>
 
     #define YOA_ASSERT(x, ...) assert(x);
@@ -59,4 +59,4 @@ namespace YoaEngine
             //return pow(2, logValue) == n;
         }
     }
-}
+}  // namespace YoaEngine

@@ -123,4 +123,4 @@ namespace YoaEngine
 		mThread.join();
 		AudioThread::sInitialized = false;
 	}
-}
+}  // namespace YoaEngine

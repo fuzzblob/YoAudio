@@ -362,4 +362,4 @@ namespace YoaEngine
 			return;
 		}
 	}
-};
+}  // namespace YoaEngine

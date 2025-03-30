@@ -33,4 +33,4 @@ namespace YoaEngine
 			}
 		}
 	};
-}
+}  // namespace YoaEngine

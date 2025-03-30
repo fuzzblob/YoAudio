@@ -20,4 +20,4 @@ namespace YoaEngine
 		std::string assetPath;
 		std::map<std::string, std::shared_ptr<Sample>> mSounds;
 	};
-}
+}  // namespace YoaEngine

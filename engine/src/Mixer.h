@@ -50,4 +50,4 @@ namespace YoaEngine
 
 		std::unique_ptr<ResourceManager> mResources = nullptr;
 	};
-}
+}  // namespace YoaEngine

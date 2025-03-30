@@ -26,4 +26,4 @@ namespace YoaEngine
 			volR = sqrt(0.5f * (1.0f + t));
 		}
 	};
-}
+}  // namespace YoaEngine
