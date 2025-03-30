@@ -42,14 +42,17 @@ jobs:
       run: Invoke-WebRequest https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip -OutFile C:\SDL2-dev-libs-win.zip
     
     - name: Extract SDL2 libraries
-      run: expand "C:\SDL2-dev-libs-win.zip" -F:* "D:\a\YoAudio\YoAudio\SDL2-unzipped"
-      # 7z x "C:\SDL2-dev-libs-win.zip" 
+      #run: expand "C:\SDL2-dev-libs-win.zip" -F:* "D:\a\YoAudio\YoAudio\SDL2-unzipped"
+      run: 7z x "C:\SDL2-dev-libs-win.zip" -o*
     
+    - name: print archive
+      run: dir C:\SDL2-dev-libs-win
+      
     - name: print dir
       run: dir
       
     - name: copy SDL2 libraries
-      run: xcopy /s /e SDL2-unzipped\ dependencies\SDL2\
+      run: xcopy /s /e C:\SDL2-dev-libs-win\ dependencies\SDL2\
       
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
