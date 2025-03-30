@@ -44,9 +44,6 @@ jobs:
     - name: Extract SDL2 libraries
       #run: expand "C:\SDL2-dev-libs-win.zip" -F:* "D:\a\YoAudio\YoAudio\SDL2-unzipped"
       run: 7z x "C:\SDL2-dev-libs-win.zip" -oD:\a\YoAudio\YoAudio\SDL2-unzipped
-    
-    - name: print archive
-      run: dir C:\SDL2-dev-libs-win
       
     - name: print dir
       run: dir
