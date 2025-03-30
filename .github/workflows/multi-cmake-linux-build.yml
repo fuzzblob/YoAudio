@@ -5,9 +5,9 @@ name: Linux CMake build with multiple compilers
 on:
   workflow_dispatch:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "linux" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "linux" ]
 
 jobs:
   build:
@@ -51,22 +51,22 @@ jobs:
     - name: pull in git-submodules
       run: git submodule update --init --recursive --remote
     
-    - name: cmake build script
-      run: build_Linux_Make.sh
+    #- name: cmake build script
+    #  run: build_Linux_Make.sh
     
-    #- name: Configure CMake
+    - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      #run: >
-      #  cmake -B ${{ steps.strings.outputs.build-output-dir }}
-      #  -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-      #  -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-      #  -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-      #  -S ${{ github.workspace }}
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ github.workspace }}
 
-    #- name: Build
+    - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
-      #run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
     #- name: Test
       #working-directory: ${{ steps.strings.outputs.build-output-dir }}
