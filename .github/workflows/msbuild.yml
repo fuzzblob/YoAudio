@@ -19,7 +19,7 @@ env:
   # Configuration type to build.
   # You can convert this to a build matrix if you need coverage of multiple configuration types.
   # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-  BUILD_CONFIGURATION: Release
+  BUILD_CONFIGURATION: Debug
 
 permissions:
   contents: read
@@ -31,13 +31,25 @@ jobs:
     steps:
     - uses: actions/checkout@v4
   
-    - uses: libsdl-org/setup-sdl@main
-      id: sdl
-      with:
-        install-linux-dependencies: true
-        version: 2-latest
-        version-sdl-image: 2-latest
-  
+    #- uses: libsdl-org/setup-sdl@main
+    #  id: sdl
+    #  with:
+    #    install-linux-dependencies: true
+    #    version: 2-latest
+    #    version-sdl-image: 2-latest
+
+    - name: pull in git-submodules
+      run: git submodule update --init --recursive --remote
+
+    - name: download & extract SDL2 development libraries
+      run: aria2 --dir="dependencies/SDL2/" --out="SDL2-dev-libs-win.zip" https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip
+    
+    - name: Extract SDL2 libraries
+      run: 7z x SDL2-dev-libs-win.zip .
+    
+    - name: copy SDL2 libraries
+      run: cp SDL2*/* dependencies/SDL2/
+      
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
 
