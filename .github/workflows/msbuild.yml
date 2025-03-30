@@ -42,7 +42,7 @@ jobs:
       run: git submodule update --init --recursive --remote
 
     - name: download & extract SDL2 development libraries
-      run: (new-object System.Net.WebClient).DownloadFile('https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip','C:\tmp\SDL2-dev-libs-win.zip')
+      run: wget https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip -OutFile C:\tmp\SDL2-dev-libs-win.zip')
     
     - name: Extract SDL2 libraries
       run: 7z x "C:\tmp\SDL2-dev-libs-win.zip" .
