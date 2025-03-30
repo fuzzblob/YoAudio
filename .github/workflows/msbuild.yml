@@ -30,7 +30,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-
+  
+    - uses: libsdl-org/setup-sdl@main
+      id: sdl
+      with:
+        install-linux-dependencies: true
+        version: 2-latest
+        version-sdl-image: 2-latest
+  
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
 
