@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../include/EngineConfig.h"
-#include "../include/Platform.h"
 #include "AudioFormat.h"
+#include <SDL_audio.h>
 #include <string>
 
 // 0                                    No changes

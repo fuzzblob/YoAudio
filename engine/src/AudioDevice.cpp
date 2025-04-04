@@ -1,5 +1,4 @@
 #include "AudioDevice.h"
-
 #include "Log.h"
 
 namespace YoaEngine

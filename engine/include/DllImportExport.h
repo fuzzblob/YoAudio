@@ -1,7 +1,7 @@
 #pragma once
 
 #if defined(_MSC_VER)
-    //  Microsoft 
+    //  Microsoft
     #define YOA_EXPORT __declspec(dllexport)
     #define YOA_IMPORT __declspec(dllimport)
 #elif defined(__GNUC__)
