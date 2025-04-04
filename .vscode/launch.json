@@ -2,5 +2,39 @@
     "name": "Launch YOA_Editor",
     "type": "",
     "request": "launch",
-    "program": "${workspaceRoot}/bin/YOA_Editor"
+    "program": "${workspaceRoot}/bin/YOA_Editor",
+    "configurations": [
+    {
+        "name": "EDITOR C/C++ Debug (gdb Attach)",
+        "type": "cppdbg",
+        "request": "attach",
+        "program": "${workspaceFolder}/bin/YOA_Editor",
+        "processId": "${command:pickProcess}",
+        "MIMode": "gdb",
+        "miDebuggerPath": "/usr/bin/gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            }
+        ]
+    },
+    {
+        "name": "ENGINE C/C++ Debug (gdb Attach)",
+        "type": "cppdbg",
+        "request": "attach",
+        "program": "${workspaceFolder}/bin/libYOA_Engine.so",
+        "processId": "${command:pickProcess}",
+        "MIMode": "gdb",
+        "miDebuggerPath": "/usr/bin/gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            }
+        ]
+    }
+    ]
 }
