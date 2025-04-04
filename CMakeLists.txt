@@ -11,6 +11,8 @@ project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSI
 #
 ##########################
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 # Meta Project
 set(FORCE_SDL true) # "force the use of SDL2 backend (no other options are implemented at the moment)"
 option(Code_Analysis "do code analysis in MS VS" OFF)
