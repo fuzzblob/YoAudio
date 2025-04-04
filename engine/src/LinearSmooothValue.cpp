@@ -43,7 +43,7 @@ namespace YoaEngine
 		}
 		currentTarget = newTarget;
 		countdown = stepsToTarget.load();
-		if (countdown <= 0)
+		if (countdown == 0)
 		{
 			currentValue = currentTarget;
 			hasReacheTarget.store(true);
@@ -59,14 +59,14 @@ namespace YoaEngine
 			return currentValue;
 		}
 		countdown--;
-		if (countdown <= 0) {
+		if (countdown == 0) {
 			hasReacheTarget.store(true);
 			return currentValue;
 		}
 		currentValue += stepSize;
 		return currentValue;
 	}
-	float LinearSmooothValue::GetCurrent() noexcept{
+	float LinearSmooothValue::GetCurrent() const noexcept{
 		return currentValue;
 	}
 }  // namespace YoaEngine

@@ -29,6 +29,6 @@ namespace YoaEngine
 
 		void UpdateTarget() noexcept;
 		float GetNext() noexcept;
-		float GetCurrent() noexcept;
+		float GetCurrent() const noexcept;
 	};
 }  // namespace YoaEngine
