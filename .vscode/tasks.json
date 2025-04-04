@@ -4,11 +4,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "echo",
-            "type": "shell",
-            "command": "echo Hello"
-        },
-        {
             "label": "build Make",
             "type": "shell",
             "command": "${workspaceFolder}/build_Linux_Make.sh",

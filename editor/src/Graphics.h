@@ -38,10 +38,6 @@ namespace YoaEditor
 		};
 		void StartFrame() { mImplementation->StartFrame(); };
 		void EndFrame() { mImplementation->EndFrame(); };
-		bool ProcessEvent(SDL_Event* event)
-		{
-			return mImplementation->ProcessEvent(event);
-		};
 	};
 }  // namespace YoaEditor
 #endif // !_GRAPHICS_H

@@ -1,5 +1,4 @@
 #include "../include/YoAudio.h"
-
 #include "AudioThread.h"
 
 bool YOA_Init(void)
