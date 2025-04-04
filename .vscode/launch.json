@@ -1,0 +1,6 @@
+{
+    "name": "Launch YOA_Editor",
+    "type": "",
+    "request": "launch",
+    "program": "${workspaceRoot}/bin/YOA_Editor"
+}

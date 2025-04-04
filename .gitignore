@@ -10,9 +10,10 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 
-# Visual Studio
+# Visual Studio / VS-Code
 
 .vs/*
+.cache/*
 
 # build outputs
 

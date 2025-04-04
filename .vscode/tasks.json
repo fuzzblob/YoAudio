@@ -1,0 +1,28 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "echo",
+            "type": "shell",
+            "command": "echo Hello"
+        },
+        {
+            "label": "build Make",
+            "type": "shell",
+            "command": "${workspaceFolder}/build_Linux_Make.sh",
+            "problemMatcher": [],
+            "group": "build",
+        },
+        {
+            "label": "build Ninja",
+            "type": "shell",
+            "command": "${workspaceFolder}/build_Linux_Ninja.sh",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+            }
+        }
+    ]
+}

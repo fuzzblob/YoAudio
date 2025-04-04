@@ -1,0 +1,17 @@
+# Set the default behavior for all files.
+* text=auto eol=lf
+
+# Normalized and converts to native line endings on checkout.
+*.c text
+*.cc text
+*.cxx text
+*.cpp text
+*.h text
+*.hxx text
+*.hpp text
+
+*.wav binary
+*.ogg binary
+*.mp3 binary
+*.aiff binary
+*.flac binary
