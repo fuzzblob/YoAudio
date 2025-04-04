@@ -1,7 +1,8 @@
 #pragma once
 
+#include "EngineConfig.h"
+
 #include <atomic>
-#include "../include/EngineConfig.h"
 
 namespace YoaEngine
 {

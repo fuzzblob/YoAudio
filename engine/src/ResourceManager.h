@@ -1,10 +1,10 @@
 #pragma once
 
+#include "Sample.h"
+
 #include <memory>
 #include <map>
 #include <string>
-
-#include "Sample.h"
 
 namespace YoaEngine
 {

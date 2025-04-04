@@ -1,10 +1,11 @@
 #pragma once
 
+#include <cmath>
+#include <cassert>
+
 namespace YoaEngine
 {
     #define UNUSED(x) (void)(x)
-
-    #include <cassert>
 
     #define YOA_ASSERT(x, ...) assert(x);
     // TODO(maris): print a YOA_CRITICAL() log message
@@ -15,8 +16,6 @@ namespace YoaEngine
     #else
     // POSIX portable debug break
     raise(SIGTRAP); */
-
-    #include <cmath>
 
     template<
         typename T, //real type

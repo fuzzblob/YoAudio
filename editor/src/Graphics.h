@@ -2,6 +2,8 @@
 #define _GRAPHICS_H
 
 #include "SDLopenGL.h"
+
+#include <imgui.h>
 #include <memory>
 
 namespace YoaEditor

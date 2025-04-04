@@ -1,10 +1,10 @@
 #pragma once
 
-#include <memory>
-
 #include "Sample.h"
 #include "LinearSmooothValue.h"
 #include "StereoPanner.h"
+
+#include <memory>
 
 namespace YoaEngine
 {

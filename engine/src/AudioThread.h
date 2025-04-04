@@ -1,10 +1,10 @@
 #pragma once
 
+#include "Mixer.h"
+
 #include <memory>
 #include <atomic>
 #include <thread>
-
-#include "Mixer.h"
 
 namespace YoaEngine
 {

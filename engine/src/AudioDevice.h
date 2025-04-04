@@ -2,6 +2,7 @@
 
 #include "../include/EngineConfig.h"
 #include "AudioFormat.h"
+
 #include <SDL_audio.h>
 #include <string>
 

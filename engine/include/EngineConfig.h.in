@@ -5,6 +5,7 @@
 //			Change EditorConfig.h.in instead please.
 
 #include "../src/AudioFormat.h"
+
 #include <cstdint>
 #include <string>
 

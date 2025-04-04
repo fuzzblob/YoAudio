@@ -1,7 +1,8 @@
 #include "Editor.h"
-#include "InputManager.h"
-#include <algorithm>
 
+#include "InputManager.h"
+
+#include <algorithm>
 #include <YoAudio.h>
 
 namespace YoaEditor

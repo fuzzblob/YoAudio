@@ -1,4 +1,5 @@
 #include "Voice.h"
+
 #include <cmath>
 #include <algorithm>
 

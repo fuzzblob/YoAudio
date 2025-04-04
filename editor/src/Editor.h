@@ -4,6 +4,8 @@
 #include "Graphics.h"
 #include "EditorConfig.h"
 
+#include <imgui.h>
+
 namespace YoaEditor
 {
 	class Editor

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <math.h>
 #include "LinearSmooothValue.h"
+
+#include <math.h>
 
 namespace YoaEngine
 {

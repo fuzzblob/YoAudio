@@ -1,7 +1,8 @@
 #pragma once
 
-#include <stdint.h>
 #include "DllImportExport.h"
+
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C"

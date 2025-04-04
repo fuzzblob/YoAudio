@@ -1,12 +1,12 @@
 #include "Mixer.h"
 
-#include <algorithm>
-#include <cmath>
-#include <memory>
-
 #include "AudioFormat.h"
 #include "Log.h"
 #include "Utility.h"
+
+#include <algorithm>
+#include <cmath>
+#include <memory>
 
 namespace YoaEngine
 {
