@@ -14,7 +14,6 @@
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl2.h>
 #include <SDL.h>
-#include <stdio.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
 #else
@@ -60,8 +59,8 @@ namespace YoaEditor
 			(
 				0,
 				0,
-				int(ImGui::GetIO().DisplaySize.x),
-				int(ImGui::GetIO().DisplaySize.y)
+				static_cast<int>(ImGui::GetIO().DisplaySize.x),
+				static_cast<int>(ImGui::GetIO().DisplaySize.y)
 			);
 			static const ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 			glClearColor
@@ -89,6 +88,6 @@ namespace YoaEditor
 
 		bool ProcessEvent(SDL_Event* event) { return ImGui_ImplSDL2_ProcessEvent(event); };
 	};
-}
+}  // namespace YoaEditor
 
 #endif // !_OPENGL_H

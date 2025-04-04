@@ -2,7 +2,6 @@
 #define _GRAPHICS_H
 
 #include "SDLopenGL.h"
-#include <string>
 #include <memory>
 
 namespace YoaEditor
@@ -40,5 +39,5 @@ namespace YoaEditor
 			return mImplementation->ProcessEvent(event);
 		};
 	};
-}
+}  // namespace YoaEditor
 #endif // !_GRAPHICS_H

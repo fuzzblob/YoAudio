@@ -5,12 +5,12 @@
 //			Change EditorConfig.h.in instead please.
 
 #include "../src/AudioFormat.h"
-#include <ostream>
 #include <cstdint>
+#include <string>
 
-constexpr const char* PROJECT_NAME = "@PROJECT_NAME@";
+constexpr const std::string PROJECT_NAME = "@PROJECT_NAME@";
 // project version set through CMake project build process
-constexpr const char* PROJECT_VERSION = "@PROJECT_VERSION@";
+constexpr const std::string PROJECT_VERSION = "@PROJECT_VERSION@";
 constexpr uint16_t @PROJECT_NAME@_VERSION_MAJOR = @YOA_VERSION_MAJOR@u;
 constexpr uint16_t @PROJECT_NAME@_VERSION_MINOR = @YOA_VERSION_MINOR@u;
 constexpr uint16_t @PROJECT_NAME@_VERSION_PATCH = @YOA_VERSION_PATCH@u;

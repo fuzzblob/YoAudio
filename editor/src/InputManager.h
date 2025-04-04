@@ -13,8 +13,8 @@ namespace YoaEditor
 	public:
 		bool KeyDown(SDL_Scancode scanCode) const;
 		void Update();
-		InputManager();
-		~InputManager();
+		InputManager() { };
+		~InputManager() { };
 	};
-}
+}  // namespace YoaEditor
 #endif // !_INPUTMANAGER_H
