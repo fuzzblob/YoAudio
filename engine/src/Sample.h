@@ -1,7 +1,7 @@
 #pragma once
 
 #include "AudioFormat.h"
-#include "Log.h"
+#include <cstdint>
 
 namespace YoaEngine
 {

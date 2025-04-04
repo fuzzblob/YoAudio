@@ -4,7 +4,6 @@
 #include <atomic>
 #include <thread>
 
-#include "Timer.h"
 #include "Mixer.h"
 
 namespace YoaEngine
@@ -17,13 +16,13 @@ namespace YoaEngine
 		AudioThread();
 		~AudioThread();
 
-		std::unique_ptr<Timer> mTimer = nullptr;
-		std::unique_ptr<Mixer> mMixer = nullptr;
+		std::shared_ptr<Mixer> GetMixer() const { return mMixer; };
 	private:
 		void Run();
 		void Update() noexcept;
 	private:
 		static std::unique_ptr<AudioThread> sInstance;
+		std::shared_ptr<Mixer> mMixer = nullptr;
 		static bool sInitialized;
 
 		std::atomic_bool mQuit;

@@ -5,6 +5,7 @@
 #include <stack>
 
 #include "AudioDevice.h"
+#include "Timer.h"
 #include "ResourceManager.h"
 #include "Voice.h"
 
@@ -41,6 +42,7 @@ namespace YoaEngine
 		void FillBuffer();
 		static inline void AudioCallback(void* userdata, uint8_t* stream, int len);
 	private:
+		std::unique_ptr<Timer> mTimer = nullptr;
 		std::unique_ptr<AudioDevice> mDevice = nullptr;
 		std::vector<float> mixL;
 		std::vector<float> mixR;

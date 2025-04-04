@@ -8,6 +8,7 @@ namespace YoaEngine
 	struct StereoPanner {
 		LinearSmooothValue Pan;
 
+		// TODO(maris): check is this to do with pan law?
 		float volL = 0.77f;
 		float volR = 0.77f;
 

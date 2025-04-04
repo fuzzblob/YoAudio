@@ -22,7 +22,6 @@ namespace YoaEngine
     //};
 
     #include <cmath>
-    #include <type_traits>
 
     template<
         typename T, //real type

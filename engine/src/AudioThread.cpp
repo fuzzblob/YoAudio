@@ -1,6 +1,7 @@
 #include "AudioThread.h"
 
 #include "Log.h"
+#include <memory>
 #if AUDIO_THREAD_UPDATES == false
 #include <stdlib.h>
 #include <thread>         // std::this_thread::sleep_for
@@ -15,8 +16,9 @@ namespace YoaEngine
 	AudioThread* AudioThread::GetInstance(const bool creatIfNull)
 	{
 		if (!sInstance) {
-			if (!creatIfNull)
+			if (!creatIfNull) {
 				return nullptr;
+			}
 			sInstance = std::make_unique<AudioThread>();
 		}
 
@@ -25,8 +27,9 @@ namespace YoaEngine
 
 	void AudioThread::Release(const bool quitSDL) noexcept
 	{
-		if (!sInstance)
+		if (!sInstance) {
 			return;
+		}
 		// stop audio engine
 		sInstance->mMixer = nullptr;
 
@@ -51,8 +54,9 @@ namespace YoaEngine
 		// main thread loop
 		while (mQuit == false)
 		{
-			if (mThreadRunning == false)
+			if (mThreadRunning == false) {
 				continue;
+			}
 #if AUDIO_THREAD_UPDATES
 			constexpr double targetFrameLength = 1.0 / FRAME_RATE;
 			while (mTimer->DeltaTime() < targetFrameLength) {
@@ -74,9 +78,9 @@ namespace YoaEngine
 	{
 		//YOA_INFO("Current DeltaTime: {0}", mTimer->DeltaTime());
 
-		if (!mMixer || mMixer->IsPaused())
+		if (!mMixer || mMixer->IsPaused()) {
 			return;
-
+		}
 		// interpolate values
 		// update statemachines
 		// fill ring buffer
@@ -104,10 +108,8 @@ namespace YoaEngine
 			return;
 		}
 
-		mTimer = std::make_unique<YoaEngine::Timer>();
-
 		// initialize Mixer
-		mMixer = std::make_unique<Mixer>();
+		mMixer = std::make_shared<Mixer>();
 		mMixer->Pause(false);
 
 		mQuit = false;

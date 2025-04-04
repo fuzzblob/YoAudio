@@ -47,7 +47,7 @@ namespace YoaEditor
 				SDL_Delay(std::min(mTargetFrameLength, delay));
 			}
 		}
-		// set 
+		// set
 		Shutdown();
 		// quit Yo audio system
 		YOA_Quit(false);

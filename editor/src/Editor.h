@@ -26,4 +26,4 @@ namespace YoaEditor
 	};
 
 #endif // !_EDITOR_H
-}
+}  // namespace YoaEditor
