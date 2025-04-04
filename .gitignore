@@ -18,7 +18,11 @@ CTestTestfile.cmake
 
 build/*
 build_MSVC/*
-buil_ninja/*
+build_ninja/*
+build_ninja/*
+build_make/*
+build_CodeLite/*
+
 bin/*
 cppcheck-results.xml
 
