@@ -3,11 +3,6 @@
 #		Compiler
 #
 ##########################
-# set C++ standard
-set(CMAKE_CXX_STANDARD 20)
-#set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++20")
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Test whether an MSVC-like command-line option works.
 execute_process(COMMAND "${CMAKE_${lang}_COMPILER}" -?
@@ -28,6 +23,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_${lang}_COMPILER
 	# Compiler warnings
 	# Update if necessary
 	# For more warning options see: https://github.com/cpp-best-practices/cppbestpractices/blob/master/02-Use_the_Tools_Available.md
+	
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wnon-virtual-dtor -pedantic -g -std=c++20")
 	if(Warnings_As_Errors)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")

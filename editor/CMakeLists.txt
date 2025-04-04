@@ -8,7 +8,7 @@ message(STATUS "Now building the project for ${EDITOR_NAME} version ${PROJECT_VE
 message(STATUS "")
 message(STATUS "###################################################################################################################")
 
-# set C++ standard
+# setup compiler options
 include(../compiler.cmake)
 #
 # handle dependencies
@@ -45,6 +45,7 @@ include_directories(
 #
 add_executable(${EDITOR_NAME} ${SRCS} ${HDRS} ${IMGUI_SOURCES})
 target_compile_features(${EDITOR_NAME} PRIVATE cxx_std_20)
+
 #
 # link extermal libraries
 #

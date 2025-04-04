@@ -4,11 +4,13 @@ set (YOA_VERSION_MAJOR 0)
 set (YOA_VERSION_MINOR 2)
 set (YOA_VERSION_PATCH 3)
 project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSION_PATCH}" DESCRIPTION "YoAudio Meta project")
+
 ##########################
 #
 #		Options
 #
 ##########################
+
 # Meta Project
 set(FORCE_SDL true) # "force the use of SDL2 backend (no other options are implemented at the moment)"
 option(Code_Analysis "do code analysis in MS VS" OFF)
@@ -29,12 +31,21 @@ set (TARGET_SAMPLERATE 48000)		# "default audio output sample rate"
 set (TARGET_CHANNELS 2)				# "default audio output channel count"
 set (TARGET_BUFFER 4096)			# "default audio output buffer length"
 set (TARGET_BITDEPTH 16)			# "default audio output bit depth"
+
 # beging project setup
 message(STATUS "###################################################################################################################")
 message(STATUS "")
 message(STATUS "Now building the project for ${PROJECT_NAME} version ${PROJECT_VERSION}")
 message(STATUS "")
 message(STATUS "###################################################################################################################")
+
+# set C++ standard
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# setup compiler options
+include(compiler.cmake)
 
 ##########################
 #

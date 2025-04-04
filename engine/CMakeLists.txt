@@ -9,7 +9,7 @@ message(STATUS "Now building the project for ${ENGINE_NAME} version ${PROJECT_VE
 message(STATUS "")
 message(STATUS "###################################################################################################################")
 
-# set C++ standard
+# setup compiler options
 include(../compiler.cmake)
 #
 # Set up spdlog dependency stuff
@@ -65,6 +65,7 @@ endif()
 #
 add_library(${ENGINE_NAME} SHARED ${SRCS} ${HDRS})
 target_compile_features(${ENGINE_NAME} PRIVATE cxx_std_20)
+
 set_target_properties(${ENGINE_NAME} PROPERTIES LINKER_LANGUAGE C)
 # link SDL2
 if(SDL2_LIBRARY)
