@@ -14,6 +14,10 @@ namespace YoaEngine
 		static void Release(const bool quitSDL) noexcept;
 
 		AudioThread();
+		AudioThread(const AudioThread &) = delete;
+		AudioThread(AudioThread &&) = delete;
+		AudioThread &operator=(const AudioThread &) = delete;
+		AudioThread &operator=(AudioThread &&) = delete;
 		~AudioThread();
 
 		std::shared_ptr<Mixer> GetMixer() const { return mMixer; };

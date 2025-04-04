@@ -1,5 +1,6 @@
 #include "AudioDevice.h"
 #include "Log.h"
+#include "Utility.h"
 
 namespace YoaEngine
 {
@@ -7,8 +8,9 @@ namespace YoaEngine
 		return mPaused;
 	}
 	void AudioDevice::SetPaused(const bool pause) {
-		if (mPaused == pause)
+		if (mPaused == pause) {
 			return;
+		}
 		YOA_TRACE("audio engine state set to \"paused = {0}\"", pause);
 		mPaused = pause;
 		SDL_PauseAudioDevice(mDeviceID, pause ? 1 : 0);

@@ -17,8 +17,8 @@ namespace YoaEngine
 		uint32_t countdown;
 		float stepSize;
 	public:
-		LinearSmooothValue(float initial = 1.0f, double sampleRate = TARGET_SAMPLERATE,
-			double rampLengthSeconds = 0.01) noexcept;
+		explicit LinearSmooothValue(float initial = 1.0f, double sampleRate = TARGET_SAMPLERATE,
+			double rampLengthSeconds = MIN_FADE_LENGTH) noexcept;
 		void Reset(const float startValue) noexcept;
 
 		uint32_t GetRemainingFadeSteps() const noexcept;

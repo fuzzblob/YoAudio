@@ -14,6 +14,10 @@ namespace YoaEngine
 	class Mixer {
 	public:
 		Mixer();
+		Mixer(const Mixer &) = delete;
+		Mixer(Mixer &&) = delete;
+		Mixer &operator=(const Mixer &) = delete;
+		Mixer &operator=(Mixer &&) = delete;
 		~Mixer();
 
 		void Pause(const bool pause);

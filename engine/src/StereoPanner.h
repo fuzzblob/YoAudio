@@ -1,5 +1,6 @@
 #pragma once
 
+#include "EngineConfig.h"
 #include "LinearSmooothValue.h"
 
 #include <math.h>
@@ -15,7 +16,7 @@ namespace YoaEngine
 
 		StereoPanner() noexcept {
 			Pan.Reset(0.0f);
-			Pan.SetFadeLength(500);
+			Pan.SetFadeLength(MIN_FADE_LENGTH * TARGET_SAMPLERATE);
 		}
 
 		void Set(const float pan) {

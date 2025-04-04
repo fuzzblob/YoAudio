@@ -30,10 +30,14 @@ constexpr uint16_t @PROJECT_NAME@_VERSION_PATCH = @YOA_VERSION_PATCH@u;
 #endif
 
 constexpr bool AUDIO_THREAD_UPDATES = @AUDIO_THREAD_UPDATES@;
+// if no automatic audio thread updates,
+constexpr uint16_t WAIT_TIME_MILLI_SECONDS = 10;
 // calls to YoManager::Update() per second
 constexpr uint16_t TICK_RATE = @TICK_RATE@u;
 // set to 0 for no limit on playing voices
 constexpr uint16_t MAX_VOICES = @MAX_VOICES@u;
+// default minimum fade length
+constexpr float MIN_FADE_LENGTH = 0.01f;
 
 // audio device configuration
 #cmakedefine TARGET_SAMPLERATE		@TARGET_SAMPLERATE@

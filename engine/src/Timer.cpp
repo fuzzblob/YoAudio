@@ -2,6 +2,13 @@
 
 namespace YoaEngine
 {
+	Timer::Timer(clockType::time_point start) noexcept : mEpoch(start)
+	{
+		if (start == clockType::time_point::max()) {
+			mEpoch = clockType::now();
+		}
+	}
+
 	void Timer::ResetDeltaTime() noexcept
 	{
 		mDeltaTime = 0.0f;
@@ -34,12 +41,4 @@ namespace YoaEngine
 	{
 		return mRenderTime.load();
 	}
-
-	Timer::Timer() noexcept
-	{
-		mEpoch = std::chrono::high_resolution_clock::now();
-		mRenderTime.store(0.0);
-	}
-
-	Timer::~Timer() noexcept {}
-}  // namespace YoaEngine
+} // namespace YoaEngine

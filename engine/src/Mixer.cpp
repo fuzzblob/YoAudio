@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <memory>
 
 namespace YoaEngine
@@ -85,17 +86,18 @@ namespace YoaEngine
 		voice->IsLooping = loop;
 		voice->Panning.Set(pan);
 		// set volume & fade
+		const auto fadeVol = std::max(0.0f, std::min(1.0f, volume));
 		if (fadeIn > 0.0f) {
 			// ensure current target and value are at 0.0f
 			voice->Volume.Reset(0.0f);
 			// set fade duration (so the audio callback doesn't snap to the newly set value)
-			voice->Volume.SetFadeLength(static_cast<int>(fadeIn * mDevice->GetFrequency()));
+			voice->Volume.SetFadeLength(static_cast<uint32_t>(fadeIn * mDevice->GetFrequency()));
 			// set fader target
-			voice->Volume.SetValue(std::max(0.0f, std::min(1.0f, volume)));
+			voice->Volume.SetValue(fadeVol);
 		}
 		else {
 			// ensure current target and value are at 0.0f
-			voice->Volume.Reset(std::max(0.0f, std::min(1.0f, volume)));
+			voice->Volume.Reset(fadeVol);
 		}
 
 		// add voice to playing voices vector
@@ -120,7 +122,7 @@ namespace YoaEngine
 		if (!voice) {
 			return false;
 		}
-		fadeOut = std::max(0.01f, fadeOut);
+		fadeOut = std::max(MIN_FADE_LENGTH, fadeOut);
 		voice->Volume.SetValue(0.0f);
 		voice->Volume.SetFadeLength(static_cast<int>(fadeOut * mDevice->GetFrequency()));
 
@@ -374,8 +376,8 @@ namespace YoaEngine
 			return;
 		}
 		default:
-			const auto f = (unsigned char)(mixer->mDevice->GetFormat());
-			YOA_ERROR("Unsupported output format: {0}", f);
+			const auto deviceFormat = (unsigned char)(mixer->mDevice->GetFormat());
+			YOA_ERROR("Unsupported output format: {0}", deviceFormat);
 			int32_t* out32 = (int32_t*)stream;
 			// zero output / fill with silence
 			for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)
