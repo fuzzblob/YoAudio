@@ -25,5 +25,9 @@ namespace YoaEngine
 			volL = sqrt(0.5f * (1.0f - t));
 			volR = sqrt(0.5f * (1.0f + t));
 		}
+
+		float ReturnCurrentPan(){
+			return Pan.GetCurrent();
+		}
 	};
 }  // namespace YoaEngine

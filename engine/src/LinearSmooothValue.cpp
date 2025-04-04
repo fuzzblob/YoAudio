@@ -64,4 +64,7 @@ namespace YoaEngine
 		currentValue += stepSize;
 		return currentValue;
 	}
+	float LinearSmooothValue::GetCurrent() noexcept{
+		return currentValue;
+	}
 }  // namespace YoaEngine
