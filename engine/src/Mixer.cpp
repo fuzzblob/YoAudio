@@ -347,31 +347,34 @@ namespace YoaEngine
 		}
 		case YOA_Format_Uint8:
 		{
+			constexpr auto maxUint = 255;
 			int8_t* out8 = (int8_t*)stream;
 			for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)
 			{
-				out8[sampleIndex++] = static_cast<uint8_t>((mixer->mixL[mix] + 1.0f) * 127);
-				out8[sampleIndex++] = static_cast<uint8_t>((mixer->mixR[mix] + 1.0f) * 127);
+				out8[sampleIndex++] = static_cast<uint8_t>((mixer->mixL[mix] + 1.0f) * maxUint);
+				out8[sampleIndex++] = static_cast<uint8_t>((mixer->mixR[mix] + 1.0f) * maxUint);
 			}
 			return;
 		}
 		case YOA_Format_Sint16:
 		{
+			constexpr auto maxSint = 32767;
 			int16_t* out16 = (int16_t*)stream;
 			for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)
 			{
-				out16[sampleIndex++] = static_cast<int16_t>(mixer->mixL[mix] * 32767);
-				out16[sampleIndex++] = static_cast<int16_t>(mixer->mixR[mix] * 32767);
+				out16[sampleIndex++] = static_cast<int16_t>(mixer->mixL[mix] * maxSint);
+				out16[sampleIndex++] = static_cast<int16_t>(mixer->mixR[mix] * maxSint);
 			}
 			return;
 		}
 		case YOA_Format_Sint32:
 		{
+			constexpr auto maxSint = 2147483647.0f;
 			int32_t* out32 = (int32_t*)stream;
 			for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)
 			{
-				out32[sampleIndex++] = static_cast<int32_t>(mixer->mixL[mix] * 2147483647.0f);
-				out32[sampleIndex++] = static_cast<int32_t>(mixer->mixR[mix] * 2147483647.0f);
+				out32[sampleIndex++] = static_cast<int32_t>(mixer->mixL[mix] * maxSint);
+				out32[sampleIndex++] = static_cast<int32_t>(mixer->mixR[mix] * maxSint);
 			}
 			return;
 		}
