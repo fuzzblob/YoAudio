@@ -1,8 +1,11 @@
-cmake_minimum_required(VERSION 3.8...3.31)
+cmake_minimum_required(VERSION 3.12...3.31)
+cmake_policy(SET CMP0077 NEW)  # This policy controls the behavior of boolean options
+
 # The version number.
 set (YOA_VERSION_MAJOR 0)
 set (YOA_VERSION_MINOR 2)
 set (YOA_VERSION_PATCH 3)
+
 project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSION_PATCH}" DESCRIPTION "YoAudio Meta project")
 
 ##########################
@@ -122,13 +125,19 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin )
 if(BUILD_LIBRARY)
     add_subdirectory(engine)
 	set(STARTUP_PROJECT ${EGINE_NAME})
-	set_property(TARGET ${ENGINE_NAME} PROPERTY CXX_STANDARD 20)
-	set_property(TARGET ${ENGINE_NAME} PROPERTY CXX_STANDARD_REQUIRED On)
-	set_property(TARGET ${ENGINE_NAME} PROPERTY CXX_EXTENSIONS Off)
+	#set_property(TARGET ${ENGINE_NAME} PROPERTY CXX_STANDARD 20)
+	#set_property(TARGET ${ENGINE_NAME} PROPERTY CXX_STANDARD_REQUIRED On)
+	#set_property(TARGET ${ENGINE_NAME} PROPERTY CXX_EXTENSIONS Off)
+	target_compile_features(${ENGINE_NAME} PRIVATE cxx_std_20)
+	target_compile_options(${ENGINE_NAME} PRIVATE /std:c++20)	
+	set_target_properties(${ENGINE_NAME} PROPERTIES CXX_STANDARD 20)
 endif()
 
 if(BUILD_EDITOR)
     add_subdirectory(editor)
+	set_target_properties(${EDITOR_NAME} PROPERTIES CXX_STANDARD 20)
+	target_compile_features(${EDITOR_NAME} PRIVATE cxx_std_20)
+	target_compile_options(${EDITOR_NAME} PRIVATE /std:c++20)
 	if (${STARTUP_IN_EDITOR})
 		if(${EDITOR_NAME} STREQUAL "")
 			message(STATUS "EDITOR_NAME seems unset. cant set startup project to Editor.")
