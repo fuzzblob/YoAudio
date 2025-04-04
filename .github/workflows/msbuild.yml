@@ -8,9 +8,9 @@ name: MSBuild
 on:
   workflow_dispatch:
   push:
-    branches: [ "master", "msvc" ]
+    branches: [ "master", "linux", "msvc" ]
   pull_request:
-    branches: [ "master", "msvc" ]
+    branches: [ "master", "linux", "msvc" ]
 
 env:
   # Path to the solution file relative to the root of the project.
@@ -30,43 +30,21 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-  
-    #- uses: libsdl-org/setup-sdl@main
-    #  id: sdl
-    #  with:
-    #    install-linux-dependencies: true
-    #    version: 2-latest
-    #    version-sdl-image: 2-latest
-    #- name: debug info
-      #run: cmake --version
-
-    #- name: VS edition
-      #run: dir "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\"
-
-    #- name: invoke cli command promp
-      #run: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat
-      #run: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-
+    
     - name: Download SDL2 development libraries
       run: Invoke-WebRequest https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip -OutFile C:\SDL2-dev-libs-win.zip
-    
     - name: Extract SDL2 libraries
       run: 7z x "C:\SDL2-dev-libs-win.zip" -oD:\a\YoAudio\YoAudio\SDL2-unzipped
-      
     - name: Copy SDL2 libraries to ./dependencies/SDL2/
       run: xcopy /s /e D:\a\YoAudio\YoAudio\SDL2-unzipped\SDL2-2.32.2 dependencies\SDL2
-      
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
-
     - name: Pull git-submodules
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: git submodule update --init --recursive --remote
-
     - name: Run CMake to setup project
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: cmake -G "Visual Studio 17 2022" .
-
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
