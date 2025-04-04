@@ -18,16 +18,22 @@ namespace YoaEngine
 		// amaount of channels present in the buffer
 		uint8_t Channels;
 
-		float GetSample(const uint32_t position) noexcept {
+		float GetSample(const uint32_t position) noexcept
+		{
+			// setup constants
+			constexpr auto uint8Max = 255.0f;
+			constexpr auto sint16Max = 32768.0f;
+			constexpr auto sint32Max = 2147483648.0f;
+			// output a sample format
 			switch (Format) {
 			case YOA_Format_Float:
 				return ((float*)Buffer)[position];
 			case YOA_Format_Uint8:
-				return (float)(Buffer)[position] / 128.0f - 1.0f;
+				return Buffer[position] / uint8Max;
 			case YOA_Format_Sint16:
-				return (float)((int16_t*)Buffer)[position] / 32768.0f;
+				return (float)((int16_t*)Buffer)[position] / sint16Max;
 			case YOA_Format_Sint32:
-				return (float)((int32_t*)Buffer)[position] / 2147483648.0f;
+				return (float)((int32_t*)Buffer)[position] / sint32Max;
 			case YOA_Format_Unknown:
 			default:
 				return 0.0f;
