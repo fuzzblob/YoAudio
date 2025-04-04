@@ -41,7 +41,10 @@ jobs:
       run: cmake --version
 
     - name: VS edition
-      run: dir "C:\Program Files\Microsoft Visual Studio\2022\"
+      run: dir "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
+
+    - name: invoke cli command promp
+      run: C:\\Program\ Files\\Microsoft\ Visual\ Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat
 
     - name: Download SDL2 development libraries
       run: Invoke-WebRequest https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip -OutFile C:\SDL2-dev-libs-win.zip
