@@ -26,6 +26,10 @@ namespace YoaEditor
 
 			mImplementation = std::make_unique<SDLopenGL>();
 		};
+		Graphics(const Graphics &) = delete;
+		Graphics(Graphics &&) = delete;
+		Graphics &operator=(const Graphics &) = delete;
+		Graphics &operator=(Graphics &&) = delete;
 		~Graphics() { mImplementation = nullptr; };
 
 		bool ProcessEvent(const SDL_Event* event)

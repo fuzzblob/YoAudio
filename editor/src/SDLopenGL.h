@@ -34,59 +34,16 @@ namespace YoaEditor
 		SDL_GLContext mGlContext = nullptr;
 	public:
 		SDLopenGL() noexcept;
+		SDLopenGL(const SDLopenGL &) = delete;
+		SDLopenGL(SDLopenGL &&) = delete;
+		SDLopenGL &operator=(const SDLopenGL &) = delete;
+		SDLopenGL &operator=(SDLopenGL &&) = delete;
 		~SDLopenGL();
-		SDL_Window* GetWindow() noexcept {
-			return mWindow;
-		};
 
-		bool ProcessEvent(const SDL_Event* event)
-		{
-			// Forward your event to backend
-			return ImGui_ImplSDL2_ProcessEvent(event);
-		}
-
-		void StartFrame() {
-			// (After event loop)
-			// Start the Dear ImGui frame
-			ImGui_ImplOpenGL3_NewFrame();
-			ImGui_ImplSDL2_NewFrame();
-			ImGui::NewFrame();
-		};
-		void EndFrame()
-		{
-			// Rendering
-			glViewport
-			(
-				0,
-				0,
-				static_cast<int>(ImGui::GetIO().DisplaySize.x),
-				static_cast<int>(ImGui::GetIO().DisplaySize.y)
-			);
-			static const ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-			glClearColor
-			(
-				clear_color.x,
-				clear_color.y,
-				clear_color.z,
-				clear_color.w
-			);
-			glClearColor
-			(
-				clear_color.x * clear_color.w,
-				clear_color.y * clear_color.w,
-				clear_color.z * clear_color.w,
-				clear_color.w
-			);
-			glClear(GL_COLOR_BUFFER_BIT);
-			// Rendering
-			// (Your code clears your framebuffer, renders your other stuff etc.)
-			ImGui::Render();
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-			// (Your code calls SDL_GL_SwapWindow() etc.)
-			SDL_GL_SwapWindow(mWindow);
-		};
-
-		bool ProcessEvent(SDL_Event* event) { return ImGui_ImplSDL2_ProcessEvent(event); };
+		SDL_Window* GetWindow() noexcept;
+		bool ProcessEvent(const SDL_Event* event);
+		void StartFrame();
+		void EndFrame();
 	};
 }  // namespace YoaEditor
 
