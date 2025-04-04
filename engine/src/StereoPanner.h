@@ -26,11 +26,11 @@ namespace YoaEngine
 
 		void CalculateNext() {
 			const float t = Pan.GetNext();
-			volL = 1 - pow(0.5 * (1 + t), 2); // sqrt(0.5f * (1.0f - t));
-			volR = 1 - pow(0.5 * (1 - t), 2); // sqrt(0.5f * (1.0f + t));
+			volL = 1.0f - pow(0.5f * (1 + t), 2); // old: sqrt(0.5f * (1.0f - t));
+			volR = 1.0f - pow(0.5f * (1 - t), 2); // old: sqrt(0.5f * (1.0f + t));
 		}
 
-		float ReturnCurrentPan(){
+		float ReturnCurrentPan() const noexcept {
 			return Pan.GetCurrent();
 		}
 	};
