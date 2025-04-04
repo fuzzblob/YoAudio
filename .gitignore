@@ -26,6 +26,7 @@ build_CodeLite/*
 
 bin/*
 cppcheck-results.xml
+*/imgui.ini
 
 # work in progress files
 
