@@ -1,14 +1,21 @@
-cmake_minimum_required(VERSION 3.8...3.31)
+cmake_minimum_required(VERSION 3.12...3.31)
+cmake_policy(SET CMP0077 NEW)  # This policy controls the behavior of boolean options
+
 # The version number.
 set (YOA_VERSION_MAJOR 0)
 set (YOA_VERSION_MINOR 2)
 set (YOA_VERSION_PATCH 3)
+
 project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSION_PATCH}" DESCRIPTION "YoAudio Meta project")
+
 ##########################
 #
 #		Options
 #
 ##########################
+
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 # Meta Project
 set(FORCE_SDL true) # "force the use of SDL2 backend (no other options are implemented at the moment)"
 option(Code_Analysis "do code analysis in MS VS" OFF)
@@ -29,12 +36,21 @@ set (TARGET_SAMPLERATE 48000)		# "default audio output sample rate"
 set (TARGET_CHANNELS 2)				# "default audio output channel count"
 set (TARGET_BUFFER 4096)			# "default audio output buffer length"
 set (TARGET_BITDEPTH 16)			# "default audio output bit depth"
+
 # beging project setup
 message(STATUS "###################################################################################################################")
 message(STATUS "")
 message(STATUS "Now building the project for ${PROJECT_NAME} version ${PROJECT_VERSION}")
 message(STATUS "")
 message(STATUS "###################################################################################################################")
+
+# set C++ standard
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# setup compiler options
+include(compiler.cmake)
 
 ##########################
 #
@@ -109,10 +125,23 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin )
 if(BUILD_LIBRARY)
     add_subdirectory(engine)
 	set(STARTUP_PROJECT ${EGINE_NAME})
+	#set_property(TARGET ${ENGINE_NAME} PROPERTY CXX_STANDARD 20)
+	#set_property(TARGET ${ENGINE_NAME} PROPERTY CXX_STANDARD_REQUIRED On)
+	#set_property(TARGET ${ENGINE_NAME} PROPERTY CXX_EXTENSIONS Off)
+	target_compile_features(${ENGINE_NAME} PRIVATE cxx_std_20)
+	if(MSVC)
+		target_compile_options(${ENGINE_NAME} PRIVATE /std:c++20)
+	endif()
+	set_target_properties(${ENGINE_NAME} PROPERTIES CXX_STANDARD 20)
 endif()
 
 if(BUILD_EDITOR)
     add_subdirectory(editor)
+	set_target_properties(${EDITOR_NAME} PROPERTIES CXX_STANDARD 20)
+	target_compile_features(${EDITOR_NAME} PRIVATE cxx_std_20)
+	if(MSVC)
+		target_compile_options(${EDITOR_NAME} PRIVATE /std:c++20)
+	endif()
 	if (${STARTUP_IN_EDITOR})
 		if(${EDITOR_NAME} STREQUAL "")
 			message(STATUS "EDITOR_NAME seems unset. cant set startup project to Editor.")

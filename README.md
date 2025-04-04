@@ -1,7 +1,10 @@
 ![image: fox with headphones](docs/img/fox_small.png)
 
 # [YoAudio](https://github.com/fuzzblob/YoAudio)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![MSBuild](https://github.com/fuzzblob/YoAudio/actions/workflows/msbuild.yml/badge.svg)](https://github.com/fuzzblob/YoAudio/actions/workflows/msbuild.yml) [![Linux](https://github.com/fuzzblob/YoAudio/actions/workflows/multi-cmake-linux-build.yml/badge.svg)](https://github.com/fuzzblob/YoAudio/actions/workflows/multi-cmake-linux-build.yml)
+
+|build-windows|build-linux|License|
+|:--:|:--:|:--:|
+|[![MSBuild](https://github.com/fuzzblob/YoAudio/actions/workflows/msbuild.yml/badge.svg)](https://github.com/fuzzblob/YoAudio/actions/workflows/msbuild.yml)|[![Linux](https://github.com/fuzzblob/YoAudio/actions/workflows/multi-cmake-linux-build.yml/badge.svg)](https://github.com/fuzzblob/YoAudio/actions/workflows/multi-cmake-linux-build.yml)|[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)|
 
 - [About](#about)
 	- [Usage](docs/usage.md)
@@ -9,6 +12,7 @@
 	- [Roadmap](docs/roadmap.md)
 - [Build Instructions](docs/build.md)
 - [Acknowledgements](#acknowledge)
+- [MIT license](#license)
 
 ## About <a name="about"></a>
 
@@ -40,3 +44,7 @@ The initial development was inspired by this [Simple SDL2 Audio example](https:/
 Part of the idea to build this project came from watching the [Youtube Series](https://www.youtube.com/playlist?list=PLEETnX-uPtBVpZvp-R2daNfy9k3-L-Q3u) centered on building an [Audio Engine by thebennybox](https://github.com/BennyQBD/AudioTutorial).
 
 A huge thank you to [Jeremy Tammik](https://github.com/jeremytammik) for helping me setup some basics, specifically CMake.
+
+## [MIT](LICENSE) license <a name="license"></a>
+
+Copyright (c) 2025, Maris Tammik ([https://fuzzblob.github.io/](https://fuzzblob.github.io/))
