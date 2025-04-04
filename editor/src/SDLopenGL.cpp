@@ -1,6 +1,5 @@
 #include "SDLopenGL.h"
 
-#include <SDL.h>
 #include <imgui.h>
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_opengl3.h>
@@ -58,7 +57,7 @@ namespace YoaEditor
     {
         return mWindow;
     };
-    bool ProcessEvent(const SDL_Event* event)
+    bool SDLopenGL::ProcessEvent(const SDL_Event* event)
     {
         // Forward your event to backend
         return ImGui_ImplSDL2_ProcessEvent(event);
