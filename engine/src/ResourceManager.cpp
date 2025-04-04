@@ -12,7 +12,7 @@ namespace YoaEngine
 			auto sdl_path = SDL_GetBasePath();
 			assetPath = std::string(sdl_path);
 
-			// TODO: change slash dependent on platform
+			// TODO(maris): change slash dependent on platform
 #if YOA_PLATFORM == YOA_UNIX || YOA_PLATFORM == YOA_MAC
 			assetPath.append("assets/");
 #elif YOA_PLATFORM == YOA_WINDOWS
@@ -36,7 +36,7 @@ namespace YoaEngine
 	{
 		std::shared_ptr<Sample> newSound = std::make_shared<Sample>();
 		SDL_AudioSpec spec;
-		uint32_t audioLength;
+		uint32_t audioLength = 0;
 		if (SDL_LoadWAV(filePath.c_str(), &spec, &newSound->Buffer, &audioLength) == nullptr) {
 			YOA_ERROR("Failed to open wave file: {0}\nerror: {1}", filePath, SDL_GetError());
 			return nullptr;

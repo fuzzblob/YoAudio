@@ -24,7 +24,7 @@ namespace YoaEngine
 		float GetSamplesRemaining() const noexcept;
 		float GetSample(const float position, const uint8_t channel = 0);
 
-		Voice(uint32_t id) : ID(id) {}
+		explicit Voice(uint32_t id) : ID(id) {}
 	private:
 		float LoadSample(uint32_t position, const uint8_t channel = 0);
 	public:

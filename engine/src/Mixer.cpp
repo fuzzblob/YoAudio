@@ -118,7 +118,7 @@ namespace YoaEngine
 		voice->Volume.SetValue(0.0f);
 		voice->Volume.SetFadeLength(static_cast<int>(fadeOut * mDevice->Frequency));
 
-		// TODO is lock needed? maybe make state atomic?
+		// TODO(maris): is lock needed? maybe make state atomic?
 		mDevice->Lock();
 		voice->State = Stopping;
 		mDevice->Unlock();
