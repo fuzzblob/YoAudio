@@ -65,6 +65,9 @@ endif()
 #
 add_library(${ENGINE_NAME} SHARED ${SRCS} ${HDRS})
 target_compile_features(${ENGINE_NAME} PRIVATE cxx_std_20)
+set_property(TARGET ${ENGINE_NAME} PROPERTY CXX_STANDARD 20)
+set_property(TARGET ${ENGINE_NAME} PROPERTY CXX_STANDARD_REQUIRED On)
+set_property(TARGET ${ENGINE_NAME} PROPERTY CXX_EXTENSIONS Off)
 
 set_target_properties(${ENGINE_NAME} PROPERTIES LINKER_LANGUAGE C)
 # link SDL2
