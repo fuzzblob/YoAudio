@@ -18,12 +18,6 @@ constexpr uint16_t @PROJECT_NAME@_VERSION_PATCH = @YOA_VERSION_PATCH@u;
 
 // toggle certain features of YoAudio
 #define SDL2_FOUND @SDL2_FOUND@
-#if SDL2_FOUND
-#define FORCE_SDL @FORCE_SDL@
-#else
-#error "can't find SDL2 dependency!"
-#endif
-
 #define LOGGING_ENABLED			@LOGGING_ENABLED@
 #if LOGGING_ENABLED
 #cmakedefine SPDLOG_FOUND			@SPDLOG_FOUND@
