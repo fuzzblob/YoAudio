@@ -6,30 +6,46 @@
 
 namespace YoaEngine
 {
-	std::shared_ptr<Sample> ResourceManager::GetSound(const std::string& filename)
+	ResourceManager::ResourceManager(
+		std::string assetPath,
+		std::map<std::string, std::shared_ptr<Sample>> soundDict)
+		: mAssetPath(std::move(assetPath)), mSounds(std::move(soundDict))
 	{
-		if (assetPath.size() == 0) {
-			auto sdl_path = SDL_GetBasePath();
-			assetPath = std::string(sdl_path);
+		// check if proper path was passed
+		if (mAssetPath.size() == 0) {
+		auto sdl_path = SDL_GetBasePath();
+		mAssetPath = std::string(sdl_path);
 
-			// TODO(maris): change slash dependent on platform
+		// TODO(maris): change slash dependent on platform
 #if YOA_PLATFORM == YOA_UNIX || YOA_PLATFORM == YOA_MAC
-			assetPath.append("assets/");
+		mAssetPath.append("assets/");
 #elif YOA_PLATFORM == YOA_WINDOWS
-			assetPath.append("assets\\");
+		mAssetPath.append("assets\\");
 #else
 #error audio backend for this platform currently not implemented
 #endif
 
-			SDL_free(sdl_path);
+		SDL_free(sdl_path);
 		}
+		// TODO(maris): check if proper sound dictionary was passed
+	}
+
+	ResourceManager::~ResourceManager() {
+		for (const auto& soundEntry : mSounds) {
+			FreeSound(soundEntry.second);
+		}
+		mSounds.clear();
+	}
+
+	std::shared_ptr<Sample> ResourceManager::GetSound(const std::string& filename)
+	{
+
 		// return if file is loaded
-		if (mSounds[filename] != nullptr)
+		if (mSounds[filename] != nullptr) {
 			return mSounds[filename];
+		}
 		// load file if needed
-		std::string fullPath = assetPath;
-		fullPath.append(filename);
-		return mSounds[filename] = LoadSound(fullPath);
+		return mSounds[filename] = LoadSound(mAssetPath + filename);
 	}
 
 	std::shared_ptr<Sample> ResourceManager::LoadSound(const std::string& filePath)
@@ -70,22 +86,16 @@ namespace YoaEngine
 		return newSound;
 	}
 
-	void ResourceManager::FreeSound(std::shared_ptr<Sample> sound) noexcept {
+	void ResourceManager::FreeSound(const std::shared_ptr<Sample> sound) noexcept {
 		if (sound == nullptr) {
 			YOA_ERROR("Can't stop NULL sound!");
 			return;
 		}
 		// free buffer if not null
-		if (sound->Buffer != nullptr)
+		if (sound->Buffer != nullptr) {
 			SDL_FreeWAV(sound->Buffer);
+		}
 		// ensure buffer points to null
 		sound->Buffer = nullptr;
 	}
-
-	ResourceManager::~ResourceManager() {
-		for (auto soundEntry : mSounds) {
-			FreeSound(soundEntry.second);
-		}
-		mSounds.clear();
-	}
-}  // namespace YoaEngine
+} // namespace YoaEngine
