@@ -1,6 +1,7 @@
 #include "AudioThread.h"
 
 #include "Log.h"
+#include "SDL.h"
 #include <memory>
 #if AUDIO_THREAD_UPDATES == false
 #include <stdlib.h>

@@ -14,15 +14,16 @@ namespace YoaEngine
 	{
 		// initialize audio device
 		mDevice = std::make_unique<AudioDevice>(this, AudioCallback);
-		if (mDevice->Format == YOA_Format_Unknown) {
+		if (mDevice->GetFormat() == YOA_Format_Unknown) {
 			return;
 		}
 		// reserve mix buffers for callback
-		mixL.reserve(mDevice->Samples);
+		auto sampleCount = mDevice->GetSamples();
+		mixL.reserve(sampleCount);
 		for (size_t i = 0; i < mixL.capacity(); i++) {
 			mixL.push_back(0.0f);
 		}
-		mixR.reserve(mDevice->Samples);
+		mixR.reserve(sampleCount);
 		for (size_t i = 0; i < mixR.capacity(); i++) {
 			mixR.push_back(0.0f);
 		}
@@ -88,7 +89,7 @@ namespace YoaEngine
 			// ensure current target and value are at 0.0f
 			voice->Volume.Reset(0.0f);
 			// set fade duration (so the audio callback doesn't snap to the newly set value)
-			voice->Volume.SetFadeLength(static_cast<int>(fadeIn * mDevice->Frequency));
+			voice->Volume.SetFadeLength(static_cast<int>(fadeIn * mDevice->GetFrequency()));
 			// set fader target
 			voice->Volume.SetValue(std::max(0.0f, std::min(1.0f, volume)));
 		}
@@ -121,7 +122,7 @@ namespace YoaEngine
 		}
 		fadeOut = std::max(0.01f, fadeOut);
 		voice->Volume.SetValue(0.0f);
-		voice->Volume.SetFadeLength(static_cast<int>(fadeOut * mDevice->Frequency));
+		voice->Volume.SetFadeLength(static_cast<int>(fadeOut * mDevice->GetFrequency()));
 
 		// TODO(maris): is lock needed? maybe make state atomic?
 		mDevice->Lock();
@@ -137,7 +138,7 @@ namespace YoaEngine
 			return;
 		}
 		voice->Volume.SetValue(std::max(0.0f, std::min(1.0f, value)));
-		voice->Volume.SetFadeLength(static_cast<int>(fade * mDevice->Frequency));
+		voice->Volume.SetFadeLength(static_cast<int>(fade * mDevice->GetFrequency()));
 	}
 
 	void Mixer::SetVoicePan(const uint32_t id, const float value)
@@ -224,7 +225,7 @@ namespace YoaEngine
 			if (voice->State == Playing || voice->State == Stopping)
 			{
 				// get pitch and resampling factor
-				const float pitch = voice->Pitch * (1.0f * voice->Sound->Frequency) / mDevice->Frequency;
+				const float pitch = voice->Pitch * (1.0f * voice->Sound->Frequency) / mDevice->GetFrequency();
 				// Update the LinearSmoothValue objects
 				voice->Volume.UpdateTarget();
 				voice->Panning.Pan.UpdateTarget();
@@ -330,7 +331,7 @@ namespace YoaEngine
 		mixer->FillBuffer();
 		// fill output buffer
 		uint32_t sampleIndex = 0;
-		switch (mixer->mDevice->Format)
+		switch (mixer->mDevice->GetFormat())
 		{
 		case YOA_Format_Float:
 		{
@@ -373,8 +374,8 @@ namespace YoaEngine
 			return;
 		}
 		default:
-			const auto format = (unsigned char)(mixer->mDevice->Format);
-			YOA_ERROR("Unsupported output format: {0}", format);
+			const auto f = (unsigned char)(mixer->mDevice->GetFormat());
+			YOA_ERROR("Unsupported output format: {0}", f);
 			int32_t* out32 = (int32_t*)stream;
 			// zero output / fill with silence
 			for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)

@@ -35,21 +35,35 @@ namespace YoaEngine
 		void Unlock() const noexcept;
 
 		const char* GetDeviceName() const noexcept;
-		AudioDevice(void* userData, void(*callback)(void* userdata, uint8_t* stream, int len));
+		AudioDevice(const AudioDevice &) = delete;
+		AudioDevice(AudioDevice &&) = delete;
+		AudioDevice &operator=(const AudioDevice &) = delete;
+		AudioDevice &operator=(AudioDevice &&) = delete;
+		AudioDevice(void *userData,
+					void (*callback)(void *userdata, uint8_t *stream,
+										int len));
 		~AudioDevice();
 	public:
 		// audio callback buffer size (per channel)
-		uint32_t Samples = 0;
+		uint32_t GetSamples() { return mSamples; };
 		// audio callback sample rate
-		uint32_t Frequency = 0;
+		uint32_t GetFrequency() {return mFrequency; };
 		// audio callback bit depth
-		SampleFormat Format = YOA_Format_Unknown;
+		SampleFormat GetFormat() { return mFormat;};
 		// audio callback channel count
-		uint8_t Channels = 0;
+		uint8_t GetChannels() { return mChannels; };
 	private:
 		// is the audio device paused
 		bool mPaused = true;
-		SDL_AudioDeviceID DeviceID;
-		std::string DeviceName;
+		SDL_AudioDeviceID mDeviceID;
+		std::string mDeviceName;
+		// audio callback buffer size (per channel)
+		uint32_t mSamples = 0;
+		// audio callback sample rate
+		uint32_t mFrequency = 0;
+		// audio callback bit depth
+		SampleFormat mFormat = YOA_Format_Unknown;
+		// audio callback channel count
+		uint8_t mChannels = 0;
 	};
 }  // namespace YoaEngine
