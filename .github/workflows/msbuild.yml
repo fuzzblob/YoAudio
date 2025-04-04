@@ -37,12 +37,16 @@ jobs:
     #    install-linux-dependencies: true
     #    version: 2-latest
     #    version-sdl-image: 2-latest
+    - name: debug info
+      run: cmake --version
+
+    - name: VS edition
+      run: dir C:\Program Files\Microsoft Visual Studio\2022\
 
     - name: Download SDL2 development libraries
       run: Invoke-WebRequest https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip -OutFile C:\SDL2-dev-libs-win.zip
     
     - name: Extract SDL2 libraries
-      #run: expand "C:\SDL2-dev-libs-win.zip" -F:* "D:\a\YoAudio\YoAudio\SDL2-unzipped"
       run: 7z x "C:\SDL2-dev-libs-win.zip" -oD:\a\YoAudio\YoAudio\SDL2-unzipped
       
     - name: Copy SDL2 libraries to ./dependencies/SDL2/
