@@ -2,7 +2,8 @@
 #define _GRAPHICS_H
 
 #include "SDLopenGL.h"
-#include <string>
+
+#include <imgui.h>
 #include <memory>
 
 namespace YoaEditor
@@ -27,6 +28,10 @@ namespace YoaEditor
 
 			mImplementation = std::make_unique<SDLopenGL>();
 		};
+		Graphics(const Graphics &) = delete;
+		Graphics(Graphics &&) = delete;
+		Graphics &operator=(const Graphics &) = delete;
+		Graphics &operator=(Graphics &&) = delete;
 		~Graphics() { mImplementation = nullptr; };
 
 		bool ProcessEvent(const SDL_Event* event)
@@ -35,10 +40,6 @@ namespace YoaEditor
 		};
 		void StartFrame() { mImplementation->StartFrame(); };
 		void EndFrame() { mImplementation->EndFrame(); };
-		bool ProcessEvent(SDL_Event* event)
-		{
-			return mImplementation->ProcessEvent(event);
-		};
 	};
-}
+}  // namespace YoaEditor
 #endif // !_GRAPHICS_H

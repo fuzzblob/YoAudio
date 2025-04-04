@@ -10,33 +10,29 @@
 
 #if defined( _WIN32 )
 #define YOA_PLATFORM YOA_WINDOWS
-// TODO: implement XAudio2
+// TODO(maris): implement XAudio2
+#define YOA_RENDERER YOA_SDL
 #elif defined( __APPLE__ )
 #define YOA_PLATFORM YOA_MAC
-// TODO: implement CoreAudio
+// TODO(maris): implement CoreAudio
+#define YOA_RENDERER YOA_SDL
 #elif defined( __linux__ ) // linux
 // unix OSes should use SDL - https://www.libsdl.org/
 #define YOA_PLATFORM YOA_UNIX
+#define YOA_RENDERER YOA_SDL
 #elif defined( __unix__ ) // all unices not caught above
 // unix OSes should use SDL - https://www.libsdl.org/
 #define YOA_PLATFORM YOA_UNIX
+#define YOA_RENDERER YOA_SDL
 #elif defined(_POSIX_VERSION) // POSIX
 // unix OSes should use SDL - https://www.libsdl.org/
 #define YOA_PLATFORM YOA_UNIX
+#define YOA_RENDERER YOA_SDL
 #else
 #error Platform detection error!
 #endif
 
 // switching audio rendering backends
-// TODO: implement a different approach to specifying backend API
-
-// define this to force SDL backend
-#ifdef FORCE_SDL
-#undef YOA_RENDERER
-#define YOA_RENDERER YOA_SDL
-#endif
-
-// TODO: handle other platform specific backends
 #if YOA_RENDERER == YOA_SDL
 #ifdef SDL2_FOUND
 #include <SDL.h>

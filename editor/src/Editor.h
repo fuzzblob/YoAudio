@@ -4,6 +4,8 @@
 #include "Graphics.h"
 #include "EditorConfig.h"
 
+#include <imgui.h>
+
 namespace YoaEditor
 {
 	class Editor
@@ -13,7 +15,7 @@ namespace YoaEditor
 		bool mQuit = false;
 		// GUI
 		static constexpr uint64_t mTargetFrameLength = 1000u / EDITOR_FRAME_RATE;
-		const ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+		static constexpr ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 		std::unique_ptr<Graphics> mGraphics;
 		SDL_Window* mWindow = nullptr;
 		// Cleanup function
@@ -26,4 +28,4 @@ namespace YoaEditor
 	};
 
 #endif // !_EDITOR_H
-}
+}  // namespace YoaEditor

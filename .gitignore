@@ -10,17 +10,28 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 
-# Visual Studio
+# Visual Studio / VS-Code
 
 .vs/*
+.cache/*
 
 # build outputs
 
 build/*
 build_MSVC/*
-buil_ninja/*
+build_ninja/*
+build_ninja/*
+build_make/*
+build_CodeLite/*
+
 bin/*
 cppcheck-results.xml
+*/imgui.ini
+
+# work in progress files
+
+patches/*
+*.patch
 
 # YoAudio-Engine
 

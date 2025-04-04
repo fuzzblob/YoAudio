@@ -11,14 +11,4 @@ namespace YoaEditor
 	{
 		mKeyboardStates = SDL_GetKeyboardState(nullptr);
 	}
-
-	InputManager::InputManager()
-	{
-		mKeyboardStates = nullptr;
-	}
-
-	InputManager::~InputManager()
-	{
-
-	}
-}
+}  // namespace YoaEditor

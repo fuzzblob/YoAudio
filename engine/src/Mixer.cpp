@@ -1,12 +1,13 @@
 #include "Mixer.h"
 
-#include <algorithm>
-#include <cmath>
-
-#include "AudioThread.h"
 #include "AudioFormat.h"
 #include "Log.h"
 #include "Utility.h"
+
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <memory>
 
 namespace YoaEngine
 {
@@ -14,19 +15,23 @@ namespace YoaEngine
 	{
 		// initialize audio device
 		mDevice = std::make_unique<AudioDevice>(this, AudioCallback);
-		if (mDevice->Format == YOA_Format_Unknown) {
+		if (mDevice->GetFormat() == YOA_Format_Unknown) {
 			return;
 		}
 		// reserve mix buffers for callback
-		mixL.reserve(mDevice->Samples);
-		for (size_t i = 0; i < mixL.capacity(); i++)
+		auto sampleCount = mDevice->GetSamples();
+		mixL.reserve(sampleCount);
+		for (size_t i = 0; i < mixL.capacity(); i++) {
 			mixL.push_back(0.0f);
-		mixR.reserve(mDevice->Samples);
-		for (size_t i = 0; i < mixR.capacity(); i++)
+		}
+		mixR.reserve(sampleCount);
+		for (size_t i = 0; i < mixR.capacity(); i++) {
 			mixR.push_back(0.0f);
+		}
 		// unpause audio device
 		mDevice->SetPaused(false);
 		// initialize other resources
+		mTimer = std::make_unique<YoaEngine::Timer>();
 		constexpr int reserveAmt = (MAX_VOICES > 0) ? MAX_VOICES : 32;
 		mPlayingAudio.reserve(reserveAmt);
 		mResources = std::make_unique<ResourceManager>();
@@ -35,6 +40,7 @@ namespace YoaEngine
 	Mixer::~Mixer()
 	{
 		mDevice = nullptr;
+		mTimer = nullptr;
 		mResources = nullptr;
 	}
 
@@ -80,17 +86,18 @@ namespace YoaEngine
 		voice->IsLooping = loop;
 		voice->Panning.Set(pan);
 		// set volume & fade
+		const auto fadeVol = std::max(0.0f, std::min(1.0f, volume));
 		if (fadeIn > 0.0f) {
 			// ensure current target and value are at 0.0f
 			voice->Volume.Reset(0.0f);
 			// set fade duration (so the audio callback doesn't snap to the newly set value)
-			voice->Volume.SetFadeLength(static_cast<int>(fadeIn * mDevice->Frequency));
+			voice->Volume.SetFadeLength(static_cast<uint32_t>(fadeIn * mDevice->GetFrequency()));
 			// set fader target
-			voice->Volume.SetValue(std::max(0.0f, std::min(1.0f, volume)));
+			voice->Volume.SetValue(fadeVol);
 		}
 		else {
 			// ensure current target and value are at 0.0f
-			voice->Volume.Reset(std::max(0.0f, std::min(1.0f, volume)));
+			voice->Volume.Reset(fadeVol);
 		}
 
 		// add voice to playing voices vector
@@ -112,13 +119,14 @@ namespace YoaEngine
 	bool Mixer::StopVoice(const uint32_t id, float fadeOut)
 	{
 		auto voice = GetVoiceActive(id);
-		if (!voice)
+		if (!voice) {
 			return false;
-		fadeOut = std::max(0.01f, fadeOut);
+		}
+		fadeOut = std::max(MIN_FADE_LENGTH, fadeOut);
 		voice->Volume.SetValue(0.0f);
-		voice->Volume.SetFadeLength(static_cast<int>(fadeOut * mDevice->Frequency));
+		voice->Volume.SetFadeLength(static_cast<int>(fadeOut * mDevice->GetFrequency()));
 
-		// TODO is lock needed? maybe make state atomic?
+		// TODO(maris): is lock needed? maybe make state atomic?
 		mDevice->Lock();
 		voice->State = Stopping;
 		mDevice->Unlock();
@@ -128,17 +136,19 @@ namespace YoaEngine
 	void Mixer::SetVoiceVolume(const uint32_t id, const float value, const float fade)
 	{
 		auto voice = GetVoiceActive(id);
-		if (!voice)
+		if (!voice) {
 			return;
+		}
 		voice->Volume.SetValue(std::max(0.0f, std::min(1.0f, value)));
-		voice->Volume.SetFadeLength(static_cast<int>(fade * mDevice->Frequency));
+		voice->Volume.SetFadeLength(static_cast<int>(fade * mDevice->GetFrequency()));
 	}
 
 	void Mixer::SetVoicePan(const uint32_t id, const float value)
 	{
 		auto voice = GetVoiceActive(id);
-		if (!voice)
+		if (!voice) {
 			return;
+		}
 		voice->Panning.Set(std::max(-1.0f, std::min(1.0f, value)));
 	}
 
@@ -188,8 +198,9 @@ namespace YoaEngine
 
 		// loop throu sound channels removing stopped voices
 		for (auto& voice : mPlayingAudio) {
-			if (voice->ID != id)
+			if (voice->ID != id) {
 				continue;
+			}
 			return voice;
 		}
 		return nullptr;
@@ -199,19 +210,24 @@ namespace YoaEngine
 	{
 		const uint32_t bufferSize = mixL.size();
 		// fill float buffer with silence
-		for (size_t i = 0; i < bufferSize; i++)
+		for (size_t i = 0; i < bufferSize; i++) {
 			mixL[i] = 0.0f;
-		for (size_t i = 0; i < bufferSize; i++)
+		}
+		for (size_t i = 0; i < bufferSize; i++) {
 			mixR[i] = 0.0f;
-
+		}
+		// loop over voices and mix their audio into buffer
 		for (auto& voice : mPlayingAudio)
 		{
-			if (voice->State == ToPlay)
+			// switch voices that are ready to playing
+			if (voice->State == ToPlay) {
 				voice->State = Playing;
+			}
+			// mix only actively playing voices
 			if (voice->State == Playing || voice->State == Stopping)
 			{
 				// get pitch and resampling factor
-				const float pitch = voice->Pitch * (1.0f * voice->Sound->Frequency) / mDevice->Frequency;
+				const float pitch = voice->Pitch * (1.0f * voice->Sound->Frequency) / mDevice->GetFrequency();
 				// Update the LinearSmoothValue objects
 				voice->Volume.UpdateTarget();
 				voice->Panning.Pan.UpdateTarget();
@@ -220,14 +236,16 @@ namespace YoaEngine
 				if (voice->IsLooping == false) {
 					// if not looping, will we run out of samples?
 					const uint32_t samplesRemaining = static_cast<uint32_t>(voice->GetSamplesRemaining() / pitch);
-					if (samplesRemaining > 0 && samplesRemaining < length)
+					if (samplesRemaining > 0 && samplesRemaining < length) {
 						length = samplesRemaining;
+					}
 				}
 				if (voice->State == Stopping) {
 					// if stopping will the fadeout be finished in fewer samples?
 					const uint32_t steps = voice->Volume.GetRemainingFadeSteps();
-					if (steps < length)
+					if (steps < length) {
 						length = steps;
+					}
 				}
 				//YOA_ASSERT(length <= bufferSize);
 				//YOA_ASSERT(voice->Sound->Channels <= 2);
@@ -260,7 +278,8 @@ namespace YoaEngine
 					voice->State = Stopped;
 				}
 				else if (voice->IsLooping == false
-					&& voice->GetSamplesRemaining() <= 0.0f) {
+					&& voice->GetSamplesRemaining() <= 0.0f)
+				{
 					// Non looping sound has no more mixable samples
 					voice->State = Stopped;
 				}
@@ -269,8 +288,10 @@ namespace YoaEngine
 
 		// remove stopped voies
 		for (int i = mPlayingAudio.size() - 1; i >= 0; i--) {
-			if (mPlayingAudio[i]->State != Stopped)
+			// check if already stopped
+			if (mPlayingAudio[i]->State != Stopped) {
 				continue;
+			}
 			auto& voice = mPlayingAudio[i];
 			voice->Volume.SetFadeLength(0);
 			voice->Volume.SetValue(1.0f);
@@ -282,32 +303,37 @@ namespace YoaEngine
 		// clip both mix buffers
 		for (uint32_t i = 0; i < bufferSize; i++) {
 			// clipping if float buffer outside of render range
-			if (mixL[i] > 1.0f)
+			if (mixL[i] > 1.0f) {
 				mixL[i] = 1.0f;
-			else if (mixL[i] < -1.0f)
+			}
+			else if (mixL[i] < -1.0f) {
 				mixL[i] = -1.0f;
+			}
 		}
 		for (uint32_t i = 0; i < bufferSize; i++) {
 			// clipping if float buffer outside of render range
-			if (mixR[i] > 1.0f)
+			if (mixR[i] > 1.0f) {
 				mixR[i] = 1.0f;
-			else if (mixR[i] < -1.0f)
+			}
+			else if (mixR[i] < -1.0f) {
 				mixR[i] = -1.0f;
+			}
 		}
 
 		// update render time
-		AudioThread::GetInstance()->mTimer->AdvancemRenderTime(bufferSize);
+		mTimer->AdvancemRenderTime(bufferSize);
 	}
 
 	inline void Mixer::AudioCallback(void* userdata, uint8_t* stream, int len)
 	{
 		UNUSED(len);
-		Mixer* mixer = (Mixer*)userdata;
+		//Mixer* mixer = (Mixer*)userdata;
+		Mixer* mixer = static_cast<Mixer*>(userdata);
 		// render to mixing buffer
 		mixer->FillBuffer();
 		// fill output buffer
 		uint32_t sampleIndex = 0;
-		switch (mixer->mDevice->Format)
+		switch (mixer->mDevice->GetFormat())
 		{
 		case YOA_Format_Float:
 		{
@@ -321,37 +347,40 @@ namespace YoaEngine
 		}
 		case YOA_Format_Uint8:
 		{
+			constexpr auto maxUint = 255;
 			int8_t* out8 = (int8_t*)stream;
 			for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)
 			{
-				out8[sampleIndex++] = static_cast<uint8_t>((mixer->mixL[mix] + 1.0f) * 127);
-				out8[sampleIndex++] = static_cast<uint8_t>((mixer->mixR[mix] + 1.0f) * 127);
+				out8[sampleIndex++] = static_cast<uint8_t>((mixer->mixL[mix] + 1.0f) * maxUint);
+				out8[sampleIndex++] = static_cast<uint8_t>((mixer->mixR[mix] + 1.0f) * maxUint);
 			}
 			return;
 		}
 		case YOA_Format_Sint16:
 		{
+			constexpr auto maxSint = 32767;
 			int16_t* out16 = (int16_t*)stream;
 			for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)
 			{
-				out16[sampleIndex++] = static_cast<int16_t>(mixer->mixL[mix] * 32767);
-				out16[sampleIndex++] = static_cast<int16_t>(mixer->mixR[mix] * 32767);
+				out16[sampleIndex++] = static_cast<int16_t>(mixer->mixL[mix] * maxSint);
+				out16[sampleIndex++] = static_cast<int16_t>(mixer->mixR[mix] * maxSint);
 			}
 			return;
 		}
 		case YOA_Format_Sint32:
 		{
+			constexpr auto maxSint = 2147483647.0f;
 			int32_t* out32 = (int32_t*)stream;
 			for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)
 			{
-				out32[sampleIndex++] = static_cast<int32_t>(mixer->mixL[mix] * 2147483647.0f);
-				out32[sampleIndex++] = static_cast<int32_t>(mixer->mixR[mix] * 2147483647.0f);
+				out32[sampleIndex++] = static_cast<int32_t>(mixer->mixL[mix] * maxSint);
+				out32[sampleIndex++] = static_cast<int32_t>(mixer->mixR[mix] * maxSint);
 			}
 			return;
 		}
 		default:
-			const auto format = (unsigned char)(mixer->mDevice->Format);
-			YOA_ERROR("Unsupported output format: {0}", format);
+			const auto deviceFormat = (unsigned char)(mixer->mDevice->GetFormat());
+			YOA_ERROR("Unsupported output format: {0}", deviceFormat);
 			int32_t* out32 = (int32_t*)stream;
 			// zero output / fill with silence
 			for (uint32_t mix = 0; mix < mixer->mixL.size(); mix++)

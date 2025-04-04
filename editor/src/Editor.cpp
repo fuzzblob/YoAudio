@@ -1,7 +1,8 @@
 #include "Editor.h"
-#include "InputManager.h"
-#include <algorithm>
 
+#include "InputManager.h"
+
+#include <algorithm>
 #include <YoAudio.h>
 
 namespace YoaEditor
@@ -28,8 +29,9 @@ namespace YoaEditor
 				uint64_t startTicks = SDL_GetTicks64();
 				while (SDL_PollEvent(&mEvents) != 0) {
 					mGraphics->ProcessEvent(&mEvents);
-					if (mEvents.type == SDL_QUIT)
+					if (mEvents.type == SDL_QUIT) {
 						mQuit = true;
+					}
 				}
 				inputManager->Update();
 				// begin GUI
@@ -47,7 +49,7 @@ namespace YoaEditor
 				SDL_Delay(std::min(mTargetFrameLength, delay));
 			}
 		}
-		// set 
+		// set
 		Shutdown();
 		// quit Yo audio system
 		YOA_Quit(false);
@@ -81,11 +83,12 @@ namespace YoaEditor
 			const bool volChanged = ImGui::Button("Update Volume");
 
 			ImGui::InputFloat("Pitch", &pitch, 0.01f, 0.1f);
-			if (pitch > 4.0f)
+			if (pitch > 4.0f) {
 				pitch = 4.0f;
-			if (pitch < 0.01f)
+			}
+			if (pitch < 0.01f) {
 				pitch = 0.01f;
-
+			}
 			static uint32_t ambLoop_01 = 0u;
 			if (ambLoop_01 == 0u && ImGui::Button("Play Ambience 01")) {
 				ambLoop_01 = YOA_PlayWavFile("ambience_01.wav", true, 1.0f * volume, 1.0f * pitch, 12.0f, panning);
@@ -101,10 +104,12 @@ namespace YoaEditor
 				}
 				else
 				{
-					if (volChanged)
+					if (volChanged) {
 						YOA_SetVoiceVolume(ambLoop_01, volume);
-					if (panChanged)
+					}
+					if (panChanged) {
 						YOA_SetVoicePan(ambLoop_01, panning);
+					}
 				}
 			}
 
@@ -123,10 +128,12 @@ namespace YoaEditor
 				}
 				else
 				{
-					if (volChanged)
+					if (volChanged) {
 						YOA_SetVoiceVolume(ambLoop_02, volume);
-					if (panChanged)
+					}
+					if (panChanged) {
 						YOA_SetVoicePan(ambLoop_02, panning);
+					}
 				}
 			}
 
@@ -145,10 +152,12 @@ namespace YoaEditor
 				}
 				else
 				{
-					if (volChanged)
+					if (volChanged) {
 						YOA_SetVoiceVolume(engineLoop, volume);
-					if (panChanged)
+					}
+					if (panChanged) {
 						YOA_SetVoicePan(engineLoop, panning);
+					}
 				}
 			}
 
@@ -167,10 +176,12 @@ namespace YoaEditor
 				}
 				else
 				{
-					if (volChanged)
+					if (volChanged) {
 						YOA_SetVoiceVolume(musicLoop, volume);
-					if (panChanged)
+					}
+					if (panChanged) {
 						YOA_SetVoicePan(musicLoop, panning);
+					}
 				}
 			}
 
@@ -185,14 +196,15 @@ namespace YoaEditor
 			ImGui::Spacing();
 
 			// pause & unpause the audio engine
-			if (ImGui::Button("Pause Playback"))
+			if (ImGui::Button("Pause Playback")) {
 				YOA_Pause();
-
-			if (ImGui::Button("Resume Playback"))
+			}
+			if (ImGui::Button("Resume Playback")) {
 				YOA_Resume();
-
-			if (ImGui::Button("Stop All Playback"))
+			}
+			if (ImGui::Button("Stop All Playback")) {
 				YOA_Stop(0.0f);
+			}
 			// end the sound caster window
 			ImGui::End();
 		}
@@ -266,4 +278,4 @@ namespace YoaEditor
 			ImGui::EndMainMenuBar();
 		}
 	}
-}
+}  // namespace YoaEditor

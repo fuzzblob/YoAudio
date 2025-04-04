@@ -2,12 +2,19 @@
 
 namespace YoaEngine
 {
+	Timer::Timer(clockType::time_point start) noexcept : mEpoch(start)
+	{
+		if (start == clockType::time_point::max()) {
+			mEpoch = clockType::now();
+		}
+	}
+
 	void Timer::ResetDeltaTime() noexcept
 	{
 		mDeltaTime = 0.0f;
 	}
 
-	double Timer::DeltaTime() noexcept
+	double Timer::DeltaTime() const noexcept
 	{
 		return mDeltaTime;
 	}
@@ -21,7 +28,8 @@ namespace YoaEngine
 
 	double Timer::GetTime() noexcept
 	{
-		return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - mEpoch).count() / 1000000000.0;
+		constexpr auto nanosecondFactor = 1000000000.0;
+		return std::chrono::duration_cast<std::chrono::nanoseconds>(clockType::now() - mEpoch).count() / nanosecondFactor;
 	}
 
 	void Timer::AdvancemRenderTime(double change) noexcept
@@ -34,14 +42,4 @@ namespace YoaEngine
 	{
 		return mRenderTime.load();
 	}
-
-	Timer::Timer() noexcept
-	{
-		mEpoch = std::chrono::high_resolution_clock::now();
-		mTime = 0.0;
-		mDeltaTime = 0.0f;
-		mRenderTime.store(0.0);
-	}
-
-	Timer::~Timer() noexcept {}
-}  // namespace YoaEngine
+} // namespace YoaEngine

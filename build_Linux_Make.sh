@@ -1,9 +1,9 @@
 #!/bin/sh
 
 echo "removing, creating and moving to build dir..."
-rm -rf build
-mkdir build -p
-cd build
+#rm -rf build_make
+mkdir build_make -p
+cd build_make
 
 echo "\nmaking DEBUG unix makefiles:"
 cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ../

@@ -1,19 +1,23 @@
 #pragma once
 
-#include <math.h>
+#include "EngineConfig.h"
 #include "LinearSmooothValue.h"
+
+#include <math.h>
 
 namespace YoaEngine
 {
 	struct StereoPanner {
 		LinearSmooothValue Pan;
 
-		float volL = 0.77f;
-		float volR = 0.77f;
+		// TODO(maris): check is this to do with pan law?
+		static constexpr float centerPan = 0.75f;
+		float volL = centerPan;
+		float volR = centerPan;
 
 		StereoPanner() noexcept {
 			Pan.Reset(0.0f);
-			Pan.SetFadeLength(500);
+			Pan.SetFadeLength(MIN_FADE_LENGTH * TARGET_SAMPLERATE);
 		}
 
 		void Set(const float pan) {
@@ -22,8 +26,12 @@ namespace YoaEngine
 
 		void CalculateNext() {
 			const float t = Pan.GetNext();
-			volL = sqrt(0.5f * (1.0f - t));
-			volR = sqrt(0.5f * (1.0f + t));
+			volL = 1.0f - pow(0.5f * (1 + t), 2); // old: sqrt(0.5f * (1.0f - t));
+			volR = 1.0f - pow(0.5f * (1 - t), 2); // old: sqrt(0.5f * (1.0f + t));
+		}
+
+		float ReturnCurrentPan() const noexcept {
+			return Pan.GetCurrent();
 		}
 	};
 }  // namespace YoaEngine

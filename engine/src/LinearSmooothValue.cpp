@@ -38,11 +38,12 @@ namespace YoaEngine
 	}
 	void LinearSmooothValue::UpdateTarget() noexcept {
 		const float newTarget = target.load();
-		if (newTarget == currentTarget)
+		if (newTarget == currentTarget) {
 			return;
+		}
 		currentTarget = newTarget;
 		countdown = stepsToTarget.load();
-		if (countdown <= 0)
+		if (countdown == 0)
 		{
 			currentValue = currentTarget;
 			hasReacheTarget.store(true);
@@ -54,14 +55,18 @@ namespace YoaEngine
 		}
 	}
 	float LinearSmooothValue::GetNext() noexcept {
-		if (hasReacheTarget.load())
+		if (hasReacheTarget.load()) {
 			return currentValue;
+		}
 		countdown--;
-		if (countdown <= 0) {
+		if (countdown == 0) {
 			hasReacheTarget.store(true);
 			return currentValue;
 		}
 		currentValue += stepSize;
+		return currentValue;
+	}
+	float LinearSmooothValue::GetCurrent() const noexcept {
 		return currentValue;
 	}
 }  // namespace YoaEngine

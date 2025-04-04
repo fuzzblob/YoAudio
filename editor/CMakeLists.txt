@@ -94,11 +94,7 @@ if(MSVC)
 			VS_GLOBAL_EnableMicrosoftCodeAnalysis true)
 	endif()
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_${lang}_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
-    message(STATUS "TODO: contemplate copying assets to buid directory if needed?")
-	# add_custom_command(
-		# TARGET ${EDITOR_NAME}
-	    # PRE_BUILD
-		# COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:${EDITOR_NAME}>/assets )
+    message(STATUS "TODO(maris): contemplate non MSVC specific commands?")
 endif()
 
 # copy assets folder to build directory to enable easy playback

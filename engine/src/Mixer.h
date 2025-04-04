@@ -1,18 +1,23 @@
 #pragma once
 
+#include "AudioDevice.h"
+#include "Timer.h"
+#include "ResourceManager.h"
+#include "Voice.h"
+
 #include <memory>
 #include <vector>
 #include <stack>
-
-#include "AudioDevice.h"
-#include "ResourceManager.h"
-#include "Voice.h"
 
 namespace YoaEngine
 {
 	class Mixer {
 	public:
 		Mixer();
+		Mixer(const Mixer &) = delete;
+		Mixer(Mixer &&) = delete;
+		Mixer &operator=(const Mixer &) = delete;
+		Mixer &operator=(Mixer &&) = delete;
 		~Mixer();
 
 		void Pause(const bool pause);
@@ -41,6 +46,7 @@ namespace YoaEngine
 		void FillBuffer();
 		static inline void AudioCallback(void* userdata, uint8_t* stream, int len);
 	private:
+		std::unique_ptr<Timer> mTimer = nullptr;
 		std::unique_ptr<AudioDevice> mDevice = nullptr;
 		std::vector<float> mixL;
 		std::vector<float> mixR;
