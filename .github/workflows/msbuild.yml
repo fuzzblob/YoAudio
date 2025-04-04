@@ -37,14 +37,14 @@ jobs:
     #    install-linux-dependencies: true
     #    version: 2-latest
     #    version-sdl-image: 2-latest
-    - name: debug info
-      run: cmake --version
+    #- name: debug info
+      #run: cmake --version
 
-    - name: VS edition
-      run: dir "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\"
+    #- name: VS edition
+      #run: dir "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\"
 
-    - name: invoke cli command promp
-      run: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+    #- name: invoke cli command promp
+      #run: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat
       #run: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
 
     - name: Download SDL2 development libraries
@@ -60,10 +60,12 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.2
 
     - name: Pull git-submodules
+      working-directory: ${{env.GITHUB_WORKSPACE}}
       run: git submodule update --init --recursive --remote
 
     - name: Run CMake to setup project
-      run: cmake -G "Visual Studio 17 2022" -A x64 -Wdev .
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: cmake -G "Visual Studio 17 2022" .
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
