@@ -22,7 +22,7 @@ namespace YoaEngine
           ~Timer() = default;
 
           void ResetDeltaTime() noexcept;
-          double DeltaTime() noexcept;
+          double DeltaTime() const noexcept;
 
           void Update() noexcept;
           double GetTime() noexcept;

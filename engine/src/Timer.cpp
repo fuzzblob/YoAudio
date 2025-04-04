@@ -14,7 +14,7 @@ namespace YoaEngine
 		mDeltaTime = 0.0f;
 	}
 
-	double Timer::DeltaTime() noexcept
+	double Timer::DeltaTime() const noexcept
 	{
 		return mDeltaTime;
 	}
@@ -28,7 +28,8 @@ namespace YoaEngine
 
 	double Timer::GetTime() noexcept
 	{
-		return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - mEpoch).count() / 1000000000.0;
+		constexpr auto nanosecondFactor = 1000000000.0;
+		return std::chrono::duration_cast<std::chrono::nanoseconds>(clockType::now() - mEpoch).count() / nanosecondFactor;
 	}
 
 	void Timer::AdvancemRenderTime(double change) noexcept
