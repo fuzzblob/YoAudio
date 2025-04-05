@@ -1,15 +1,18 @@
 #include "AudioThread.h"
 
+#include "EngineConfig.h"
 #include "Log.h"
 #include "Platform.h"
+#include "Timer.h"
 // includes <SDL.h>
 
+#include <algorithm>
 #include <memory>
-#if AUDIO_THREAD_UPDATES == false
+#ifndef AUDIO_THREAD_UPDATES
 #include <stdlib.h>
+#endif
 #include <thread>         // std::this_thread::sleep_for
 #include <chrono>         // std::chrono::seconds
-#endif
 
 namespace YoaEngine
 {
@@ -57,36 +60,47 @@ namespace YoaEngine
 		// main thread loop
 		while (mQuit == false)
 		{
+			using milliseconds = std::chrono::milliseconds;
 			if (mThreadRunning == false) {
 				continue;
 			}
-#if AUDIO_THREAD_UPDATES
-			constexpr double targetFrameLength = 1.0 / FRAME_RATE;
-			while (mTimer->DeltaTime() < targetFrameLength) {
+#ifdef AUDIO_THREAD_UPDATES
+			// sanity check: make sure that the requested AudioThread update rate is high enough
+			constexpr double targetTickLength = 1.0 / TICK_RATE;
+			constexpr double calculatedTickLength = 1.0 * TARGET_SAMPLERATE / TARGET_BUFFER;
+			static_assert(targetTickLength < calculatedTickLength,
+				"AudiThread updates must happen more frequently than the Mixer::AudioCallback");
+			// ping the timer until i'ts time to update the engine state
+			while (mTimer->DeltaTime() < targetTickLength) {
+				const auto delta = mTimer->DeltaTime();
+				const auto wait = targetTickLength - delta;
+				constexpr auto sleepThreshold = 1.5;
+				if(wait >= sleepThreshold)
+				{
+					const auto sleepLength = static_cast<int>(std::max(floor(wait) - 1, 1.0));
+					const auto sleep = milliseconds(sleepLength);
+					// wait a little
+					std::this_thread::sleep_for(sleep);
+				}
 				// increment deltaTime
 				mTimer->Update();
 			}
 
-			Update();
+			if (!mMixer)
+			{
+				YOA_WARN("AudioThread::Update without active Mixer")
+			}
+			else if(mMixer->IsPaused() == false)
+			{
+				mMixer->Update(mTimer->DeltaTime());
+			}
+
 			mTimer->ResetDeltaTime();
 #else
-			// wait for 10 ms before checking if the thread should continue running
-			//Sleep(10);
-			std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MILLI_SECONDS));
+			// wait for 10 ms before checking if the thread should continue running. used to be "Sleep(10);"
+			std::this_thread::sleep_for(milliseconds(WAIT_TIME_MILLI_SECONDS));
 #endif
 		}
-	}
-
-	void AudioThread::Update() noexcept
-	{
-		//YOA_INFO("Current DeltaTime: {0}", mTimer->DeltaTime());
-
-		if (!mMixer || mMixer->IsPaused()) {
-			return;
-		}
-		// interpolate values
-		// update statemachines
-		// fill ring buffer
 	}
 
 	AudioThread::AudioThread()
@@ -110,6 +124,11 @@ namespace YoaEngine
 			YOA_CRITICAL("SDL_INIT_AUDIO not initialized");
 			return;
 		}
+
+#ifdef AUDIO_THREAD_UPDATES
+		// initialize timer for deltaTime
+		mTimer = std::make_unique<Timer>();
+#endif
 
 		// initialize Mixer
 		mMixer = std::make_shared<Mixer>();
