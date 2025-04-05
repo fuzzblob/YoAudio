@@ -25,6 +25,8 @@ build_make/*
 build_CodeLite/*
 
 bin/*
+*.cppcheck
+cppcheck*/
 cppcheck-results.xml
 */imgui.ini
 
