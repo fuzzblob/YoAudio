@@ -13,6 +13,6 @@ void Log::Init()
 	spdlog::set_pattern("%^[%T] [%n:] %v%$");
 	//spdlog::set_pattern("[%H:%M:%S] [%n] [%^-%L-%$] %v");
 
-	YOA_WARN("YoAudio logging initialized\n[{0}:\t{1}]", __FILE__, __LINE__);
+	YOA_TRACE("YoAudio logging initialized.");
 }
 #endif
