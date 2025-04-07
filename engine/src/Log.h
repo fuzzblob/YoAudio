@@ -15,6 +15,9 @@ private:
 };
 
 // log macros
+//
+// example use:
+// YOA_INFO("Some logging message - [{0}:\t{1}]", __FILE__, __LINE__);
 #define YOA_TRACE(...)			{ auto log = ::Log::GetCoreLogger(); if(log)log->trace(__VA_ARGS__); };
 #define YOA_INFO(...)			{ auto log = ::Log::GetCoreLogger(); if(log)log->info(__VA_ARGS__); };
 #define YOA_WARN(...)			{ auto log = ::Log::GetCoreLogger(); if(log)log->warn(__VA_ARGS__); };
