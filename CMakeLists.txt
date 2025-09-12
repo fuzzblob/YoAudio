@@ -101,6 +101,38 @@ endif()
 #	Dependencies
 #
 ##########################
+
+if(MSVC AND NOT SDL2_BUILDING_LIBRARY)
+	# set SDL2.x.x release info
+	set(SDL2_VERSION "2.32.10")
+	set(SDL2_ZIP_HASH "af347939395a58b365846aaea27391e69f9ec9d4dd650d6ac40802159b418a6e")
+	# set file and path names
+	set(SDL2_DIR ${PROJECT_SOURCE_DIR}/dependencies/SDL2)
+	set(SDL2_ZIP_FILE "SDL2-devel-${SDL2_VERSION}-VC.zip")
+	# check if already downloaded
+	file(TOUCH ${SDL2_DIR}/${SDL2_ZIP_FILE})
+	file(SHA256 ${SDL2_DIR}/${SDL2_ZIP_FILE} SDL2_ZIP_SHA256)
+	set(SDL2_ZIP_EXISTS ${SDL2_ZIP_SHA256} STREQUAL ${SDL2_ZIP_HASH})
+	# download if not currect hash
+	if(NOT ${SDL2_ZIP_EXISTS})
+		message(STATUS "Downloading SDL2-devel-${SDL2_VERSION}-VC.zip")
+		file(
+			DOWNLOAD https://github.com/libsdl-org/SDL/releases/download/release-${SDL2_VERSION}/SDL2-devel-${SDL2_VERSION}-VC.zip
+			${SDL2_DIR}/${SDL2_ZIP_FILE}
+			EXPECTED_HASH SHA256=${SDL2_ZIP_HASH}
+		)
+	else()
+		message(STATUS "SDL2-devel-${SDL2_VERSION}-VC.zip already downloaded.")
+	endif()
+	message(STATUS "Extracting SDL2-devel-${SDL2_VERSION}-VC.zip")
+	# extract zip
+	file(ARCHIVE_EXTRACT INPUT ${SDL2_DIR}/${SDL2_ZIP_FILE} DESTINATION ${SDL2_DIR})
+	# move zip contents up a level
+	file(COPY ${SDL2_DIR}/SDL2-${SDL2_VERSION}/ DESTINATION ${SDL2_DIR})
+	# remove extracted folder
+	file(REMOVE_RECURSE ${SDL2_DIR}/SDL2-${SDL2_VERSION}/)
+endif()
+
 # set(SDL2_BUILDING_LIBRARY false)
 set(SDL2_CUSTOM_SEARCH_PATH ${PROJECT_SOURCE_DIR}/dependencies/SDL2/)
 #set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/dependencies)
