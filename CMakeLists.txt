@@ -4,7 +4,7 @@ cmake_policy(SET CMP0077 NEW)  # This policy controls the behavior of boolean op
 # The version number.
 set (YOA_VERSION_MAJOR 0)
 set (YOA_VERSION_MINOR 2)
-set (YOA_VERSION_PATCH 3)
+set (YOA_VERSION_PATCH 4)
 
 project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSION_PATCH}" DESCRIPTION "YoAudio Meta project")
 
