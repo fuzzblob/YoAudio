@@ -52,6 +52,7 @@ namespace YoaEngine
 			return;
 		}
 
+		// TODO(maris): fade in/out
 		mDevice->SetPaused(pause);
 	}
 
@@ -206,6 +207,28 @@ namespace YoaEngine
 		return nullptr;
 	}
 
+#ifdef AUDIO_THREAD_UPDATES
+	void Mixer::Update(const double deltaTime)
+	{
+		UNUSED(deltaTime);
+		//YOA_INFO("Current DeltaTime: {0}", deltaTime);
+
+		// TODO(maris): implement proper update behaviour
+		// interpolate values
+		// update statemachines
+		// fill ring buffer
+
+		if(mBufferFilled)
+		{
+			//YOA_INFO("Mixer buffer is already filled")
+			return;
+		}
+
+		FillBuffer();
+		mBufferFilled = true;
+	}
+#endif
+
 	void Mixer::FillBuffer()
 	{
 		const uint32_t bufferSize = mixL.size();
@@ -329,8 +352,10 @@ namespace YoaEngine
 		UNUSED(len);
 		//Mixer* mixer = (Mixer*)userdata;
 		Mixer* mixer = static_cast<Mixer*>(userdata);
+#ifndef AUDIO_THREAD_UPDATES
 		// render to mixing buffer
 		mixer->FillBuffer();
+#endif
 		// fill output buffer
 		uint32_t sampleIndex = 0;
 		switch (mixer->mDevice->GetFormat())
@@ -343,7 +368,7 @@ namespace YoaEngine
 				outF[sampleIndex++] = mixer->mixL[mix];
 				outF[sampleIndex++] = mixer->mixR[mix];
 			}
-			return;
+			break;
 		}
 		case YOA_Format_Uint8:
 		{
@@ -354,7 +379,7 @@ namespace YoaEngine
 				out8[sampleIndex++] = static_cast<uint8_t>((mixer->mixL[mix] + 1.0f) * maxUint);
 				out8[sampleIndex++] = static_cast<uint8_t>((mixer->mixR[mix] + 1.0f) * maxUint);
 			}
-			return;
+			break;
 		}
 		case YOA_Format_Sint16:
 		{
@@ -365,7 +390,7 @@ namespace YoaEngine
 				out16[sampleIndex++] = static_cast<int16_t>(mixer->mixL[mix] * maxSint);
 				out16[sampleIndex++] = static_cast<int16_t>(mixer->mixR[mix] * maxSint);
 			}
-			return;
+			break;
 		}
 		case YOA_Format_Sint32:
 		{
@@ -376,7 +401,7 @@ namespace YoaEngine
 				out32[sampleIndex++] = static_cast<int32_t>(mixer->mixL[mix] * maxSint);
 				out32[sampleIndex++] = static_cast<int32_t>(mixer->mixR[mix] * maxSint);
 			}
-			return;
+			break;
 		}
 		default:
 			const auto deviceFormat = (unsigned char)(mixer->mDevice->GetFormat());
@@ -388,7 +413,10 @@ namespace YoaEngine
 				out32[sampleIndex++] = 0;
 				out32[sampleIndex++] = 0;
 			}
-			return;
+			break;
 		}
+#ifdef AUDIO_THREAD_UPDATES
+		mixer->mBufferFilled = false;
+#endif
 	}
 }  // namespace YoaEngine

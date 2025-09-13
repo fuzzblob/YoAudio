@@ -30,6 +30,8 @@ build-scripts/build_make/*
 build-scripts/build_CodeLite/*
 
 bin/*
+*.cppcheck
+cppcheck*/
 cppcheck-results.xml
 */imgui.ini
 

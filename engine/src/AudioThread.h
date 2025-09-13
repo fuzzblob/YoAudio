@@ -27,6 +27,9 @@ namespace YoaEngine
 	private:
 		static std::unique_ptr<AudioThread> sInstance;
 		std::shared_ptr<Mixer> mMixer = nullptr;
+#ifdef AUDIO_THREAD_UPDATES
+		std::unique_ptr<Timer> mTimer = nullptr;
+#endif
 		static bool sInitialized;
 
 		std::atomic_bool mQuit;

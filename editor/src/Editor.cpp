@@ -70,7 +70,8 @@ namespace YoaEditor
 		static bool bTrue = true;
 		{
 			ImGui::Begin("Sound Caster", &bTrue);
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            constexpr float msPerSecond = 1000.0f;
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", msPerSecond / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
 			static float panning = 0.0f;
 			static float volume = 1.0f;
@@ -82,14 +83,17 @@ namespace YoaEditor
 			ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f);
 			const bool volChanged = ImGui::Button("Update Volume");
 
-			ImGui::InputFloat("Pitch", &pitch, 0.01f, 0.1f);
-			if (pitch > 4.0f) {
-				pitch = 4.0f;
-			}
-			if (pitch < 0.01f) {
-				pitch = 0.01f;
-			}
-			static uint32_t ambLoop_01 = 0u;
+            static bool pitchLimiting = true;
+            ImGui::Checkbox("enable pitch limiting", &pitchLimiting);
+            ImGui::InputFloat("Pitch", &pitch, 0.01f, 0.1f);
+            if(pitchLimiting)
+            {
+                // keep pitch within a nice range
+                constexpr auto pitchMin = 0.01f;
+                constexpr auto pitchMax = 10.0f;
+                pitch = std::max(pitchMin, std::min(pitchMax, pitch));
+            }
+            static uint32_t ambLoop_01 = 0u;
 			if (ambLoop_01 == 0u && ImGui::Button("Play Ambience 01")) {
 				ambLoop_01 = YOA_PlayWavFile("ambience_01.wav", true, 1.0f * volume, 1.0f * pitch, 12.0f, panning);
 			}

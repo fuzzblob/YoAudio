@@ -20,6 +20,9 @@ namespace YoaEngine
 		Mixer &operator=(Mixer &&) = delete;
 		~Mixer();
 
+#ifdef AUDIO_THREAD_UPDATES
+		void Update(const double deltaTime);
+#endif
 		void Pause(const bool pause);
 		bool IsPaused() noexcept;
 		/// <summary>
@@ -52,8 +55,10 @@ namespace YoaEngine
 		std::vector<float> mixR;
 		std::vector<std::shared_ptr<Voice>> mPlayingAudio;
 		std::stack<std::shared_ptr<Voice>> mAvailableVoices;
-		uint32_t mVoiceCount = 0u;
-
 		std::unique_ptr<ResourceManager> mResources = nullptr;
+		uint32_t mVoiceCount = 0u;
+#ifdef AUDIO_THREAD_UPDATES
+		bool mBufferFilled = false;
+#endif
 	};
 }  // namespace YoaEngine

@@ -22,7 +22,7 @@ constexpr uint16_t @PROJECT_NAME@_VERSION_PATCH = @YOA_VERSION_PATCH@u;
 #cmakedefine SPDLOG_FOUND			@SPDLOG_FOUND@
 #endif
 
-constexpr bool AUDIO_THREAD_UPDATES = @AUDIO_THREAD_UPDATES@;
+#define AUDIO_THREAD_UPDATES @AUDIO_THREAD_UPDATES@;
 // if no automatic audio thread updates,
 constexpr uint16_t WAIT_TIME_MILLI_SECONDS = 10;
 // calls to YoManager::Update() per second

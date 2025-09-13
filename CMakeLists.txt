@@ -29,7 +29,7 @@ set(EDITOR_FRAME_RATE 60)			# "Editor rendering frame rate"
 option(BUILD_LIBRARY "Enable building library" ON)
 # should we allow logging?
 set (LOGGING_ENABLED true)			# "enable logging"
-set (AUDIO_THREAD_UPDATES false)	# "enable audio thread updates"
+set (AUDIO_THREAD_UPDATES true)	# "enable audio thread updates"
 set (TICK_RATE 60)					# "audio thread tick rate"
 set (MAX_VOICES 0)					# "Maximum audio voices (unlimited when below 1)"
 set (TARGET_SAMPLERATE 48000)		# "default audio output sample rate"
