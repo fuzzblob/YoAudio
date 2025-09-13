@@ -34,6 +34,7 @@ namespace YoaEngine
 		mTimer = std::make_unique<YoaEngine::Timer>();
 		constexpr int reserveAmt = (MAX_VOICES > 0) ? MAX_VOICES : 32;
 		mPlayingAudio.reserve(reserveAmt);
+		mPlayingSines.reserve(1);
 		mResources = std::make_unique<ResourceManager>();
 	}
 
@@ -60,6 +61,89 @@ namespace YoaEngine
 	{
 		return mDevice->IsPaused();
 	}
+
+    uint32_t Mixer::PlaySine(const float frequency, const float amplitude)
+    {
+		if (!mDevice)
+		{
+			YOA_CRITICAL("Can't play audio. No Device present!");
+			return 0;
+		}
+
+        uint32_t id = sineIdCount++;
+
+        std::shared_ptr<SineSample> voice = std::make_shared<SineSample>(id, frequency, TARGET_SAMPLERATE, amplitude);
+
+        mPlayingSines.push_back(voice);
+		//mPlayingSines.at(0) = voice;
+		return id;
+	}
+
+	bool Mixer::SetSine(const uint32_t id, const float frequency, const float amplitude)
+	{
+		std::shared_ptr<SineSample> voice = nullptr;
+		if (!mDevice)
+		{
+			YOA_CRITICAL("Voice stopping failed! no Device present!");
+			return false;
+		}
+		else if (id == 0u)
+		{
+			YOA_ERROR("Can't stop specified Voice. Invadid voiceID: {0}", id);
+			return false;
+		}
+
+		// loop throu sound channels removing stopped voices
+		for (auto &v : mPlayingSines)
+		{
+			if (v->ID != id)
+			{
+				continue;
+			}
+			voice = v;
+		}
+
+		if (!voice)
+		{
+			return false;
+		}
+		voice->SetFrequency(frequency);
+		voice->SetAmplitude(0.0f);
+		return true;
+	}
+
+	bool Mixer::StopSine(const uint32_t id, float fadeOut)
+    {
+		std::shared_ptr<SineSample> voice = nullptr;
+		if (!mDevice)
+		{
+			YOA_CRITICAL("Voice stopping failed! no Device present!");
+			return false;
+		}
+		else if (id == 0u)
+		{
+			YOA_ERROR("Can't stop specified Voice. Invadid voiceID: {0}", id);
+			return false;
+		}
+
+		// loop throu sound channels removing stopped voices
+		for (auto &v : mPlayingSines)
+		{
+			if (v->ID != id)
+			{
+				continue;
+			}
+			voice = v;
+		}
+
+		if (!voice)
+		{
+			return false;
+		}
+		fadeOut = std::max(MIN_FADE_LENGTH, fadeOut);
+		voice->SetAmplitude(0.0f, fadeOut);
+        return true;
+    }
 
 	uint32_t Mixer::PlayWavFile(const std::string& filename, const bool loop, const float volume,
 		const float pitch, const float fadeIn, const float pan, const bool startPaused)
@@ -159,6 +243,11 @@ namespace YoaEngine
 		for (auto& voice : mPlayingAudio) {
 			StopVoice(voice->ID, fade);
 		}
+
+        for (uint32_t i = sineIdCount - 1; i > 0u; i--)
+        {
+			StopSine(i, 0.0f);
+        }
 	}
 
 	std::shared_ptr<Voice> Mixer::GetVoiceAvailable()
@@ -321,6 +410,29 @@ namespace YoaEngine
 			voice->Volume.UpdateTarget();
 			mAvailableVoices.push(voice);
 			mPlayingAudio.erase(mPlayingAudio.begin() + i);
+		}
+
+        // loop over sines and mix their audio into buffer
+        for (auto& sine : mPlayingSines)
+        {
+			// set amount of samples to be rendered
+			uint32_t length = bufferSize;
+			float sampleIndex = 0.0f;
+			for (uint32_t i = 0; i < length; i++)
+			{
+				const float sample = sine->GetSample(sampleIndex);
+				mixL [i] += sample;
+				mixR [i] += sample;
+			}
+        }
+
+        // remove stopped sines
+		for (int i = mPlayingSines.size() - 1; i >= 0; i--)
+		{
+			if (mPlayingSines [i]->HasStopped())
+			{
+				mPlayingSines.erase(mPlayingSines.begin() + i);
+			}
 		}
 
 		// clip both mix buffers

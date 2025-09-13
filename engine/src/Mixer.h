@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include <stack>
+#include "SineSample.h"
 
 namespace YoaEngine
 {
@@ -25,6 +26,11 @@ namespace YoaEngine
 #endif
 		void Pause(const bool pause);
 		bool IsPaused() noexcept;
+
+        uint32_t PlaySine(const float frequency, const float amplitude);
+		bool SetSine(const uint32_t id, const float frequency, const float amplitude);
+		bool StopSine(const uint32_t id, float fadeOut);
+
 		/// <summary>
 		/// Play a sound file
 		/// </summary>
@@ -53,6 +59,10 @@ namespace YoaEngine
 		std::unique_ptr<AudioDevice> mDevice = nullptr;
 		std::vector<float> mixL;
 		std::vector<float> mixR;
+
+        uint32_t sineIdCount = 1u;
+        std::vector<std::shared_ptr<SineSample>> mPlayingSines;
+
 		std::vector<std::shared_ptr<Voice>> mPlayingAudio;
 		std::stack<std::shared_ptr<Voice>> mAvailableVoices;
 		std::unique_ptr<ResourceManager> mResources = nullptr;

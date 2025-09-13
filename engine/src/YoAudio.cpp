@@ -46,6 +46,36 @@ void YOA_SetVoicePan(const uint32_t id, const float newPan)
 	}
 }
 
+uint32_t YOA_API YOA_PlaySine(const float frequency, const float amplitude)
+{
+	const YoaEngine::AudioThread *inst = YoaEngine::AudioThread::GetInstance();
+	if (inst)
+	{
+		return inst->GetMixer()->PlaySine(frequency, amplitude);
+	}
+	return 0u;
+}
+
+bool YOA_API YOA_SetSine(const uint32_t id, const float frequency, const float amplitude)
+{
+	const YoaEngine::AudioThread *inst = YoaEngine::AudioThread::GetInstance();
+	if (inst)
+	{
+		return inst->GetMixer()->SetSine(id, frequency, amplitude);
+	}
+	return false;
+}
+
+bool YOA_API YOA_StopSine(const uint32_t id, const float fadeOut)
+{
+	const YoaEngine::AudioThread *inst = YoaEngine::AudioThread::GetInstance();
+	if (inst)
+	{
+		return inst->GetMixer()->StopSine(id, fadeOut);
+	}
+	return false;
+}
+
 void YOA_Pause(void)
 {
 	const YoaEngine::AudioThread* inst = YoaEngine::AudioThread::GetInstance();

@@ -21,6 +21,12 @@ void YOA_API YOA_SetVoiceVolume(const uint32_t id, const float newVolume);
 
 void YOA_API YOA_SetVoicePan(const uint32_t id, const float newPan);
 
+uint32_t YOA_API YOA_PlaySine(const float frequency, const float amplitude);
+
+bool YOA_API YOA_SetSine(const uint32_t id, const float frequency, const float amplitude);
+
+bool YOA_API YOA_StopSine(const uint32_t id, const float fadeOut);
+
 void YOA_API YOA_Pause(void);
 
 void YOA_API YOA_Resume(void);
