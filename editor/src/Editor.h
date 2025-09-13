@@ -14,6 +14,7 @@ namespace YoaEditor
 		// Application
 		bool mQuit = false;
 		bool mSoundCaster = true;
+		bool mSineCaster = true;
 		// GUI
 		static constexpr uint64_t mTargetFrameLength = 1000u / EDITOR_FRAME_RATE;
 		static constexpr ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -24,6 +25,7 @@ namespace YoaEditor
 		// ImGui layouts
 		void App();
 		void SoundCaster();
+		void SineCaster();
 		void Menu();
 	public:
 		int Run();

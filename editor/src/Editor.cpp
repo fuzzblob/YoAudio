@@ -68,6 +68,8 @@ namespace YoaEditor
 		Menu();
 
 		SoundCaster();
+
+        SineCaster();
 	}
 
 	void Editor::SoundCaster()
@@ -240,6 +242,87 @@ namespace YoaEditor
 			// end the sound caster window
 			ImGui::End();
 		}
+	}
+
+	void Editor::SineCaster()
+	{
+        // SineCaster
+        {
+			ImGui::Begin("Sine Caster", &mSoundCaster);
+
+			//static float panning = 0.0f;
+			static float volume = 1.0f;
+			static float frequency = 200.0f;
+
+			//ImGui::SliderFloat("Panning", &panning, -1.0f, 1.0f);
+			//const bool panChanged = ImGui::Button("Update Panning");
+
+            auto oldVol = volume;
+			ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f);
+
+            auto oldFreq = frequency;
+			ImGui::SliderFloat("Frequency", &frequency, 5.0f, 22000.0f);
+			//ImGui::InputFloat("Frequency", &frequency, 1.0f, 100.0f);
+			if (frequency > 22000.0f)
+			{
+				frequency = 22000.0f;
+			}
+			if (frequency < 5.0f)
+			{
+				frequency = 5.0f;
+			}
+
+			const bool updateParameters =
+                (volume != oldVol)
+                || (frequency != oldFreq);
+
+			static uint32_t sine = 0u;
+			if (sine == 0u && ImGui::Button("Play Sine"))
+			{
+				sine = YOA_PlaySine(frequency, 1.0f * volume);
+			}
+			if (sine != 0u)
+			{
+				if (ImGui::Button("Stop Sine"))
+				{
+					// stop the looping sound
+					if (YOA_StopSine(sine, 0.2f) != 1)
+					{
+						printf("Error: could not stop sine!\n");
+					}
+					sine = 0u;
+				}
+				else
+				{
+					if (updateParameters)
+					{
+                        // TODO: implement passing updates
+						if (YOA_SetSine(sine, frequency, volume) != 1)
+						{
+							printf("Error: could not update sine!\n");
+						}
+					}
+				}
+			}
+
+			ImGui::Spacing();
+
+			// pause & unpause the audio engine
+			if (ImGui::Button("Pause Playback"))
+			{
+				YOA_Pause();
+			}
+			if (ImGui::Button("Resume Playback"))
+			{
+				YOA_Resume();
+			}
+			if (ImGui::Button("Stop All Playback"))
+			{
+				YOA_Stop(0.0f);
+			}
+			// end the sound caster window
+			ImGui::End();
+        }
 	}
 
 	void Editor::Menu()
