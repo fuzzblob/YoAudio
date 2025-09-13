@@ -67,11 +67,14 @@ namespace YoaEditor
 	{
 		Menu();
 
-		static bool bTrue = true;
+		SoundCaster();
+	}
+
+	void Editor::SoundCaster()
+	{
+		// SoundCaster
 		{
-			ImGui::Begin("Sound Caster", &bTrue);
-            constexpr float msPerSecond = 1000.0f;
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", msPerSecond / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			ImGui::Begin("Sound Caster", &mSoundCaster);
 
 			static float panning = 0.0f;
 			static float volume = 1.0f;
@@ -83,130 +86,155 @@ namespace YoaEditor
 			ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f);
 			const bool volChanged = ImGui::Button("Update Volume");
 
-            static bool pitchLimiting = true;
-            ImGui::Checkbox("enable pitch limiting", &pitchLimiting);
-            ImGui::InputFloat("Pitch", &pitch, 0.01f, 0.1f);
-            if(pitchLimiting)
-            {
-                // keep pitch within a nice range
-                constexpr auto pitchMin = 0.01f;
-                constexpr auto pitchMax = 10.0f;
-                pitch = std::max(pitchMin, std::min(pitchMax, pitch));
-            }
-            static uint32_t ambLoop_01 = 0u;
+		    	static bool pitchLimiting = true;
+		    	ImGui::Checkbox("enable pitch limiting", &pitchLimiting);
+		    	ImGui::InputFloat("Pitch", &pitch, 0.01f, 0.1f);
+		    	if(pitchLimiting)
+		    	{
+				// keep pitch within a nice range
+				constexpr auto pitchMin = 0.01f;
+				constexpr auto pitchMax = 10.0f;
+				pitch = std::max(pitchMin, std::min(pitchMax, pitch));
+		    	}
+		    	static uint32_t ambLoop_01 = 0u;
 			if (ambLoop_01 == 0u && ImGui::Button("Play Ambience 01")) {
 				ambLoop_01 = YOA_PlayWavFile("ambience_01.wav", true, 1.0f * volume, 1.0f * pitch, 12.0f, panning);
 			}
-			if (ambLoop_01 != 0u) {
+			if (ambLoop_01 != 0u)
+			{
 				if (ImGui::Button("Stop Ambience 01"))
 				{
 					// stop the looping sound
-					if (YOA_StopVoice(ambLoop_01, 2.5f) != 1) {
+					if (YOA_StopVoice(ambLoop_01, 2.5f) != 1)
+					{
 						printf("Error: could not stop amb-loop!\n");
 					}
 					ambLoop_01 = 0u;
 				}
 				else
 				{
-					if (volChanged) {
+					if (volChanged)
+					{
 						YOA_SetVoiceVolume(ambLoop_01, volume);
 					}
-					if (panChanged) {
+					if (panChanged)
+					{
 						YOA_SetVoicePan(ambLoop_01, panning);
 					}
 				}
 			}
 
 			static uint32_t ambLoop_02 = 0u;
-			if (ambLoop_02 == 0u && ImGui::Button("Play Ambience 02")) {
+			if (ambLoop_02 == 0u && ImGui::Button("Play Ambience 02"))
+			{
 				ambLoop_02 = YOA_PlayWavFile("ambience_02.wav", true, 1.0f * volume, 1.0f * pitch, 5.0f, panning);
 			}
-			if (ambLoop_02 != 0u) {
+			if (ambLoop_02 != 0u)
+			{
 				if (ImGui::Button("Stop Ambience 02"))
 				{
 					// stop the looping sound
-					if (YOA_StopVoice(ambLoop_02, 0.0f) != 1) {
+					if (YOA_StopVoice(ambLoop_02, 0.0f) != 1)
+					{
 						printf("Error: could not stop amb-loop!\n");
 					}
 					ambLoop_02 = 0u;
 				}
 				else
 				{
-					if (volChanged) {
+					if (volChanged)
+					{
 						YOA_SetVoiceVolume(ambLoop_02, volume);
 					}
-					if (panChanged) {
+					if (panChanged)
+					{
 						YOA_SetVoicePan(ambLoop_02, panning);
 					}
 				}
 			}
 
 			static uint32_t engineLoop = 0u;
-			if (engineLoop == 0u && ImGui::Button("Play Engine")) {
+			if (engineLoop == 0u && ImGui::Button("Play Engine"))
+			{
 				engineLoop = YOA_PlayWavFile("engine.wav", true, 1.0f * volume, 1.0f * pitch, 5.0f, panning);
 			}
-			if (engineLoop != 0u) {
+			if (engineLoop != 0u)
+			{
 				if (ImGui::Button("Stop Engine"))
 				{
 					// stop the looping sound
-					if (YOA_StopVoice(engineLoop, 0.0f) != 1) {
+					if (YOA_StopVoice(engineLoop, 0.0f) != 1)
+					{
 						printf("Error: could not stop Engine!\n");
 					}
 					engineLoop = 0u;
 				}
 				else
 				{
-					if (volChanged) {
+					if (volChanged)
+					{
 						YOA_SetVoiceVolume(engineLoop, volume);
 					}
-					if (panChanged) {
+					if (panChanged)
+					{
 						YOA_SetVoicePan(engineLoop, panning);
 					}
 				}
 			}
 
 			static uint32_t musicLoop = 0u;
-			if (musicLoop == 0u && ImGui::Button("Play Music")) {
-				musicLoop = YOA_PlayWavFile("DasRied_loop_mono_8bit.wav", true, 1.0f * volume, 1.0f * pitch, 0.0f, panning);
+			if (musicLoop == 0u && ImGui::Button("Play Music"))
+			{
+				musicLoop =
+				    YOA_PlayWavFile("DasRied_loop_mono_8bit.wav", true, 1.0f * volume, 1.0f * pitch, 0.0f, panning);
 			}
-			if (musicLoop != 0u) {
+			if (musicLoop != 0u)
+			{
 				if (ImGui::Button("Stop Music"))
 				{
 					// stop the looping sound
-					if (YOA_StopVoice(musicLoop, 1.5f) != 1) {
+					if (YOA_StopVoice(musicLoop, 1.5f) != 1)
+					{
 						printf("Error: could not stop Music!\n");
 					}
 					musicLoop = 0u;
 				}
 				else
 				{
-					if (volChanged) {
+					if (volChanged)
+					{
 						YOA_SetVoiceVolume(musicLoop, volume);
 					}
-					if (panChanged) {
+					if (panChanged)
+					{
 						YOA_SetVoicePan(musicLoop, panning);
 					}
 				}
 			}
 
-			if (ImGui::Button("Play Door Open")) {
+			if (ImGui::Button("Play Door Open"))
+			{
 				YOA_PlayWavFile("door_open_01.wav", false, 0.5f * volume, 1.0f * pitch, 0.0f, panning);
 			}
 
-			if (ImGui::Button("Play Door Close")) {
+			if (ImGui::Button("Play Door Close"))
+			{
 				YOA_PlayWavFile("door_close_01.wav", false, 0.5f * volume, 1.0f * pitch, 0.0f, panning);
 			}
 
 			ImGui::Spacing();
 
 			// pause & unpause the audio engine
-			if (ImGui::Button("Pause Playback")) {
+			if (ImGui::Button("Pause Playback"))
+			{
 				YOA_Pause();
 			}
-			if (ImGui::Button("Resume Playback")) {
+			if (ImGui::Button("Resume Playback"))
+			{
 				YOA_Resume();
 			}
-			if (ImGui::Button("Stop All Playback")) {
+			if (ImGui::Button("Stop All Playback"))
+			{
 				YOA_Stop(0.0f);
 			}
 			// end the sound caster window
@@ -278,6 +306,10 @@ namespace YoaEditor
 				if (ImGui::MenuItem("Paste", "CTRL+V")) {}
 				ImGui::EndMenu();
 			}
+
+            		constexpr float msPerSecond = 1000.0f;
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", msPerSecond / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
 
 			ImGui::EndMainMenuBar();
 		}
