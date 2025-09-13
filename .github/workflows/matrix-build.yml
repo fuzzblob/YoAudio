@@ -26,7 +26,7 @@ jobs:
       fail-fast: false
       
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-latest, macos-latest ]
         c_compiler: [ clang, gcc ]
         build_type: [ Debug, Release ]
         include:
@@ -34,6 +34,12 @@ jobs:
             c_compiler: gcc
             cpp_compiler: g++
           - os: ubuntu-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+          - os: macos-latest
+            c_compiler: gcc
+            cpp_compiler: g++
+          - os: macos-latest
             c_compiler: clang
             cpp_compiler: clang++
           - os: windows-latest
@@ -67,6 +73,11 @@ jobs:
       shell: bash
       run: sudo apt install libsdl2-dev
       if: matrix.os == 'ubuntu-latest'
+      
+    - name: Install MacOS Dependencies
+      shell: bash
+      run: brew install SDL2 gcc llvm
+      if: matrix.os == 'macos-latest'
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
