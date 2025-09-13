@@ -31,12 +31,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Download SDL2 development libraries
-      run: Invoke-WebRequest https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip -OutFile C:\SDL2-dev-libs-win.zip
-    - name: Extract SDL2 libraries
-      run: 7z x "C:\SDL2-dev-libs-win.zip" -oD:\a\YoAudio\YoAudio\SDL2-unzipped
-    - name: Copy SDL2 libraries to ./dependencies/SDL2/
-      run: xcopy /s /e D:\a\YoAudio\YoAudio\SDL2-unzipped\SDL2-2.32.2 dependencies\SDL2
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
     - name: Pull git-submodules
