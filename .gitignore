@@ -23,6 +23,11 @@ build_ninja/*
 build_ninja/*
 build_make/*
 build_CodeLite/*
+build-scripts/build_MSVC/*
+build-scripts/build_ninja/*
+build-scripts/build_ninja/*
+build-scripts/build_make/*
+build-scripts/build_CodeLite/*
 
 bin/*
 cppcheck-results.xml

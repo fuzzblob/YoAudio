@@ -6,7 +6,7 @@ mkdir build_ninja -p
 cd build_ninja
 
 echo "\nmaking DEBUG unix makefiles:"
-cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Debug ../
+cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Debug ../..
 echo "\nbuilding DEBUG build of YoAudio:"
 #cmake --build . --target YoAudio --config Debug
 ninja -d stats
