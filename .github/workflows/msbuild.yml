@@ -7,10 +7,6 @@ name: MSBuild
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "master", "linux", "msvc" ]
-  pull_request:
-    branches: [ "master", "linux", "msvc" ]
 
 env:
   # Path to the solution file relative to the root of the project.
