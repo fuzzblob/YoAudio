@@ -38,11 +38,11 @@ set (TARGET_BUFFER 4096)			# "default audio output buffer length"
 set (TARGET_BITDEPTH 16)			# "default audio output bit depth"
 
 # beging project setup
-message(STATUS "###################################################################################################################")
-message(STATUS "")
-message(STATUS "Now building the project for ${PROJECT_NAME} version ${PROJECT_VERSION}")
-message(STATUS "")
-message(STATUS "###################################################################################################################")
+message(STATUS "##############################################################################")
+message(STATUS "#")
+message(STATUS "# Now building the project for ${PROJECT_NAME} version ${PROJECT_VERSION}")
+message(STATUS "#")
+message(STATUS "##############################################################################")
 
 # set C++ standard
 set(CMAKE_CXX_STANDARD 20)
@@ -138,7 +138,9 @@ endif()
 set(SDL2_CUSTOM_SEARCH_PATH ${PROJECT_SOURCE_DIR}/dependencies/SDL2/)
 #set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/dependencies)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/dependencies ${SDL2_CUSTOM_SEARCH_PATH})
-message(STATUS "Looking for SDL2 (SDL2_CUSTOM_SEARCH_PATH = ${SDL2_CUSTOM_SEARCH_PATH})...")
+message(STATUS "")
+message(STATUS "Looking for SDL2")
+message(STATUS "(SDL2_CUSTOM_SEARCH_PATH = ${SDL2_CUSTOM_SEARCH_PATH})...")
 find_package(SDL2 REQUIRED)
 # example usage: target_link_libraries(${PROJECT_NAME} OpenGL::GL ${SDL2_LIBRARY} )
 
@@ -201,8 +203,8 @@ endif()
 message(STATUS "########## ${PROJECT_NAME} CMakeLists.txt end ##########")
 
 message(STATUS "")
-message(STATUS "###################################################################################################################")
-message(STATUS "")
-message(STATUS "				${PROJECT_NAME} configuration complete!")
-message(STATUS "")
-message(STATUS "###################################################################################################################")
+message(STATUS "##############################################################################")
+message(STATUS "#")
+message(STATUS "# ${PROJECT_NAME} configuration complete!")
+message(STATUS "#")
+message(STATUS "##############################################################################")

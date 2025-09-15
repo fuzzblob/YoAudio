@@ -2,11 +2,11 @@
 project("YOA_Editor" VERSION ${PROJECT_VERSION})
 SET(EDITOR_NAME ${PROJECT_NAME} CACHE INTERNAL "Name of ${PROJECT_NAME} project")
 
-message(STATUS "###################################################################################################################")
-message(STATUS "")
-message(STATUS "Now building the project for ${EDITOR_NAME} version ${PROJECT_VERSION}")
-message(STATUS "")
-message(STATUS "###################################################################################################################")
+message(STATUS "##############################################################################")
+message(STATUS "#")
+message(STATUS "# Now building the project for ${EDITOR_NAME} version ${PROJECT_VERSION}")
+message(STATUS "#")
+message(STATUS "##############################################################################")
 
 # setup compiler options
 include(../compiler.cmake)

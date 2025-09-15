@@ -3,11 +3,11 @@ cmake_minimum_required(VERSION 3.5...3.31)
 project("YOA_Engine" VERSION ${PROJECT_VERSION})
 SET(ENGINE_NAME ${PROJECT_NAME} CACHE INTERNAL "Name of ${PROJECT_NAME} project")
 
-message(STATUS "###################################################################################################################")
-message(STATUS "")
-message(STATUS "Now building the project for ${ENGINE_NAME} version ${PROJECT_VERSION}")
-message(STATUS "")
-message(STATUS "###################################################################################################################")
+message(STATUS "##############################################################################")
+message(STATUS "#")
+message(STATUS "# Now building the project for ${ENGINE_NAME} version ${PROJECT_VERSION}")
+message(STATUS "#")
+message(STATUS "##############################################################################")
 
 # setup compiler options
 include(../compiler.cmake)
