@@ -18,16 +18,8 @@ CTestTestfile.cmake
 # build outputs
 
 build/*
-build_MSVC/*
-build_ninja/*
-build_ninja/*
-build_make/*
-build_CodeLite/*
-build-scripts/build_MSVC/*
-build-scripts/build_ninja/*
-build-scripts/build_ninja/*
-build-scripts/build_make/*
-build-scripts/build_CodeLite/*
+build_*
+build-scripts/build_*
 
 bin/*
 *.cppcheck
