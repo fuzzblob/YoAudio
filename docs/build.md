@@ -13,8 +13,8 @@
 
 ### Prerequisites <a name="prerequisites"></a>
 
-- A moder install if [git](https://git-scm.com/downloads)
-- An moder installation of [CMake 3.8 or newer](https://cmake.org/)
+- A modern install of [git](https://git-scm.com/downloads)
+- An modern installation of [CMake 3.8 or newer](https://cmake.org/)
 - SDL2 ([Simple DirectMedia Layer](https://www.libsdl.org/), [prebuilt downloads](https://github.com/libsdl-org/SDL/releases))
 	- SDL2 is being used as the audio rendering backend in the Engine, and for rendering graphics in the Editor.
 	- SDL3 has been released, but not tested yet.
@@ -48,24 +48,42 @@ At the moment the build process has only ever been tested on Windows with Micros
 
 ### Building on Linux <a name="linux"></a>
 
-- install build essetials (e.g. on Debian run '''apt install build-essential''' bringing in libc-dev, gcc, g++, make)
-- install cmake
-- install SDL2:
-    - Arch: pacman -S sdl2
-    - Debian: apt-get install sdl2 or apt-get install libsdl2-2.0-0 or apt-get install libsdl2-dev
-    - Fedora: dnf install SDL2-devel
-    - Gentoo: emerge media-libs/libsdl2
-- run cmake
-	- a build script targeting gcc is available as [build_Linux_Make.sh](../build_Linux_Make.sh)
-- build
-- the output will be built to `/bin/` as **libYoAudio.so**
+#### dependencies
+
+- Ubuntu / Debian users run: `sudo apt-get install build-essential cmake ninja-build libsdl2-dev`
+    - you can now skip down to the build step
+
+To build the project yourself you will need the following:
+
+- A modern **C** and **C++** compiler:
+    - version 13+ of `gcc`
+    - version 20+ of `clang` and `clang-tools`)
+- A build tool such as `make` or `ninja` in addition to `cmake`
+- The SDL2 development libraries:
+    - Arch: `pacman -S sdl2`
+    - Ubuntu / Debian: `apt-get install libsdl2-dev`
+    - Fedora: `dnf install SDL2-devel`
+    - Gentoo: `emerge media-libs/libsdl2`
+
+#### building the project
+
+- An easyto use build script is available at [./build-scripts/linux.sh](../build-scripts/linux.sh)
+    - either call up the help text with `./linux.sh --help` or let it auto-detect the available tools
+- the output will be built to `/bin/` as **libYoAudio.so** & **YOA_Editor**
+
+To run the Editor software you will also need:
+- an ALSA compatible audio backend (`alsa-base` or `pipewire`)
+- a graphical user interface
+
 
 ### Building on Mac OS <a name="macos"></a>
 
 As I don't have a Mac OS build environment I can not provide detailed instructions on how to build YoAudio for that platform. A pull request with a build script, as well as any changes required to *CMakeLists.txt* and source code would be much appreciated. What follows is an assumption:
 
-- install SDL via [homebrew](https://brew.sh/) (*CMakeLists.txt* is setup to find it in the default install directory)
+- install SDL via [homebrew](https://formulae.brew.sh/formula/sdl2) (*CMakeLists.txt* is setup to find it in the default install directory)
+    - `brew install sdl2`
 - run CMake
+    - chances are the new `./build-scripts/linux.sh` will work as expected 
 - build
 
 ## On Submodules <a name="submodules"></a>
