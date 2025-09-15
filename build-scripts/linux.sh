@@ -25,8 +25,6 @@ show_help() {
     echo "                                (\"Unix Makefiles\", \"Ninja\", \"Visual Studio 17 2022\")"
     echo "     -b, --build-type <type>    Specify the build type (e.g. Release, Debug, etc...)"
     echo "     --clean                    Clean previous build files before configuring"
-    echo "     -a, --auto                 Automatically choose available compiler and toolchain"
-    echo "                                The default if no options are provided"
     echo "     -i, --interactive          Select compiler and toolchain interactively"
     echo "     -h, --help                 Show this help message and exit"
     echo ""
@@ -66,10 +64,6 @@ while [[ $# -gt 0 ]]; do
             CLEAN_BUILD=1
             shift
             ;;
-        -a|--auto)
-            AUTO_CHOOSE=1
-            shift
-            ;;
         -i|--interactive)
             INTERACTIVE=1
             shift
@@ -86,12 +80,6 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [[ "$AUTO_CHOOSE" == "1" ]]; then
-    if [[ "$INTERACTIVE" == "1" ]]; then
-        echo "Warning: --auto overrides the --interactive option."
-    fi
-    INTERACTIVE=0
-fi
 # Interactive selection if requested
 if [[ "$INTERACTIVE" == "1" ]]; then
     # C Compiler selection
