@@ -20,12 +20,13 @@ show_help() {
     echo "     ./linux.sh [OPTIONS]"
     echo ""
     echo " Options:"
+    echo "     -b, --build-type <type>    Specify the build type (e.g. Release, Debug, etc...)"
     echo "     -c, --compiler <name>      Specify the C compiler to use (e.g., gcc, clang)"
     echo "     -cpp, --cppcompiler <name> Specify the C++ compiler to use (e.g., g++, clang++)"
     echo "                                (defaults to C compiler with standard suffix)"
     echo "     -g, --generator <name>     Specify the CMake generator / build toolchain"
     echo "                                (\"Unix Makefiles\", \"Ninja\", \"Visual Studio 17 2022\")"
-    echo "     -b, --build-type <type>    Specify the build type (e.g. Release, Debug, etc...)"
+    echo "     -l, --list                 List options for -b, -c, -cpp and -g"
     echo "     --clean                    Clean previous build files and dependency cache"
     echo "     -i, --interactive          Select compiler and toolchain interactively"
     echo "     -h, --help                 Show this help message and exit"
@@ -37,6 +38,75 @@ show_help() {
     echo "     ./linux.sh --compiler clang --generator \"Ninja\" --build-type Release"
     echo ""
 }
+
+show_options() {
+    echo ""
+    echo "C compilers (detected)"
+    echo "----------------------------------"
+    for element in "${compilers[@]}"; do
+        echo $element
+    done
+    echo ""
+    echo "C++ compilers (detected)"
+    echo "----------------------------------"
+    for element in "${cxx_compilers[@]}"; do
+        echo $element
+    done
+    echo ""
+    echo "build types (preset)"
+    echo "----------------------------------"
+    for element in "${build_types[@]}"; do
+        echo $element
+    done
+    echo ""
+    echo "CMake generators (detected)"
+    echo "----------------------------------"
+    for element in "${generators[@]}"; do
+        echo $element
+    done
+    echo ""
+    print_generators
+}
+
+print_generators() {
+    echo "cmake --help (Generators section):"
+    echo "----------------------------------"
+    cmake --help | awk '/available on this platform/{flag=1} flag' | awk 'NF'
+}
+
+declare -a compilers
+get_compilers() {
+    if command -v gcc &>/dev/null; then compilers+=("gcc"); fi
+    if command -v clang &>/dev/null; then compilers+=("clang"); fi
+    if command -v clang-18 &>/dev/null; then compilers+=("clang-18"); fi
+    if command -v clang-19 &>/dev/null; then compilers+=("clang-19"); fi
+    if command -v clang-20 &>/dev/null; then compilers+=("clang-20"); fi
+}
+get_compilers
+
+declare -a cxx_compilers
+get_cxx_compilers() {
+    cxx_compilers+=("default")
+    if command -v g++ &>/dev/null; then cxx_compilers+=("g++"); fi
+    if command -v clang++ &>/dev/null; then cxx_compilers+=("clang++"); fi
+    if command -v clang++-18 &>/dev/null; then cxx_compilers+=("clang++-18"); fi
+    if command -v clang++-19 &>/dev/null; then cxx_compilers+=("clang++-19"); fi
+    if command -v clang++-20 &>/dev/null; then cxx_compilers+=("clang++-20"); fi
+}
+get_cxx_compilers
+
+declare -a generators
+get_generators() {
+    if command -v ninja &>/dev/null; then generators+=("Ninja"); fi
+    if command -v make &>/dev/null; then generators+=("Unix Makefiles"); fi
+}
+get_generators
+
+declare -a build_types
+get_build_types() {
+    build_types=("Debug" "Release" "RelWithDebInfo" "MinSizeRel")
+}
+get_build_types
 
 # Show help if no arguments are provided
 if [[ $# -eq 0 ]]; then
@@ -74,6 +144,10 @@ while [[ $# -gt 0 ]]; do
             show_help
             exit 0
             ;;
+        -l|--list)
+            show_options
+            exit 0
+            ;;
         *)
             echo "Unknown option: $1"
             show_help
@@ -88,9 +162,10 @@ if [[ "$INTERACTIVE" == "1" ]]; then
     if [[ -z "$C_COMPILER" ]]; then
         echo "Select a C compiler:"
         options=()
-        if command -v gcc &>/dev/null; then options+=("gcc"); fi
-        if command -v clang &>/dev/null; then options+=("clang"); fi
-        if command -v clang-20 &>/dev/null; then options+=("clang-20"); fi
+        options+=("auto")
+        for element in "${compilers[@]}"; do
+            options+=("$element")
+        done
         select opt in "${options[@]}"; do
             if [[ -n "$opt" ]]; then
                 C_COMPILER="$opt"
@@ -101,12 +176,7 @@ if [[ "$INTERACTIVE" == "1" ]]; then
     # CXX Compiler selection
     if [[ -z "$CXX_COMPILER" ]]; then
         echo "Select a C++ compiler:"
-        options=()
-        if command -v g++ &>/dev/null; then options+=("g++"); fi
-        if command -v clang++ &>/dev/null; then options+=("clang++"); fi
-        if command -v clang++-20 &>/dev/null; then options+=("clang++-20"); fi
-        options+=("default")
-        select opt in "${options[@]}"; do
+        select opt in "${cxx_compilers[@]}"; do
             if [[ -n "$opt" ]]; then
                 if [[ "$opt" == "default" ]]; then
                     CXX_COMPILER=""
@@ -119,20 +189,22 @@ if [[ "$INTERACTIVE" == "1" ]]; then
     fi
     # CMake generator selection
     if [[ -z "$TOOLCHAIN" ]]; then
+        options=()
+        options+=("auto")
+        for element in "${generators[@]}"; do
+            options+=("$element")
+        done
+        options+=("other (manual entry)")
+        options+=("print list")
         echo "Select a CMake generator:"
-        generators=()
-        if command -v make &>/dev/null; then generators+=("Unix Makefiles"); fi
-        if command -v ninja &>/dev/null; then generators+=("Ninja"); fi
-        generators+=("list")
-        generators+=("Other (manual entry)")
-        select gen in "${generators[@]}"; do
+        select gen in "${options[@]}"; do
             if [[ "$gen" == "list" ]]; then
-                echo "cmake --help (Generators section):"
-                echo "----------------------------------"
-                cmake --help | awk '/available on this platform/{flag=1} flag' | awk 'NF'
+                print_generators
                 continue
             fi
-            if [[ "$gen" == "Other (manual entry)" ]]; then
+            if [[ "$gen" == "auto" ]]; then
+                break
+            elif [[ "$gen" == "Other (manual entry)" ]]; then
                 read -p "Enter generator name: " TOOLCHAIN
                 break
             elif [[ -n "$gen" ]]; then
@@ -144,7 +216,6 @@ if [[ "$INTERACTIVE" == "1" ]]; then
     # Build type selection
     if [[ -z "$BUILD_TYPE" ]]; then
         echo "Select a build type:"
-        build_types=("Release" "Debug" "RelWithDebInfo" "MinSizeRel")
         select bt in "${build_types[@]}"; do
             if [[ -n "$bt" ]]; then
                 BUILD_TYPE="$bt"
@@ -166,23 +237,18 @@ if ! command -v "$C_COMPILER" &>/dev/null; then
 fi
 # If C compiler not set, use available ones
 if [[ -z "$C_COMPILER" ]]; then
-    if command -v gcc &>/dev/null; then
-        C_COMPILER="gcc"
-    elif command -v clang &>/dev/null; then
-        C_COMPILER="clang"
-	elif command -v clang-20 &>/dev/null; then
-        C_COMPILER="clang-20"
+    # Fallback to first C compiler in detected list
+    if ([ ${#compilers[@]} != 0 ]); then
+        C_COMPILER=${compilers[0]}
     else
         echo "No supported C compiler found."
         exit 1
     fi
-    if [[ $AUTO_CHOOSE == 0 ]]; then
-        echo "No C compiler specified. Defaulting to '$C_COMPILER'."
-    fi
+    echo "Defaulting to C compiler: '$C_COMPILER'."
 fi
 # Check for C++ compiler if specified
 if ! command -v "$CXX_COMPILER" &>/dev/null; then
-    #echo -e "Error: C++ Compiler \"'$CXX_COMPILER'\" not found."
+    echo -e "Error: C++ Compiler \"'$CXX_COMPILER'\" not found."
     CXX_COMPILER=""
 fi
 # If C++ compiler not set, use available ones
@@ -194,20 +260,14 @@ if [[ -z "$CXX_COMPILER" ]]; then
         CXX_COMPILER="${C_COMPILER/clang/clang++}"
     elif [[ "$C_COMPILER" == *"clang-20"* ]]; then
         CXX_COMPILER="${C_COMPILER/clang/clang++-20}"
-    # Fallback to common C++ compilers
-    elif command -v g++ &>/dev/null; then
-        CXX_COMPILER="g++"
-    elif command -v clang++ &>/dev/null; then
-        CXX_COMPILER="clang++"
-    elif command -v clang++-20 &>/dev/null; then
-        CXX_COMPILER="clang++-20"
+    # Fallback to first C++ compiler in detected list
+    elif ([ ${#cxx_compilers[@]} != 0 ]); then
+        CXX_COMPILER=${cxx_compilers[0]}
     else
         echo "No supported C++ compiler found."
         exit 1
     fi
-    if [[ $AUTO_CHOOSE == 0 ]]; then
-        echo "No C++ compiler specified. Defaulting to '$CXX_COMPILER'."
-    fi
+    echo "Defaulting to C++ compiler: '$CXX_COMPILER'."
 fi
 # Check for toolchain if specified
 if [[ -n "$TOOLCHAIN" ]]; then
@@ -231,6 +291,7 @@ if [[ -n "$TOOLCHAIN" ]]; then
             ;;
         *)
             echo "Warning: Unknown toolchain '$TOOLCHAIN'."
+            echo "the build script does not have support implemented."
             echo "Falling back to auto-detection."
             TOOLCHAIN=""
             ;;
@@ -238,24 +299,21 @@ if [[ -n "$TOOLCHAIN" ]]; then
 fi
 # If toolchain not set, default to "Unix Makefiles"
 if [[ -z "$TOOLCHAIN" ]]; then
-    if command -v ninja &>/dev/null; then
-        TOOLCHAIN="Ninja"
-    elif command -v make &>/dev/null; then
-        TOOLCHAIN="Unix Makefiles"
+    # Fallback to first generator in detected list
+    if ([ ${#generators[@]} != 0 ]); then
+        TOOLCHAIN=${generators[0]}
     else
         echo "No supported target toolchain found."
         exit 1
     fi
-    if [[ $AUTO_CHOOSE == 0 ]]; then
-        echo "No toolchain specified. Defaulting to '$TOOLCHAIN'."
-    fi
+    echo "Defaulting to CMake generator: '$TOOLCHAIN'."
 fi
 # If build type not set, use available ones (Release, Debug, RelWithDebInfo)
 if [[ -z "$BUILD_TYPE" ]]; then
     if [[ $AUTO_CHOOSE == 0 ]]; then
         echo "No build type specified. Defaulting to Release."
     fi
-    BUILD_TYPE="Release"
+    BUILD_TYPE="Debug"
 fi
 # Check for cmake
 if ! command -v cmake &>/dev/null; then
