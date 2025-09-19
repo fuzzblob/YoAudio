@@ -11,7 +11,7 @@ if exist bin rmdir /S /Q bin
 cd build_ninja
 
 rem run CMake
-%CM% -G "Ninja" -Wdev -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -S ../../
+%CM% -DCPM_SOURCE_CACHE=../.cpm-cache/ -G "Ninja" -Wdev -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -S ../../
 
 ninja.exe -d stats
 

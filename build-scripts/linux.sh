@@ -293,7 +293,7 @@ echo ""
 # Run CMake to configure the project
 echo "Configuring project with CMake..."
 echo ""
-cmake -DCMAKE_C_COMPILER="$C_COMPILER" -DCMAKE_CXX_COMPILER="$CXX_COMPILER" -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -G "$TOOLCHAIN" -S "$SEARCH_DIR" -B .
+cmake -DCPM_SOURCE_CACHE=../.cpm-cache/ -DCMAKE_C_COMPILER="$C_COMPILER" -DCMAKE_CXX_COMPILER="$CXX_COMPILER" -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -G "$TOOLCHAIN" -S "$SEARCH_DIR" -B .
 if [ $? -ne 0 ]; then
     echo "CMake configuration failed."
     exit 1

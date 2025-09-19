@@ -102,6 +102,8 @@ endif()
 #
 ##########################
 
+# TODO: figure out how to use local packages instead of building from source
+# set(CPM_USE_LOCAL_PACKAGES true)
 include(cmake/CPM.cmake)
 
 if(MSVC AND NOT SDL2_BUILDING_LIBRARY)
