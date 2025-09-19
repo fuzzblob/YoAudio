@@ -4,7 +4,7 @@
 
 |build-windows|build-linux|License|
 |:--:|:--:|:--:|
-|[![MSBuild](https://github.com/fuzzblob/YoAudio/actions/workflows/msbuild.yml/badge.svg)](https://github.com/fuzzblob/YoAudio/actions/workflows/msbuild.yml)|[![Linux](https://github.com/fuzzblob/YoAudio/actions/workflows/multi-cmake-linux-build.yml/badge.svg)](https://github.com/fuzzblob/YoAudio/actions/workflows/multi-cmake-linux-build.yml)|[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)|
+|[![MSBuild](https://github.com/fuzzblob/YoAudio/actions/workflows/msbuild.yml/badge.svg)](https://github.com/fuzzblob/YoAudio/actions/workflows/msbuild.yml)|[![Linux](https://github.com/fuzzblob/YoAudio/actions/workflows/matrix-build.yml/badge.svg)](https://github.com/fuzzblob/YoAudio/actions/workflows/matrix-build.yml)|[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)|
 
 - [About](#about)
 	- [Usage](docs/usage.md)
