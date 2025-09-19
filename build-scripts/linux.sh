@@ -1,5 +1,7 @@
 #!/bin/bash
 
+CACHE_DIR="../.cpm-cache/"
+
 # assuming build takes less than 24 hours
 # the clock is a wall clock and will break if builds take longer
 now () {
@@ -24,7 +26,7 @@ show_help() {
     echo "     -g, --generator <name>     Specify the CMake generator / build toolchain"
     echo "                                (\"Unix Makefiles\", \"Ninja\", \"Visual Studio 17 2022\")"
     echo "     -b, --build-type <type>    Specify the build type (e.g. Release, Debug, etc...)"
-    echo "     --clean                    Clean previous build files before configuring"
+    echo "     --clean                    Clean previous build files and dependency cache"
     echo "     -i, --interactive          Select compiler and toolchain interactively"
     echo "     -h, --help                 Show this help message and exit"
     echo ""
@@ -291,6 +293,7 @@ fi
 BUILD_DIR="build_${C_COMPILER}-${CXX_COMPILER}-${TOOLCHAIN}_${BUILD_TYPE}"
 if [[ $CLEAN_BUILD -eq 1 ]]; then
     echo "Cleaning previous build files in $BUILD_DIR..."
+	rm -rf "$CACHE_DIR"
     rm -rf "$BUILD_DIR"
 fi
 mkdir -p "$BUILD_DIR"
@@ -301,7 +304,7 @@ echo ""
 # Run CMake to configure the project
 echo "Configuring project with CMake..."
 echo ""
-cmake -DCPM_SOURCE_CACHE=../.cpm-cache/ -DCPM_USE_LOCAL_PACKAGES=TRUE -DCMAKE_C_COMPILER="$C_COMPILER" -DCMAKE_CXX_COMPILER="$CXX_COMPILER" -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -G "$TOOLCHAIN" -S "$SEARCH_DIR" -B .
+cmake -DCPM_SOURCE_CACHE="$CACHE_DIR" -DCPM_USE_LOCAL_PACKAGES=TRUE -DCMAKE_C_COMPILER="$C_COMPILER" -DCMAKE_CXX_COMPILER="$CXX_COMPILER" -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -G "$TOOLCHAIN" -S "$SEARCH_DIR" -B .
 if [ $? -ne 0 ]; then
     echo "CMake configuration failed."
     exit 1
