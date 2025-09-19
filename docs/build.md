@@ -18,27 +18,27 @@
 - SDL2 ([Simple DirectMedia Layer](https://www.libsdl.org/), [prebuilt downloads](https://github.com/libsdl-org/SDL/releases))
 	- SDL2 is being used as the audio rendering backend in the Engine, and for rendering graphics in the Editor.
 	- SDL3 has been released, but not tested yet.
-- clone the repository with submodules:
-	- **[submodule]** The YoAudio Engine uses [sdplog](https://github.com/gabime/spdlog) for printing to the console (not included in Release builds). It is an optional **git submodule**.
-	- **[submodule]** The YoAudio Editor uses [imgui](https://github.com/ocornut/imgui) for rendering immediate mode UI elements. It is required for the editor to compile and function as intended.
-	- For more information about the submodule workflow see below at [On git submodules](#submodules)
 
 ```Shell
-git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git
+git clone https://github.com/fuzzblob/YoAudio.git
 ```
 
 ## Build Instructions <a name="build"></a>
+
+The project uses CPM.cmake to automatically pull in the following dependencies:
+
+- optional: [sdplog](https://github.com/gabime/spdlog) is used by the engine for printing to the console (not included in Release builds).
+- [imgui](https://github.com/ocornut/imgui) for rendering immediate mode UI elements. It is required for the editor to compile and function as intended.
 
 ### Building on Windows <a name="windows"></a>
 
 At the moment the build process has only ever been tested on Windows with Microsoft Visual Studio 2017 Community Edition. Follow these steps to generate a Visual Studio project:
 
-- install Microsoft Visual Studio (currently recommended [VS17 2022](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022))
-	- in the setup select the MSVC C++ compiler and Windows SDK
-- download the [SDL2 Development Libraries](https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip) (zip file labeled **"SDL2-devel-2.XX.X-VC"**)
-	- extract the `include` and `lib` folders to `./dependencies/SDL2/`
+- install Microsoft Visual Studio (currently recommended [Visual Studio 17 2022](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022))
+	- in the setup select the **MSVC C++ compiler** and **Windows SDK**
 - run CMake
 	- an example is provided for VS 17 2022 [build_Windows_VisualStudio2022.bat](../build_Windows_VisualStudio2022.bat)
+	- the CMake tool automatically downloads the [SDL2 Development Libraries](https://github.com/libsdl-org/SDL/releases/download/release-2.32.2/SDL2-devel-2.32.2-VC.zip) (zip file labeled **"SDL2-devel-2.XX.X-VC"**) and extracts them to `./dependencies/SDL2/`.
 - open the created solution file (e.g. `/build/YoAudio.sln`) and build the code (`Ctrl + Shift + B`)
 - the output will be built to `/bin/Debug`
 	- YoAudio-Engine.lib (linking symbols)
@@ -85,23 +85,3 @@ As I don't have a Mac OS build environment I can not provide detailed instructio
 - run CMake
     - chances are the new `./build-scripts/linux.sh` will work as expected 
 - build
-
-## On Submodules <a name="submodules"></a>
-
-YoAudio uses a git feature called submodules to tie in other git repositories as dependencies. If you don't want to or can't use this feature, you will have to make the dependencies work by hand (adding files to `engine/dependencies/` and `editor/dependencies`, passing values to CMake, possibly editing *CMakeLists.txt*). This can be tricky as the *CMake* scripts require specific folder locations to detect the dependencies and set up the libraries properly for the compilation of code to function.
-To clone the repository with submodules paste the following command in your terminal
-
-```Shell
-git clone --recurse-submodules https://github.com/fuzzblob/YoAudio.git
-```
-If you accidentally cloned the repository without the `--recurse-submodules` option, you can fetch them after the fact with the following command:
-
-```Shell
-git submodule update --init --recursive --remote
-```
-
-Sadly this will (probably) pull in the latest versions of the submodules, instead of the ones specified by the YoAudio repository, but it may well work.
-Alternatively use a git client that supports git submodules like [Tortoise Git](https://tortoisegit.org/) or [SourceTree](https://www.sourcetreeapp.com/).
-
-- [git submodule documentation](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
-- [how to clone submodules](https://stackoverflow.com/questions/3796927/how-to-git-clone-including-submodules))
