@@ -13,7 +13,7 @@ include(../compiler.cmake)
 #
 # handle dependencies
 #
-include(../dependencies/YoAudio.cmake)
+include(../cmake/YoAudio.cmake)
 #include(../dependencies/imgui.cmake)
 include(../cmake/imgui.cmake)
 

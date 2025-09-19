@@ -106,6 +106,7 @@ endif()
 # set(CPM_USE_LOCAL_PACKAGES true)
 include(cmake/CPM.cmake)
 
+# TODO: move SDL2 download and unpacking to dedicated file
 if(MSVC AND NOT SDL2_BUILDING_LIBRARY)
 	# set SDL2.x.x release info
 	set(SDL2_VERSION "2.32.10")
@@ -135,16 +136,16 @@ if(MSVC AND NOT SDL2_BUILDING_LIBRARY)
 	file(COPY ${SDL2_DIR}/SDL2-${SDL2_VERSION}/ DESTINATION ${SDL2_DIR})
 	# remove extracted folder
 	file(REMOVE_RECURSE ${SDL2_DIR}/SDL2-${SDL2_VERSION}/)
-	file(REMOVE_RECURSE ${SDL2_DIR}/lib/x86)
 endif()
 
 # set(SDL2_BUILDING_LIBRARY false)
 set(SDL2_CUSTOM_SEARCH_PATH ${PROJECT_SOURCE_DIR}/dependencies/SDL2/)
 #set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/dependencies)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/dependencies ${SDL2_CUSTOM_SEARCH_PATH})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake ${SDL2_CUSTOM_SEARCH_PATH})
 message(STATUS "")
 message(STATUS "Looking for SDL2")
 message(STATUS "(SDL2_CUSTOM_SEARCH_PATH = ${SDL2_CUSTOM_SEARCH_PATH})...")
+
 find_package(SDL2 REQUIRED)
 # example usage: target_link_libraries(${PROJECT_NAME} OpenGL::GL ${SDL2_LIBRARY} )
 
