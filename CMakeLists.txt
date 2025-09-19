@@ -17,6 +17,7 @@ project("YoAudio" VERSION "${YOA_VERSION_MAJOR}.${YOA_VERSION_MINOR}.${YOA_VERSI
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Meta Project
+set(CMAKE_GENERATOR_PLATFORM x64) # TODO: support 32bit builds
 set(FORCE_SDL true) # "force the use of SDL2 backend (no other options are implemented at the moment)"
 option(Code_Analysis "do code analysis in MS VS" OFF)
 option(Warnings_As_Errors "Treat compiler warnings as errors" OFF)
