@@ -102,6 +102,8 @@ endif()
 #
 ##########################
 
+include(cmake/CPM.cmake)
+
 if(MSVC AND NOT SDL2_BUILDING_LIBRARY)
 	# set SDL2.x.x release info
 	set(SDL2_VERSION "2.32.10")
