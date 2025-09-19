@@ -15,8 +15,15 @@ include(../compiler.cmake)
 # Set up spdlog dependency stuff
 #
 if(LOGGING_ENABLED)
-	set(SPDLOG_ROOT  ${PROJECT_SOURCE_DIR}/../dependencies/spdlog)
-	find_package(Spdlog REQUIRED)
+	set(spdlog_ROOT  ${PROJECT_SOURCE_DIR}/../dependencies/spdlog)
+	# CPMAddPackage("gh:gabime/spdlog@1.15.1")
+	  #OPTIONS "SPDLOG_FMT_EXTERNAL 1" 
+	CPMAddPackage(
+	  GITHUB_REPOSITORY gabime/spdlog 
+	  VERSION 1.15.1
+	)
+	#find_package(spdlog REQUIRED)
+	set(SPDLOG_FOUND ${spdlog_ADDED})
 else()
 	set(SPDLOG_FOUND false)
 	message(STATUS "logging is disabled. not looking for sdpLog library.")
