@@ -7,6 +7,10 @@ name: MSBuild
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ "master", "develop", "feature/**", "editor", "linux", "msvc" ]
+  pull_request:
+    branches: [ "master", "develop", "feature/**", "editor" ]
 
 env:
   # Path to the solution file relative to the root of the project.
@@ -26,15 +30,26 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Cache CMake dependency source code
+      uses: actions/cache@v4
+      env:
+        cache-name: cache-cmake-dependency-sources
+      with:
+        # CMake cache is at ${{github.workspace}}/build/_deps but we only will cache folders ending in '-src' to cache source code
+        path: ${{github.workspace}}/build/_deps/*-src
+        # Cache hash is dependent on CMakeLists files anywhere as these can change what's in the cache, as well as cmake modules files
+        key: ${{ env.cache-name }}-${{ hashFiles('**/CMakeLists.txt', 'cmake/**') }}
+        # it's acceptable to reuse caches for different CMakeLists content if exact match is not available and unlike build caches, we
+        # don't need to restrict these by OS or compiler as it's only source code that's being cached
+        restore-keys: |
+          ${{ env.cache-name }}-
     
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
-    - name: Pull git-submodules
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: git submodule update --init --recursive --remote
     - name: Run CMake to setup project
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: cmake -G "Visual Studio 17 2022" .
+      run: cmake -G "Visual Studio 17 2022" -Wdev -S . -DCPM_SOURCE_CACHE=${{github.workspace}}/build/_deps/
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).

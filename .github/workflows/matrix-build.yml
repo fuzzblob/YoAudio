@@ -54,9 +54,20 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
-    - name: pull in git-submodules
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: git submodule update --init --recursive --remote
+
+    - name: Cache CMake dependency source code
+      uses: actions/cache@v4
+      env:
+        cache-name: cache-cmake-dependency-sources
+      with:
+        # CMake cache is at ${{github.workspace}}/build/_deps but we only will cache folders ending in '-src' to cache source code
+        path: ${{github.workspace}}/build/_deps/*-src
+        # Cache hash is dependent on CMakeLists files anywhere as these can change what's in the cache, as well as cmake modules files
+        key: ${{ env.cache-name }}-${{ hashFiles('**/CMakeLists.txt', 'cmake/**') }}
+        # it's acceptable to reuse caches for different CMakeLists content if exact match is not available and unlike build caches, we
+        # don't need to restrict these by OS or compiler as it's only source code that's being cached
+        restore-keys: |
+          ${{ env.cache-name }}-
     
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
@@ -87,6 +98,7 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DCPM_SOURCE_CACHE=${{github.workspace}}/build/_deps/
         -S ${{ github.workspace }}
 
     - name: Build CMake output
