@@ -1,5 +1,6 @@
-CPMAddPackage(gh:ocornut/imgui@1.91.9)
-
+# Adding imgui as a compiled lirary as described here:
+# https://github.com/cpm-cmake/CPM.cmake/issues/368#issuecomment-1177476658
+#CPMAddPackage(gh:ocornut/imgui@1.91.9)
 #add_library(imgui STATIC
 #    ${imgui_SOURCE_DIR}/imgui.cpp
 #    ${imgui_SOURCE_DIR}/imgui_demo.cpp # optionally comment this out
@@ -10,6 +11,8 @@ CPMAddPackage(gh:ocornut/imgui@1.91.9)
 #target_include_directories(imgui INTERFACE ${imgui_SOURCE_DIR})
 #target_compile_definitions(imgui PUBLIC -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS) # optional imgui setting
 #set_target_properties(imgui PROPERTIES FOLDER third-party) # optoinal IDE dir
+
+CPMAddPackage(gh:ocornut/imgui@1.91.9)
 
 #
 # set the include directory
@@ -25,10 +28,10 @@ find_path(GUI_INCLUDE_DIRS
 #
 if ( GUI_INCLUDE_DIRS )
 	set( GUI_FOUND TRUE )
-	message(STATUS "Looking for imgui_impl_sdl2.h - found")
+	message(STATUS "Looking for imgui.h - found")
 else( GUI_INCLUDE_DIRS )
 	set( GUI_FOUND FALSE )
-	message(STATUS "Looking for imgui_impl_sdl2.h - not found")
+	message(STATUS "Looking for imgui.h - not found")
 endif( GUI_INCLUDE_DIRS )
 
 #
