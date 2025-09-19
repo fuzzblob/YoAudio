@@ -88,6 +88,7 @@ if [[ "$INTERACTIVE" == "1" ]]; then
         options=()
         if command -v gcc &>/dev/null; then options+=("gcc"); fi
         if command -v clang &>/dev/null; then options+=("clang"); fi
+        if command -v clang-20 &>/dev/null; then options+=("clang-20"); fi
         select opt in "${options[@]}"; do
             if [[ -n "$opt" ]]; then
                 C_COMPILER="$opt"
@@ -101,6 +102,7 @@ if [[ "$INTERACTIVE" == "1" ]]; then
         options=()
         if command -v g++ &>/dev/null; then options+=("g++"); fi
         if command -v clang++ &>/dev/null; then options+=("clang++"); fi
+        if command -v clang++-20 &>/dev/null; then options+=("clang++-20"); fi
         options+=("default")
         select opt in "${options[@]}"; do
             if [[ -n "$opt" ]]; then
@@ -166,6 +168,8 @@ if [[ -z "$C_COMPILER" ]]; then
         C_COMPILER="gcc"
     elif command -v clang &>/dev/null; then
         C_COMPILER="clang"
+	elif command -v clang-20 &>/dev/null; then
+        C_COMPILER="clang-20"
     else
         echo "No supported C compiler found."
         exit 1
@@ -186,11 +190,15 @@ if [[ -z "$CXX_COMPILER" ]]; then
         CXX_COMPILER="${C_COMPILER/gcc/g++}"
     elif [[ "$C_COMPILER" == *"clang"* ]]; then
         CXX_COMPILER="${C_COMPILER/clang/clang++}"
+    elif [[ "$C_COMPILER" == *"clang-20"* ]]; then
+        CXX_COMPILER="${C_COMPILER/clang/clang++-20}"
     # Fallback to common C++ compilers
     elif command -v g++ &>/dev/null; then
         CXX_COMPILER="g++"
     elif command -v clang++ &>/dev/null; then
         CXX_COMPILER="clang++"
+    elif command -v clang++-20 &>/dev/null; then
+        CXX_COMPILER="clang++-20"
     else
         echo "No supported C++ compiler found."
         exit 1
@@ -293,7 +301,7 @@ echo ""
 # Run CMake to configure the project
 echo "Configuring project with CMake..."
 echo ""
-cmake -DCPM_SOURCE_CACHE=../.cpm-cache/ -DCMAKE_C_COMPILER="$C_COMPILER" -DCMAKE_CXX_COMPILER="$CXX_COMPILER" -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -G "$TOOLCHAIN" -S "$SEARCH_DIR" -B .
+cmake -DCPM_SOURCE_CACHE=../.cpm-cache/ -DCPM_USE_LOCAL_PACKAGES=TRUE -DCMAKE_C_COMPILER="$C_COMPILER" -DCMAKE_CXX_COMPILER="$CXX_COMPILER" -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -G "$TOOLCHAIN" -S "$SEARCH_DIR" -B .
 if [ $? -ne 0 ]; then
     echo "CMake configuration failed."
     exit 1
