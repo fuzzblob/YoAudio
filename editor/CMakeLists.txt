@@ -14,7 +14,9 @@ include(../compiler.cmake)
 # handle dependencies
 #
 include(../dependencies/YoAudio.cmake)
-include(../dependencies/imgui.cmake)
+#include(../dependencies/imgui.cmake)
+include(../cmake/imgui.cmake)
+
 # find OpenGL for rendering pixels to the screen
 find_package(OpenGL REQUIRED)
 # configure editor config header
